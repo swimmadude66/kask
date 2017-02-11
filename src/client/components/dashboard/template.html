@@ -1,0 +1,28 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12 col-md-3" *ngFor="let tap of taps">
+      <div class="card card-inverse card-success">
+        <img class="card-img-top img-fluid" src="assets/img/beer.jpg" alt="beer image">
+        <div class="card-block">
+          <h2 class="card-title tap-title">{{tap.Name}} - <small>{{tap.Description}}</small></h2>
+        </div>
+        <div class="card-block beer-details">
+          <h4 class="beer-title">
+            {{tap.Beer.Name}}
+          </h4>
+          <dl>
+            <dt>Style</dt>
+            <dd>{{tap.Beer.Style}}</dd>
+            <dt>ABV</dt>            
+            <dd>{{tap.Beer.ABV}}</dd>
+            <dt>IBU</dt>            
+            <dd>{{tap.Beer.IBU}}</dd>
+            <dt>BA Score</dt>            
+            <dd>{{tap.Beer.BA}}</dd>
+          </dl>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
