@@ -20,7 +20,7 @@ export class BreweryDBService {
     }
 
     searchForBeer(query: string): Observable<Beer[]> {
-        let searchUrl = `${BASEURL}/search?key=${this.APIKEY}&withBreweries=Y&type=beer&q=${query}`;
+        let searchUrl = `${BASEURL}/search?key=${this.APIKEY}&withBreweries=Y&type=beer&q=${query}&p=1`;
         return request.get(searchUrl)
         .map(data => JSON.parse(data.body))
         .flatMap(response => {
@@ -29,12 +29,35 @@ export class BreweryDBService {
             }
             let beers = response.data;
             return Observable.from(beers)
-            .flatMap(beer => this.saveBeerInfo(beer))
+            .flatMap(beer => this.saveBeerInfo(beer)
+                .catch(err => {
+                    console.log(err);
+                    return Observable.of(false);
+                })
+            )
+            .filter(beer => !!beer)
             .toArray();
         });
     }
 
     saveBeerInfo(beerInfo): Observable<Beer> {
+        if (!beerInfo) {
+            return Observable.throw('Missing Beer Info');
+        } else if (!beerInfo.breweries || beerInfo.breweries.length < 1) {
+            beerInfo.breweries = [
+                {
+                    id: 'unknownbrewery',
+                    name: 'Unknown Brewery',
+                    description: 'Brewery DB does not have a brewery mapping for this beer'
+                }
+            ];
+        } else if (!beerInfo.style) {
+            beerInfo.style = {
+                id: 'unkownstyle',
+                name: 'Unknown',
+                description: 'BreweryDB does not have a style mapping for this beer'
+            };
+        }
         return Observable.forkJoin(
             this.saveStyle(beerInfo.style),
             this.saveBrewery(beerInfo.breweries[0])
@@ -45,7 +68,7 @@ export class BreweryDBService {
                 let beerModel: Beer = {
                     BDBID: beerInfo.id,
                     Name: beerInfo.name,
-                    Description: (beerInfo && beerInfo.description) ? beerInfo.description : undefined,
+                    Description: beerInfo.description,
                     ABV: (beerInfo && beerInfo.abv && NUMBER_REGEX.test(beerInfo.abv)) ? +beerInfo.abv : undefined,
                     IBU: (beerInfo && beerInfo.ibu && NUMBER_REGEX.test(beerInfo.ibu)) ? +beerInfo.ibu : undefined,
                     LabelUrl: (beerInfo && beerInfo.labels && beerInfo.labels.large) ? beerInfo.labels.large : undefined,
