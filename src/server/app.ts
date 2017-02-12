@@ -1,17 +1,23 @@
 import {join} from 'path';
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const express = require('express');
-const morgan = require('morgan');
+import * as bodyParser from 'body-parser';
+import * as cookieParser from 'cookie-parser';
+import * as express from 'express';
+import * as morgan from 'morgan';
+import {BreweryDBService, MysqlDatabase} from './services';
 
 require('dotenv').config();
+
+let DB = new MysqlDatabase();
+let BeerAPI = new BreweryDBService(process.env.BREWERY_DB_KEY, DB);
 
 const APP_CONFIG = {
   environment: process.env.ENVIRONMENT || 'dev',
   cookie_name: process.env.COOKIE_NAME || 'cookie_name',
   cookie_secret: process.env.COOKIE_SECRET || 'cookie_secret',
   port: process.env.NODE_PORT || 3000,
-  log_level: process.env.MORGAN_LOG_LEVEL || 'dev'
+  log_level: process.env.MORGAN_LOG_LEVEL || 'dev',
+  database: DB,
+  beer_service: BeerAPI
 };
 
 const app = express();

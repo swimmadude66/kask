@@ -1,3 +1,4 @@
+import { Tap } from '../../models/tap.model';
 import { Component } from '@angular/core';
 
 @Component({
@@ -6,17 +7,6 @@ import { Component } from '@angular/core';
     styleUrls: ['./styles.scss']
 })
 export class DashboardComponent {
-    private taps = [{
-        Name: 'Tap 1',
-        Description: 'IPAs mostly',
-        Beer: {
-            Name: 'Scrimshaw Pilsner',
-            ABV: '4.5%',
-            IBU: '20',
-            Style: 'Pilsner',
-            BA: 'N/A'
-        }
-    }];
-
-    constructor() {}
+    private taps: Tap[] = [];
+    constructor() { }
 }
