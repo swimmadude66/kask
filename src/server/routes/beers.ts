@@ -2,13 +2,80 @@ import * as express from 'express';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
+    const db = APP_CONFIG.database;
 
-    router.get('/:beername', (req, res) => {
-        let q = req.params.beername;
-        return APP_CONFIG.beer_service.searchForBeer(q)
+    router.get('/taps', (req, res) => {
+        db.getTaps()
         .subscribe(
-            beers => res.send({numBeers: beers.length, beers}),
-            err => res.status(400).send(err)
+            taps => res.send(taps),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/locations', (req, res) => {
+        db.getLocations()
+        .subscribe(
+            locations => res.send(locations),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/locations/:locationId', (req, res) => {
+        db.getLocation(req.params.locationId)
+        .subscribe(
+            location => res.send(location),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/styles', (req, res) => {
+        db.getStyles()
+        .subscribe(
+            styles => res.send(styles),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/styles/:styleId', (req, res) => {
+        db.getStyle(req.params.styleId)
+        .subscribe(
+            style => res.send(style),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/breweries', (req, res) => {
+        db.getBreweries()
+        .subscribe(
+            breweries => res.send(breweries),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/breweries/:breweryId', (req, res) => {
+        db.getBrewery(req.params.breweryId)
+        .subscribe(
+            brewery => res.send(brewery),
+            err => res.status(500).send(err)
+        );
+    });
+
+/*
+ * Keep these last, or every other route will be matched as a beerId
+ */
+    router.get('/', (req, res) => {
+        db.getBeers()
+        .subscribe(
+            beers => res.send(beers),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/:beerId', (req, res) => {
+        db.getBeer(req.params.beerId)
+        .subscribe(
+            beer => res.send(beer),
+            err => res.status(500).send(err)
         );
     });
 
