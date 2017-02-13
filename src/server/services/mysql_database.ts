@@ -1,6 +1,14 @@
 import {Observable} from 'rxjs/Rx';
-import {Beer, Brewery, Style, Database} from '../models';
 import {createPool, IPoolConfig, Pool} from 'mysql';
+import {
+    Beer,
+    Brewery,
+    Style,
+    Database,
+    Tap,
+    Location,
+    KegSize
+} from '../models';
 
 export class MysqlDatabase implements Database {
 
@@ -22,21 +30,22 @@ export class MysqlDatabase implements Database {
         return Observable.create(observer => {
             this.pool.getConnection((err, conn) => {
                 if (err) {
+                    conn.release();
                     return observer.error(err);
                 }
                 conn.query(q, params || [], (error, result) => {
                     if (error) {
                         return observer.error(error);
                     }
-                        observer.next(result);
-                        observer.complete();
-                        conn.release();
+                    observer.next(result);
+                    observer.complete();
+                    conn.release();
                 });
             });
         });
     }
 
-    public saveBeer(beer: Beer): Observable<number> {
+    saveBeer(beer: Beer): Observable<number> {
         let q = 'Insert into `beers` SET ? ON DUPLICATE KEY Update `BeerId`=LAST_INSERT_ID(`BeerId`);';
         let params = {...beer, StyleId: -1, BreweryId: -1};
         params.StyleId = beer.Style.StyleId;
@@ -53,7 +62,7 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    public saveStyle(style: Style): Observable<number> {
+    saveStyle(style: Style): Observable<number> {
         let q = 'Insert into `styles` SET ? ON DUPLICATE KEY Update `StyleId`=LAST_INSERT_ID(`StyleId`);';
         return this.query(q, style)
         .map(
@@ -65,7 +74,7 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    public saveBrewery(brewery: Brewery): Observable<number> {
+    saveBrewery(brewery: Brewery): Observable<number> {
         let q = 'Insert into `breweries` SET ? ON DUPLICATE KEY Update `BreweryId`=LAST_INSERT_ID(`BreweryId`);';
         return this.query(q, brewery)
         .map(
@@ -145,6 +154,165 @@ export class MysqlDatabase implements Database {
             error => {
                 console.error(error);
                 return Observable.throw('Error retrieving beer');
+            }
+        );
+    }
+
+    getLocations(): Observable<Location[]> {
+        let q = 'Select * from `off_tap_locations`;';
+        return this.query(q)
+        .map(
+            results => results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error getting locations');
+            }
+        );
+    }
+
+    getLocation(locationId: number): Observable<Location> {
+        let q = 'Select * from `off_tap_locations` WHERE `LocationId` = ?;';
+        return this.query(q, [locationId])
+        .map(
+            results => results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error getting location');
+            }
+        );
+    }
+
+    getTaps(): Observable<Tap[]> {
+        let q = 'Select * from `taps`;';
+        return this.query(q)
+        .map(
+            results => results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error getting taps');
+            }
+        );
+    }
+
+    getTap(tapId: number): Observable<Tap> {
+        let q = 'Select * from `taps` WHERE `TapId` = ?;';
+        return this.query(q, [tapId])
+        .map(
+            results => results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error getting tap');
+            }
+        );
+    }
+
+    addTap(name: string, description?: string, status?: string): Observable<boolean> {
+        let q = 'Insert into `taps` (`TapName`, `Description`, `Status`) VALUES (?,?,?);';
+        return this.query(q, [name, description, status])
+        .map(
+            results => !!results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error adding tap');
+            }
+        );
+    }
+
+    addLocation(name: string, description?: string): Observable<boolean> {
+        let q = 'Insert into `off_tap_location` (`Name`, `Description`) VALUES (?,?);';
+        return this.query(q, [name, description])
+        .map(
+            results => !!results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error adding location');
+            }
+        );
+    }
+
+    assignBeerToLocation(beerId: number, locationId: number, size?: KegSize): Observable<boolean> {
+        let q = 'Insert into `off_tap_kegs` (`LocationId`, `BeerId`, `KegSize`) VALUES (?, ?, ?);';
+        return this.query(q, [locationId, beerId, size])
+        .map(results => !!results);
+    }
+
+    moveKegLocation(kegId: number, newLocationId: number): Observable<boolean> {
+        let q = 'Update `off_tap_kegs` SET `LocationId` = ? WHERE `KegId` = ?;';
+        return this.query(q, [newLocationId, kegId])
+        .map(results => !!results);
+    }
+
+    tapKeg(kegId: number, tapId: number): Observable<number> {
+        let q = 'Select `BeerId`, `KegSize` from `off_tap_kegs` WHERE `KegId` = ? LIMIT 1;';
+        return this.query(q, [kegId])
+        .map(results => {
+            if (results.length < 1) {
+                return Observable.throw('Could not locate keg');
+            }
+        })
+        .flatMap(
+            results => this.tapBeer(results[0].BeerId, tapId, results[0].KegSize)
+        )
+        .flatMap(result => {
+            let update_q = 'Update `off_tap_kegs` SET `Active`=0 WHERE `KegId` = ?;';
+            return this.query(update_q, [kegId]).map(_ => result);
+        });
+    }
+
+    tapBeer(beerId: number, tapId: number, size?: KegSize): Observable<number> {
+        return Observable.create(observer => {
+            this.pool.getConnection((err, conn) => {
+                if (err) {
+                    console.error(err);
+                    return observer.error('Could not establish connection to the database');
+                }
+                conn.beginTransaction(trans_err => {
+                    if (trans_err) {
+                        conn.release();
+                        console.error(trans_err);
+                        return observer.error('Failed to tap keg!');
+                    }
+                    let update_q = 'Update beer_sessions` SET `Active`=0, `RemovalTime`=CURRENT_TIMESTAMP WHERE `TapId`=?;';
+                    conn.query(update_q, [tapId], (error, result) => {
+                        if (error) {
+                            conn.release();
+                            console.error(error);
+                            return observer.error('Could not change active beer on tap');
+                        }
+                        let insert_q = 'Insert into `beer_sessions` (`TapId`, `BeerId`, `KegSize`) VALUES (?, ?, ?);';
+                        conn.query(insert_q, [tapId, beerId, size], (insert_err, insert_result) => {
+                            if (insert_err) {
+                                conn.release();
+                                console.error(error);
+                                return observer.error('Could not change active beer on tap');
+                            }
+                            conn.commit(commit_err => {
+                                if (commit_err) {
+                                    return conn.rollback(() => {
+                                        conn.release();
+                                        console.error(commit_err);
+                                        return observer.error('Could not change active beer on tap');
+                                    });
+                                }
+                                conn.release();
+                                observer.next(insert_result.insertId);
+                                observer.complete();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    emptyTap(tapId: number): Observable<boolean> {
+        let q = 'Update `beer_sessions` SET `Active`=0 WHERE `TapId`=?;';
+        return this.query(q, [tapId])
+        .map(
+            result => !!result,
+            error => {
+                console.error(error);
+                return Observable.throw('Could not untap keg!');
             }
         );
     }

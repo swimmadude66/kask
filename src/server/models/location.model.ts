@@ -1,8 +1,8 @@
 import {Beer} from './beer.model';
 
-export class Tap {
-    TapId: number;
+export class Location {
+    LocationId: number;
     Name: string;
     Description: string;
-    Beer: Beer;
+    Contents: Beer[];
 }
