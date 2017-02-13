@@ -182,6 +182,42 @@ export class MysqlDatabase implements Database {
         );
     }
 
+    addLocation(name: string, description?: string): Observable<boolean> {
+        let q = 'Insert into `off_tap_location` (`Name`, `Description`) VALUES (?,?);';
+        return this.query(q, [name, description])
+        .map(
+            results => !!results,
+            error => {
+                console.error(error);
+                return Observable.throw('Error adding location');
+            }
+        );
+    }
+
+    editLocation(locationId: number, name: string, description?: string): Observable<boolean> {
+        let q = 'Update `off_tap_locations` SET `Name`=?, `Description`=? WHERE `LocationId`=?;';
+        return this.query(q, [name, description, locationId])
+        .map(
+            result => !!result,
+            error => {
+                console.error(error);
+                return Observable.throw('Could not update location');
+            }
+        );
+    }
+
+    deleteLocation(locationId: number): Observable<boolean> {
+        let q = 'Delete from `off_tap_locations` where `LocationId`=?;';
+        return this.query(q, [locationId])
+        .map(
+            result => !!result,
+            error => {
+                console.error(error);
+                return Observable.throw('Could not delete location');
+            }
+        );
+    }
+
     getTaps(): Observable<Tap[]> {
         let q = 'Select * from `taps`;';
         return this.query(q)
@@ -218,14 +254,26 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    addLocation(name: string, description?: string): Observable<boolean> {
-        let q = 'Insert into `off_tap_location` (`Name`, `Description`) VALUES (?,?);';
-        return this.query(q, [name, description])
+    editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean> {
+        let q = 'Update `taps` SET `TapName`=?, `Description`=?, `Status`=? WHERE `TapId`=?;';
+        return this.query(q, [name, description, status, tapId])
         .map(
-            results => !!results,
+            result => !!result,
             error => {
                 console.error(error);
-                return Observable.throw('Error adding location');
+                return Observable.throw('Could not update tap');
+            }
+        );
+    }
+
+    deleteTap(tapId: number): Observable<boolean> {
+        let q = 'Delete from `taps` where `TapId`=?;';
+        return this.query(q, [tapId])
+        .map(
+            result => !!result,
+            error => {
+                console.error(error);
+                return Observable.throw('Could not delete tap');
             }
         );
     }

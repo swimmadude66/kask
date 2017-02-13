@@ -24,19 +24,15 @@ export interface Database {
     getLocations(): Observable<Location[]>;
     getLocation(locationId: number): Observable<Location & {Beers: Beer[]}>;
     addLocation(name: string, description?: string): Observable<boolean>;
-    /* @TODO implement
-    * editLocation(locationId: number, name: string, description?: string): Observable<boolean>
-    * deleteLocation(locationId: number): Observable<boolean>
-    */
+    editLocation(locationId: number, name: string, description?: string): Observable<boolean>;
+    deleteLocation(locationId: number): Observable<boolean>;
 
     // taps operations
     getTaps(): Observable<Tap[]>;
     getTap(tapId: number): Observable<Tap>;
     addTap(name: string, description?: string, status?: string): Observable<boolean>;
-    /* @TODO implement
-    * editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean>
-    * deleteTap(tapId: number): Observable<boolean>
-    */
+    editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean>;
+    deleteTap(tapId: number): Observable<boolean>;
 
     // beer movement
     // -----------------
