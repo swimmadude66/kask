@@ -183,7 +183,7 @@ export class MysqlDatabase implements Database {
     }
 
     addLocation(name: string, description?: string): Observable<boolean> {
-        let q = 'Insert into `off_tap_location` (`Name`, `Description`) VALUES (?,?);';
+        let q = 'Insert into `off_tap_locations` (`Name`, `Description`) VALUES (?,?);';
         return this.query(q, [name, description])
         .map(
             results => !!results,
