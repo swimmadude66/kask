@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `beers` (
   `BDBID` varchar(32) NOT NULL,
   PRIMARY KEY (`BeerId`),
   UNIQUE KEY `BeerId_UNIQUE` (`BeerId`),
-  UNIQUE KEY `UN_BeerID_API` (`BrewDBID`),
+  UNIQUE KEY `UN_BeerID_API` (`BDBID`),
   KEY `Brewery_idx` (`BreweryId`),
   KEY `Style_idx` (`StyleId`),
   CONSTRAINT `Brewery` FOREIGN KEY (`BreweryId`) REFERENCES `breweries` (`BreweryId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
