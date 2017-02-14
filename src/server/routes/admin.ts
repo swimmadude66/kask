@@ -92,12 +92,58 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
-    // @TODO implement endpoint for these functions
-    // assignBeerToLocation(beerId: number, locationId: number, size?: KegSize): Observable<boolean>;
-    // moveKegLocation(kegId: number, newLocationId: number): Observable<boolean>;
-    // tapKeg(kegId: number, tapId: number): Observable<number>;
-    // tapBeer(beerId: number, tapId: number, size?: KegSize): Observable<number>;
-    // emptyTap(tapId: number): Observable<boolean>;
+    router.post('/store/', (req, res) => {
+        let body = req.body;
+        if (!body || !body.BeerId || !body.LocationId) {
+            return res.status(400).send('Missing required parameters');
+        }
+        return db.assignBeerToLocation(body.BeerId, body.LocationId, body.Size || null)
+        .subscribe(
+            result => res.send({Success: result}),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.post('/move/', (req, res) => {
+        let body = req.body;
+        if (!body || !body.KegId || !body.LocationId) {
+            return res.status(400).send('Missing required parameters');
+        }
+        return db.moveKegLocation(body.KegId, body.LocationId)
+        .subscribe(
+            result => res.send({Success: result}),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.post('/tap/:tapId', (req, res) => {
+        let body = req.body;
+        if (!body || !body.TapId) {
+            return res.status(400).send('Missing required parameters');
+        }
+        let method;
+        if (body.KegId) {
+            method = db.tapKeg(body.KegId, body.TapId);
+        } else if (body.BeerId) {
+            method = db.tapBeer(body.BeerId, body.TapId, body.Size || null);
+        } else {
+            return res.status(400).send('Must specify one of KegId or BeerId');
+        }
+        return method
+        .subscribe(
+            result => res.send({Success: result}),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.post('/clear/:tapId', (req, res) => {
+        let tapId = req.params.tapId;
+        return db.emptyTap(tapId)
+        .subscribe(
+            result => res.send({Success: result}),
+            err => res.status(500).send(err)
+        );
+    });
 
     return router;
 };
