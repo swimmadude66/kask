@@ -1,13 +1,22 @@
+import {MysqlDatabase} from '../services/mysql_database';
 import * as express from 'express';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
-    const db = APP_CONFIG.database;
+    const db: MysqlDatabase = APP_CONFIG.database;
 
     router.get('/taps', (req, res) => {
         db.getTaps()
         .subscribe(
             taps => res.send(taps),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/taps/:tapId', (req, res) => {
+        db.getTap(req.params.tapId)
+        .subscribe(
+            tap => res.send(tap),
             err => res.status(500).send(err)
         );
     });
@@ -56,6 +65,22 @@ module.exports = (APP_CONFIG) => {
         db.getBrewery(req.params.breweryId)
         .subscribe(
             brewery => res.send(brewery),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/contents/location/:locationId', (req, res) => {
+        db.getLocationContents(req.params.locationId)
+        .subscribe(
+            contents => res.send(contents),
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.get('/contents/tap/:tapId', (req, res) => {
+        db.getLocationContents(req.params.tapId)
+        .subscribe(
+            contents => res.send(contents),
             err => res.status(500).send(err)
         );
     });

@@ -7,7 +7,8 @@ import {
     Database,
     Tap,
     Location,
-    KegSize
+    KegSize,
+    Keg
 } from '../models';
 
 export class MysqlDatabase implements Database {
@@ -361,6 +362,30 @@ export class MysqlDatabase implements Database {
             error => {
                 console.error(error);
                 return Observable.throw('Could not untap keg!');
+            }
+        );
+    }
+
+    getLocationContents(locationId: number): Observable<Keg[]> {
+        let q = 'Select * from `off_tap_kegs` where `Active`=1 AND `LocationId`=?;';
+        return this.query(q, [locationId])
+        .map(
+            results => results,
+            err => {
+                console.error(err);
+                return Observable.throw('Could not get contents of location');
+            }
+        );
+    }
+
+    getTapContents(locationId: number): Observable<Keg> {
+        let q = 'Select * from `beer_sessions` where `Active`=1 AND `TapId`=?;';
+        return this.query(q, [locationId])
+        .map(
+            results => results.length > 0 ? results[0] : null,
+            err => {
+                console.error(err);
+                return Observable.throw('Could not get contents of location');
             }
         );
     }

@@ -6,6 +6,8 @@ import {Beer} from './beer.model';
 import {Tap} from './tap.model';
 import {KegSize} from './keg_size.model';
 
+export type Keg = Beer & {Size?: KegSize};
+
 export interface Database {
     // Admin methods for saving data from searches
     saveBeer(beer: Beer): Observable<number>;
@@ -33,6 +35,10 @@ export interface Database {
     addTap(name: string, description?: string, status?: string): Observable<boolean>;
     editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean>;
     deleteTap(tapId: number): Observable<boolean>;
+
+    // Get Contents
+    getLocationContents(locationId: number): Observable<Keg[]>;
+    getTapContents(locationId: number): Observable<Keg>;
 
     // beer movement
     // -----------------
