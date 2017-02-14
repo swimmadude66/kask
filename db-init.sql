@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `beer_sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Record of beer taptimes';
 
 
+
 CREATE TABLE IF NOT EXISTS `off_tap_kegs` (
   `KegId` int(11) NOT NULL AUTO_INCREMENT,
   `LocationId` int(11) NOT NULL,

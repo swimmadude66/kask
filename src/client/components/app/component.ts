@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-seed',
+  selector: 'onTap',
   templateUrl: './template.html'
 })
 export class AppComponent {

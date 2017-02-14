@@ -118,26 +118,27 @@ module.exports = (APP_CONFIG) => {
 
     router.post('/tap/:tapId', (req, res) => {
         let body = req.body;
-        if (!body || !body.TapId) {
+        let tapId = +req.params.tapId;
+        if (!body) {
             return res.status(400).send('Missing required parameters');
         }
         let method;
         if (body.KegId) {
-            method = db.tapKeg(body.KegId, body.TapId);
+            method = db.tapKeg(body.KegId, tapId);
         } else if (body.BeerId) {
-            method = db.tapBeer(body.BeerId, body.TapId, body.Size || null);
+            method = db.tapBeer(body.BeerId, tapId, body.Size || null);
         } else {
             return res.status(400).send('Must specify one of KegId or BeerId');
         }
         return method
         .subscribe(
-            result => res.send({Success: result}),
+            result => res.send({Success: !!result}),
             err => res.status(500).send(err)
         );
     });
 
     router.post('/clear/:tapId', (req, res) => {
-        let tapId = req.params.tapId;
+        let tapId = +req.params.tapId;
         return db.emptyTap(tapId)
         .subscribe(
             result => res.send({Success: result}),

@@ -1,9 +1,8 @@
-import {MysqlDatabase} from '../services/mysql_database';
 import * as express from 'express';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
-    const db: MysqlDatabase = APP_CONFIG.database;
+    const db = APP_CONFIG.database;
 
     router.get('/taps', (req, res) => {
         db.getTaps()
@@ -14,7 +13,7 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/taps/:tapId', (req, res) => {
-        db.getTap(req.params.tapId)
+        db.getTap(+req.params.tapId)
         .subscribe(
             tap => res.send(tap),
             err => res.status(500).send(err)
@@ -30,7 +29,7 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/locations/:locationId', (req, res) => {
-        db.getLocation(req.params.locationId)
+        db.getLocation(+req.params.locationId)
         .subscribe(
             location => res.send(location),
             err => res.status(500).send(err)
@@ -46,7 +45,7 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/styles/:styleId', (req, res) => {
-        db.getStyle(req.params.styleId)
+        db.getStyle(+req.params.styleId)
         .subscribe(
             style => res.send(style),
             err => res.status(500).send(err)
@@ -62,7 +61,7 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/breweries/:breweryId', (req, res) => {
-        db.getBrewery(req.params.breweryId)
+        db.getBrewery(+req.params.breweryId)
         .subscribe(
             brewery => res.send(brewery),
             err => res.status(500).send(err)
@@ -70,7 +69,7 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/contents/location/:locationId', (req, res) => {
-        db.getLocationContents(req.params.locationId)
+        db.getLocationContents(+req.params.locationId)
         .subscribe(
             contents => res.send(contents),
             err => res.status(500).send(err)
@@ -78,9 +77,11 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/contents/tap/:tapId', (req, res) => {
-        db.getLocationContents(req.params.tapId)
+        db.getTapContents(+req.params.tapId)
         .subscribe(
-            contents => res.send(contents),
+            contents => {
+                return res.send(!!contents ? contents : false);
+            },
             err => res.status(500).send(err)
         );
     });
@@ -97,7 +98,7 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/:beerId', (req, res) => {
-        db.getBeer(req.params.beerId)
+        db.getBeer(+req.params.beerId)
         .subscribe(
             beer => res.send(beer),
             err => res.status(500).send(err)

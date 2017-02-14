@@ -31,7 +31,6 @@ export class MysqlDatabase implements Database {
         return Observable.create(observer => {
             this.pool.getConnection((err, conn) => {
                 if (err) {
-                    conn.release();
                     return observer.error(err);
                 }
                 conn.query(q, params || [], (error, result) => {
@@ -44,6 +43,56 @@ export class MysqlDatabase implements Database {
                 });
             });
         });
+    }
+
+    private mapKegs(results: any[]): Keg[] {
+        return results
+        .map(result => this.mapKeg(result));
+    }
+
+    private mapKeg(result: any): Keg {
+        let keg: Keg = {
+            BeerId: result.BeerId,
+            BDBID: result.BeerBDBID,
+            Brewery: this.mapBrewery(result),
+            Style: this.mapStyle(result),
+            Name: result.BeerName,
+            Description: result.BeerDescription,
+            ABV: result.ABV,
+            IBU: result.IBU,
+            LabelUrl: result.LabelUrl,
+            Size: result.KegSize
+        };
+        return keg;
+    }
+
+    private mapStyle(result: any): Style {
+        let style: Style = {
+            StyleId: result.StyleId,
+            BDBID: result.StyleBDBID,
+            Name: result.StyleName,
+            Description: result.StyleDescription,
+            ABVMin: result.ABVMin,
+            ABVMax: result.ABVMax,
+            IBUMin: result.IBUMin,
+            IBUMax: result.IBUMax,
+            SRMMin: result.SRMMin,
+            SRMMax: result.SRMMax
+        };
+        return style;
+    }
+
+    private mapBrewery(result: any): Brewery {
+        let brewery: Brewery = {
+            BreweryId: result.BreweryId,
+            BDBID: result.BreweryBDBID,
+            BreweryName: result.BreweryName,
+            Description: result.BreweryDescription,
+            Established: result.Established,
+            Image: result.Image,
+            Website: result.Website
+        };
+        return brewery;
     }
 
     saveBeer(beer: Beer): Observable<number> {
@@ -297,6 +346,8 @@ export class MysqlDatabase implements Database {
         .map(results => {
             if (results.length < 1) {
                 return Observable.throw('Could not locate keg');
+            } else {
+                return results;
             }
         })
         .flatMap(
@@ -305,7 +356,14 @@ export class MysqlDatabase implements Database {
         .flatMap(result => {
             let update_q = 'Update `off_tap_kegs` SET `Active`=0 WHERE `KegId` = ?;';
             return this.query(update_q, [kegId]).map(_ => result);
-        });
+        })
+        .map(
+            _ => _,
+            err => {
+                console.error(err);
+                return Observable.throw('Could not tap keg');
+            }
+        );
     }
 
     tapBeer(beerId: number, tapId: number, size?: KegSize): Observable<number> {
@@ -321,7 +379,7 @@ export class MysqlDatabase implements Database {
                         console.error(trans_err);
                         return observer.error('Failed to tap keg!');
                     }
-                    let update_q = 'Update beer_sessions` SET `Active`=0, `RemovalTime`=CURRENT_TIMESTAMP WHERE `TapId`=?;';
+                    let update_q = 'Update `beer_sessions` SET `Active`=0, `RemovalTime`=CURRENT_TIMESTAMP WHERE `TapId`=?;';
                     conn.query(update_q, [tapId], (error, result) => {
                         if (error) {
                             conn.release();
@@ -345,7 +403,7 @@ export class MysqlDatabase implements Database {
                                 }
                                 conn.release();
                                 observer.next(insert_result.insertId);
-                                observer.complete();
+                                return observer.complete();
                             });
                         });
                     });
@@ -367,10 +425,19 @@ export class MysqlDatabase implements Database {
     }
 
     getLocationContents(locationId: number): Observable<Keg[]> {
-        let q = 'Select * from `off_tap_kegs` where `Active`=1 AND `LocationId`=?;';
+        let q = 'Select ' +
+            '`beers`.`Name` as BeerName, `beers`.`Description` as BeerDescription, `beers`.`BDBID` as BeerBDBID, `beers`.*, ' +
+            '`breweries`.`Description` as BreweryDescription, `breweries`.`BDBID` as BreweryBDBID, `breweries`.*, ' +
+            '`styles`.`Name` as StyleName, `styles`.`Description` as StyleDescription, `styles`.`BDBID` as StyleDBID, `styles`.*, ' +
+            '`off_tap_kegs`.`KegSize` ' +
+            'from `off_tap_kegs` ' +
+            'join `beers` on `off_tap_kegs`.`BeerId`=`beers`.`BeerId` ' +
+            'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
+            'join  `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
+            'where `off_tap_kegs`.`Active`=1 AND `LocationId`=?;';
         return this.query(q, [locationId])
         .map(
-            results => results,
+            results => this.mapKegs(results),
             err => {
                 console.error(err);
                 return Observable.throw('Could not get contents of location');
@@ -378,11 +445,20 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    getTapContents(locationId: number): Observable<Keg> {
-        let q = 'Select * from `beer_sessions` where `Active`=1 AND `TapId`=?;';
-        return this.query(q, [locationId])
+    getTapContents(tapId: number): Observable<Keg> {
+        let q = 'Select ' +
+            '`beers`.`Name` as BeerName, `beers`.`Description` as BeerDescription, `beers`.`BDBID` as BeerBDBID, `beers`.*, ' +
+            '`breweries`.`Description` as BreweryDescription, `breweries`.`BDBID` as BreweryBDBID, `breweries`.*, ' +
+            '`styles`.`Name` as StyleName, `styles`.`Description` as StyleDescription, `styles`.`BDBID` as StyleDBID, `styles`.*, ' +
+            '`beer_sessions`.`KegSize` ' +
+            'from `beer_sessions` ' +
+            'join `beers` on `beer_sessions`.`BeerId`=`beers`.`BeerId` ' +
+            'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
+            'join  `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
+            'where `beer_sessions`.`Active`=1 AND `TapId`=?;';
+        return this.query(q, [tapId])
         .map(
-            results => results.length > 0 ? results[0] : null,
+            results => results.length > 0 ? this.mapKeg(results[0]) : null,
             err => {
                 console.error(err);
                 return Observable.throw('Could not get contents of location');

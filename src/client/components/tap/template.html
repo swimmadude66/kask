@@ -1,23 +1,25 @@
-<div class="card card-inverse card-success">
-    <img class="card-img-top img-fluid" src="{{getImage()}}" alt="beer image">
-    <div class="card-block">
+<div class="card card-inverse" [ngClass]="{'card-success': contents?.BeerId, 'card-info': !contents?.BeerId}">
+    <div class="card-img-top hidden-sm-down">
+        <img class="img-fluid" src="{{getImage()}}" alt="beer image" />
+    </div>
+    <div class="card-block tap-info">
         <h2 class="card-title tap-title">
             {{info.TapName}} 
             <br /> 
-            <small>{{info.Description}}</small>
+            <small><i>{{info.Description}}</i></small>
         </h2>
     </div>
     <div class="card-block beer-details" *ngIf="contents?.BeerId">
         <h3 class="beer-title">
             {{contents?.Name}}
         </h3>
-        <h4 *ngIf="contents?.Style?.Name">
+        <h4 *ngIf="contents?.Style?.Name" class="info-heading">
             <strong>Style:</strong> 
-            <a [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.Name}}</i></a>
+            <a class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.Name}}</i></a>
         </h4>
-        <h4 *ngIf="contents?.Brewery?.Name">
+        <h4 *ngIf="contents?.Brewery?.BreweryName" class="info-heading">
             <strong>Brewery:</strong> 
-            <a [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.Name}}</i></a>
+            <a class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a>
         </h4>
         <p class="beer-info">
             <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
