@@ -43,6 +43,10 @@
         vertical-align: middle;
     }
 
+    strong {
+        padding-right: 20px;
+    }
+
     .info-page-link {
         float: right;
         text-align: right;
@@ -51,6 +55,6 @@
 }
 
 .card-img-top {
-    max-height: 10vw;
+    max-height: 30vw;
     overflow-y: hidden;
 }
