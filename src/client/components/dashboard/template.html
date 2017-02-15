@@ -4,4 +4,9 @@
         <tap [info]="tap"></tap>
     </div>
   </div>
+  <div class="row" *ngFor="let location of locations">
+    <div class="col-12">
+        <location [info]="location"></location>
+    </div>
+  </div>
 </div>

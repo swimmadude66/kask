@@ -1,7 +1,7 @@
 import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
-import {DashboardComponent, TapComponent} from '../components';
+import {DashboardComponent, TapComponent, LocationComponent} from '../components';
 
 @NgModule({
     imports: [
@@ -14,11 +14,13 @@ import {DashboardComponent, TapComponent} from '../components';
     ],
     declarations: [
         DashboardComponent,
-        TapComponent
+        TapComponent,
+        LocationComponent,
     ],
     exports: [
         DashboardComponent,
         TapComponent,
+        LocationComponent,
     ]
 })
 export class LazyDashboardModule { }

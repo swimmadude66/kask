@@ -1,0 +1,35 @@
+<div class="location-container" *ngIf="info">
+  <h1 class="location-name">
+    {{info?.Name}}
+  </h1>
+  <p class="location-description" *ngIf="info?.Description">
+    <i>
+      {{info?.Description}}
+    </i>
+  </p>
+  <table class="table table-striped table-hover">
+    <thead class="thead">
+      <tr>
+        <th>Name</th>
+        <th>Brewery</th>
+        <th>Style</th>
+        <th>Size</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="!contents || contents.length < 1">
+          <td colspan="4">Storage location is empty, time to order more beer!</td>
+        </tr>
+        <tr *ngFor="let beer of contents">
+          <td>{{beer?.Name}}</td>
+          <td>{{beer?.Brewery?.BreweryName}}</td>
+          <td>{{beer?.Style?.Name}}</td>
+          <td>
+            <ng-container *ngIf="beer?.Size">
+              {{beer?.Size}} Barrel
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+  </table>
+</div>
