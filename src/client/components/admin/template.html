@@ -1,0 +1,28 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-4">
+      <button type="button" class="btn btn-success btn-lg btn-block" (click)="addTap()">
+        Add Tap
+      </button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-md-3" *ngFor="let tap of taps">
+        <tap [info]="tap" *ngIf="tap?.TapId"></tap>
+        <tap-form *ngIf="!tap?.TapId"></tap-form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <button type="button" class="btn btn-success btn-lg btn-block" (click)="addLocation()">
+        Add Location
+      </button>
+    </div>
+  </div>
+  <div class="row" *ngFor="let location of locations; let i = $index">
+    <div class="col-12">
+        <location [info]="location" *ngIf="location?.LocationId"></location>
+        <location-form *ngIf="!location?.LocationId" (store)="locations[i]=$event"></location-form>
+    </div>
+  </div>
+</div>

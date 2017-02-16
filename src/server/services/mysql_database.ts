@@ -232,11 +232,11 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    addLocation(name: string, description?: string): Observable<boolean> {
+    addLocation(name: string, description?: string): Observable<number> {
         let q = 'Insert into `off_tap_locations` (`Name`, `Description`) VALUES (?,?);';
         return this.query(q, [name, description])
         .map(
-            results => !!results,
+            result => result.insertId,
             error => {
                 console.error(error);
                 return Observable.throw('Error adding location');
@@ -292,11 +292,11 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    addTap(name: string, description?: string, status?: string): Observable<boolean> {
+    addTap(name: string, description?: string, status?: string): Observable<number> {
         let q = 'Insert into `taps` (`TapName`, `Description`, `Status`) VALUES (?,?,?);';
         return this.query(q, [name, description, status])
         .map(
-            results => !!results,
+            result => result.insertId,
             error => {
                 console.error(error);
                 return Observable.throw('Error adding tap');

@@ -10,6 +10,11 @@ export class LocationService {
         private http: Http
     ) {}
 
+    addLocation(data ): Observable<number> {
+        return this.http.post('/api/admin/locations', data)
+        .map(res => res.json());
+    }
+
     getLocations(): Observable<Location[]> {
         return this.http.get('/api/beers/locations')
         .map(res => res.json());

@@ -21,7 +21,7 @@ module.exports = (APP_CONFIG) => {
         }
         db.addLocation(body.Name, body.Description || null)
         .subscribe(
-            result => res.send({Success: result}),
+            result => res.send(result),
             err => res.status(500).send(err)
         );
     });
@@ -75,7 +75,7 @@ module.exports = (APP_CONFIG) => {
         }
         db.editTap(body.TapId, body.TapName, body.Description || null, body.Status || null)
         .subscribe(
-            result => res.send({Success: result}),
+            result => res.send(result),
             err => res.status(500).send(err)
         );
     });

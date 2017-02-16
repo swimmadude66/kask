@@ -14,6 +14,7 @@ import { AppComponent } from '../components/';
     RouterModule.forRoot(
       [
         { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' },
+        { path: 'admin', loadChildren: './+admin.module.ts#LazyAdminModule' },
       ]
     )
   ],

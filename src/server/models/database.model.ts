@@ -25,14 +25,14 @@ export interface Database {
     // work with storage locations
     getLocations(): Observable<Location[]>;
     getLocation(locationId: number): Observable<Location & {Beers: Beer[]}>;
-    addLocation(name: string, description?: string): Observable<boolean>;
+    addLocation(name: string, description?: string): Observable<number>;
     editLocation(locationId: number, name: string, description?: string): Observable<boolean>;
     deleteLocation(locationId: number): Observable<boolean>;
 
     // taps operations
     getTaps(): Observable<Tap[]>;
     getTap(tapId: number): Observable<Tap>;
-    addTap(name: string, description?: string, status?: string): Observable<boolean>;
+    addTap(name: string, description?: string, status?: string): Observable<number>;
     editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean>;
     deleteTap(tapId: number): Observable<boolean>;
 

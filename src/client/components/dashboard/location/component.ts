@@ -1,5 +1,5 @@
-import {LocationService} from '../../services';
-import {Beer, Location, KegSize} from '../../models';
+import {LocationService} from '../../../services';
+import {Beer, Location, KegSize} from '../../../models';
 import {Component, Input, OnInit} from '@angular/core';
 
 @Component({

@@ -1,0 +1,32 @@
+<div class="card card-inverse" [ngClass]="{'card-success': contents?.BeerId, 'card-danger': !contents?.BeerId}">
+    <div class="card-img-top hidden-sm-down">
+        <img class="img-fluid" src="{{getImage()}}" alt="beer image" />
+    </div>
+    <div class="card-block tap-info">
+        <h2 class="card-title tap-title">
+            {{info.TapName}} 
+            <small class="hidden-sm-down"><br /><i>{{info.Description}}</i></small>
+        </h2>
+    </div>
+    <div class="card-block beer-details" *ngIf="contents?.BeerId">
+        <h3 class="beer-title">
+            {{contents?.Name}}
+        </h3>
+        <p class="beer-description">
+            <i>{{contents?.Description}}</i>
+        </p>
+        <h4 *ngIf="contents?.Style?.Name" class="info-heading">
+            <strong>Style:</strong> 
+            <a class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.Name}}</i></a>
+        </h4>
+        <h4 *ngIf="contents?.Brewery?.BreweryName" class="info-heading">
+            <strong>Brewery:</strong> 
+            <a class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a>
+        </h4>
+        <p class="beer-info">
+            <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
+            <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
+            <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
+        </p>
+    </div>
+</div>
