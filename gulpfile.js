@@ -1,11 +1,11 @@
-const gulp        	= require('gulp');
-const fs          	= require('fs');
-const path			= require('path');
-const sass          = require('node-sass');
-const webpack       = require('webpack');
-const webpackConfig = require('./webpack.config');
-const browserSync   = require('browser-sync-webpack-plugin');
-const ts_project	= require('gulp-typescript').createProject('./src/server/tsconfig.json');
+var gulp        	= require('gulp');
+var fs          	= require('fs');
+var path			= require('path');
+var sass          = require('node-sass');
+var webpack       = require('webpack');
+var webpackConfig = require('./webpack.config');
+var browserSync   = require('browser-sync-webpack-plugin');
+var ts_project	= require('gulp-typescript').createProject('./src/server/tsconfig.json');
 
 function sassNodeModulesImporter(url, file, done){
     // if it starts with a tilde, search in node_modules;
@@ -51,7 +51,7 @@ gulp.task('copy_fonts', ['copy_client_assets'], function(){
 });
 
 gulp.task('webpack', function(done) {
-    let config = webpackConfig;
+    var config = webpackConfig;
     config.plugins.push(
         new webpack.optimize.UglifyJsPlugin()
     );
@@ -64,7 +64,7 @@ gulp.task('webpack', function(done) {
 });
 
 gulp.task('webpack-watch', function() {
-    let config = webpackConfig;
+    var config = webpackConfig;
     config.watch = true;
     config.cache = true;
     config.bail = false;
