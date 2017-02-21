@@ -38,3 +38,9 @@ faviconData.json
 .vscode/
 
 .env
+
+# Jetbrains
+.idea
+
+# mysql data from docker-compose
+mysql-data
