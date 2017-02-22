@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
 
-import {LocationComponent, TapComponent} from '../components/dashboard';
+import {LocationComponent, TapComponent, TapImageComponent} from '../components/dashboard';
 
 @NgModule({
     imports: [
@@ -16,6 +16,7 @@ import {LocationComponent, TapComponent} from '../components/dashboard';
     declarations: [
         LocationComponent,
         TapComponent,
+        TapImageComponent
     ],
     exports: [
         HttpModule,
@@ -24,6 +25,7 @@ import {LocationComponent, TapComponent} from '../components/dashboard';
         RouterModule,
         LocationComponent,
         TapComponent,
+        TapImageComponent
     ]
 })
 export class SharedModule { }

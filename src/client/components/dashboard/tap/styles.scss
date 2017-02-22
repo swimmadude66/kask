@@ -1,18 +1,31 @@
+@import url('https://fonts.googleapis.com/css?family=Schoolbell');
+
+* {
+    font-family: 'Schoolbell', cursive;
+}
 
 .card {
+    background: none;
+    border: none;
+
    @media(max-width: 767px) {
        margin: 20px 0;
    }
-}
 
-.card-success {
     .tap-info {
-        border-bottom: 3px groove #b5eab5;
+        &:after {
+            content: "";
+            display:block;
+            background: url('../../../assets/img/Divider_9 Line.png');
+            height:20px;
+            background-size: 100% 20px;
+        }
     }
 }
 
 .tap-title {
     text-align: center;
+    color: rgba(255,255,255,0.85);
 }
 
 .beer-info {
@@ -26,35 +39,24 @@
 
 .beer-details {
     .beer-title {
-        color: #333;
-        font-weight: bold;
+        color: #a59680;
         text-align: center
     }
 }
 
-.info-heading {
-    margin: 15px 0;
-    display: table;
-    width: 100%;
-    line-height: 30px;
-
-    * {
-        display: table-cell;
-        vertical-align: middle;
-    }
-
-    strong {
-        padding-right: 20px;
-    }
-
-    .info-page-link {
-        float: right;
-        text-align: right;
-        font-size: 20px;
-    }
+a {
+    color: rgba(122, 181, 232, 0.85);
 }
-
-.card-img-top {
-    max-height: 30vw;
-    overflow-y: hidden;
+ul {
+    margin: 0;
+}
+ul.dashed {
+    list-style-type: none;
+}
+ul.dashed > li {
+    text-indent: -5px;
+}
+ul.dashed > li:before {
+    content: "*";
+    text-indent: -5px;
 }
