@@ -11,8 +11,11 @@ export type Keg = Beer & {Size?: KegSize};
 export interface Database {
     // Admin methods for saving data from searches
     saveBeer(beer: Beer): Observable<number>;
+    saveBeers(beers: Beer[]): Observable<Beer[]>;
     saveStyle(style: Style): Observable<number>;
+    saveStyles(styles: Style[]): Observable<Style[]>;
     saveBrewery(brewery: Brewery): Observable<number>;
+    saveBreweries(breweries: Brewery[]): Observable<Brewery[]>;
 
     // retrieve data from previous searches
     getStyles(): Observable<Style[]>;

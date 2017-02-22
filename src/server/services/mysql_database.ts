@@ -1,5 +1,5 @@
 import {Observable} from 'rxjs/Rx';
-import {createPool, IPoolConfig, Pool} from 'mysql';
+import {createPool, IPoolConfig, Pool, escape} from 'mysql';
 import {
     Beer,
     Brewery,
@@ -53,11 +53,11 @@ export class MysqlDatabase implements Database {
     private mapKeg(result: any): Keg {
         let keg: Keg = {
             BeerId: result.BeerId,
-            BDBID: result.BeerBDBID,
+            BeerBDBID: result.BeerBDBID,
             Brewery: this.mapBrewery(result),
             Style: this.mapStyle(result),
-            Name: result.BeerName,
-            Description: result.BeerDescription,
+            BeerName: result.BeerName,
+            BeerDescription: result.BeerDescription,
             ABV: result.ABV,
             IBU: result.IBU,
             LabelUrl: result.LabelUrl,
@@ -66,12 +66,27 @@ export class MysqlDatabase implements Database {
         return keg;
     }
 
+    private mapBeer(result: any): Beer {
+        let beer: Beer = {
+            BeerId: result.BeerId,
+            BeerBDBID: result.BeerBDBID,
+            Brewery: this.mapBrewery(result),
+            Style: this.mapStyle(result),
+            BeerName: result.BeerName,
+            BeerDescription: result.BeerDescription,
+            ABV: result.ABV,
+            IBU: result.IBU,
+            LabelUrl: result.LabelUrl
+        };
+        return beer;
+    }
+
     private mapStyle(result: any): Style {
         let style: Style = {
             StyleId: result.StyleId,
-            BDBID: result.StyleBDBID,
-            Name: result.StyleName,
-            Description: result.StyleDescription,
+            StyleBDBID: result.StyleBDBID,
+            StyleName: result.StyleName,
+            StyleDescription: result.StyleDescription,
             ABVMin: result.ABVMin,
             ABVMax: result.ABVMax,
             IBUMin: result.IBUMin,
@@ -85,9 +100,9 @@ export class MysqlDatabase implements Database {
     private mapBrewery(result: any): Brewery {
         let brewery: Brewery = {
             BreweryId: result.BreweryId,
-            BDBID: result.BreweryBDBID,
+            BreweryBDBID: result.BreweryBDBID,
             BreweryName: result.BreweryName,
-            Description: result.BreweryDescription,
+            BreweryDescription: result.BreweryDescription,
             Established: result.Established,
             Image: result.Image,
             Website: result.Website
@@ -97,9 +112,7 @@ export class MysqlDatabase implements Database {
 
     saveBeer(beer: Beer): Observable<number> {
         let q = 'Insert into `beers` SET ? ON DUPLICATE KEY Update `BeerId`=LAST_INSERT_ID(`BeerId`);';
-        let params = {...beer, StyleId: -1, BreweryId: -1};
-        params.StyleId = beer.Style.StyleId;
-        params.BreweryId = beer.Brewery.BreweryId;
+        let params = {...beer, StyleId: beer.Style.StyleId, BreweryId: beer.Brewery.BreweryId};
         delete params.Style;
         delete params.Brewery;
         return this.query(q, params)
@@ -108,6 +121,28 @@ export class MysqlDatabase implements Database {
             err => {
                 console.error(err);
                 return Observable.throw('Error saving beer to database');
+            }
+        );
+    }
+
+    saveBeers(beers: Beer[]): Observable<Beer[]> {
+        let insert_args = beers.map(b => {
+            return [b.BeerName, b.BeerDescription, b.Style.StyleId, b.Brewery.BreweryId, b.ABV, b.IBU, b.LabelUrl, b.BeerBDBID];
+        });
+        let q = 'INSERT INTO `beers` ' +
+        '(`BeerName`, `BeerDescription`, `StyleId`, `BreweryId`, `ABV`, `IBU`, `LabelUrl`, `BeerBDBID`) ' +
+        'VALUES ' + escape(insert_args) + 'ON DUPLICATE KEY UPDATE `BeerName`=`BeerName`';
+        return this.query(q)
+        .flatMap(
+            _ => {
+                let map_q = 'Select * from `beers` ' +
+                'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
+                'join  `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
+                'where `beers`.`BeerBDBID` in (' + escape(beers.map(b => b.BeerBDBID)) + ');';
+                return this.query(map_q)
+                .map(results => {
+                    return results.map(r => this.mapBeer(r));
+                });
             }
         );
     }
@@ -124,6 +159,24 @@ export class MysqlDatabase implements Database {
         );
     }
 
+    saveStyles(styles: Style[]): Observable<Style[]> {
+        let insert_args = styles.map(s => {
+            return [s.StyleName, s.StyleDescription, s.SRMMin, s.SRMMax, s.IBUMin, s.IBUMax, s.ABVMin, s.ABVMax, s.StyleBDBID];
+        });
+        let q = 'INSERT INTO `styles` ' +
+        '(`StyleName`, `StyleDescription`, `SRMMin`, `SRMMax`, `IBUMin`, `IBUMax`, `ABVMin`, `ABVMax`, `StyleBDBID`) ' +
+        'VALUES ' + escape(insert_args) + ' ON DUPLICATE KEY UPDATE `StyleName`=`StyleName`;';
+        return this.query(q).flatMap(
+            _ => {
+                let map_q = 'Select * from `styles` where `StyleBDBID` in (' + escape(styles.map(s => s.StyleBDBID + '')) + ');';
+                return this.query(map_q)
+                .map(results => {
+                    return results.map(r => this.mapStyle(r));
+                });
+            }
+        );
+    }
+
     saveBrewery(brewery: Brewery): Observable<number> {
         let q = 'Insert into `breweries` SET ? ON DUPLICATE KEY Update `BreweryId`=LAST_INSERT_ID(`BreweryId`);';
         return this.query(q, brewery)
@@ -132,6 +185,24 @@ export class MysqlDatabase implements Database {
             err => {
                 console.error(err);
                 return Observable.throw('Error saving brewery to database');
+            }
+        );
+    }
+
+    saveBreweries(breweries: Brewery[]): Observable<Brewery[]> {
+        let insert_args = breweries.map(b => {
+            return [b.BreweryName, b.BreweryDescription, b.Image, b.Established, b.Website, b.BreweryBDBID];
+        });
+        let q = 'INSERT INTO `breweries` ' +
+        '(`BreweryName`, `BreweryDescription`, `Image`, `Established`, `Website`, `BreweryBDBID`) ' +
+        'VALUES ' + escape(insert_args) + ' ON DUPLICATE KEY UPDATE `BreweryName` = `BreweryName`;';
+        return this.query(q).flatMap(
+            _ => {
+                let map_q = 'Select * from `breweries` where `BreweryBDBID` in (' + escape(breweries.map(b => b.BreweryBDBID)) + ');';
+                return this.query(map_q)
+                .map(results => {
+                    return results.map(r => this.mapBrewery(r));
+                });
             }
         );
     }
@@ -426,12 +497,9 @@ export class MysqlDatabase implements Database {
 
     getLocationContents(locationId: number): Observable<Keg[]> {
         let q = 'Select ' +
-            '`beers`.`Name` as BeerName, `beers`.`Description` as BeerDescription, `beers`.`BDBID` as BeerBDBID, `beers`.*, ' +
-            '`breweries`.`Description` as BreweryDescription, `breweries`.`BDBID` as BreweryBDBID, `breweries`.*, ' +
-            '`styles`.`Name` as StyleName, `styles`.`Description` as StyleDescription, `styles`.`BDBID` as StyleDBID, `styles`.*, ' +
-            '`off_tap_kegs`.`KegSize` ' +
-            'from `off_tap_kegs` ' +
-            'join `beers` on `off_tap_kegs`.`BeerId`=`beers`.`BeerId` ' +
+            '`beers`.*, `breweries`.*, `styles`.*, `beer_sessions`.`KegSize` ' +
+            'from `beer_sessions` ' +
+            'join `beers` on `beer_sessions`.`BeerId`=`beers`.`BeerId` ' +
             'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
             'join  `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
             'where `off_tap_kegs`.`Active`=1 AND `LocationId`=?;';
@@ -447,10 +515,7 @@ export class MysqlDatabase implements Database {
 
     getTapContents(tapId: number): Observable<Keg> {
         let q = 'Select ' +
-            '`beers`.`Name` as BeerName, `beers`.`Description` as BeerDescription, `beers`.`BDBID` as BeerBDBID, `beers`.*, ' +
-            '`breweries`.`Description` as BreweryDescription, `breweries`.`BDBID` as BreweryBDBID, `breweries`.*, ' +
-            '`styles`.`Name` as StyleName, `styles`.`Description` as StyleDescription, `styles`.`BDBID` as StyleDBID, `styles`.*, ' +
-            '`beer_sessions`.`KegSize` ' +
+            '`beers`.*, `breweries`.*, `styles`.*, `beer_sessions`.`KegSize` ' +
             'from `beer_sessions` ' +
             'join `beers` on `beer_sessions`.`BeerId`=`beers`.`BeerId` ' +
             'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
