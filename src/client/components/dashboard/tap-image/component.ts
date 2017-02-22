@@ -5,11 +5,11 @@ import {Component, Input, OnInit} from '@angular/core';
 const BEER_IMG = 'assets/img/beer.jpg';
 
 @Component({
-    selector: 'tap',
+    selector: 'tap-image',
     templateUrl: './template.html',
     styleUrls: ['./styles.scss']
 })
-export class TapComponent implements OnInit {
+export class TapImageComponent implements OnInit {
 
     private contents: Beer & {Size?: KegSize};
     private loaded: boolean;
@@ -28,5 +28,16 @@ export class TapComponent implements OnInit {
                 () => this.loaded = true
             );
         }
+    }
+
+    getImage(): string {
+        if (this.contents) {
+            if (this.contents.LabelUrl) {
+                return this.contents.LabelUrl;
+            } else if (this.contents.Brewery && this.contents.Brewery.Image) {
+                return this.contents.Brewery.Image;
+            }
+        }
+        return BEER_IMG;
     }
 }
