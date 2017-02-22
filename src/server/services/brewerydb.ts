@@ -107,8 +107,8 @@ export class BreweryDBService {
                 let saved_styles = results[0];
                 let saved_breweries = results[1];
                 let clean_beers = beers.map((beer: any) => {
-                    let style = saved_styles.find(s => s.StyleBDBID === beer.style.id + '');
-                    let brewery = saved_breweries.find(b => b.BreweryBDBID === beer.breweries[0].id);
+                    let style = saved_styles[beer.style.id + ''];
+                    let brewery = saved_breweries[beer.breweries[0].id];
                     let clean_beer = this.mapResponseToBeer(beer, style, brewery);
                     return clean_beer;
                 });

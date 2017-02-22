@@ -13,9 +13,9 @@ export interface Database {
     saveBeer(beer: Beer): Observable<number>;
     saveBeers(beers: Beer[]): Observable<Beer[]>;
     saveStyle(style: Style): Observable<number>;
-    saveStyles(styles: Style[]): Observable<Style[]>;
+    saveStyles(styles: Style[]): Observable<{[BDBID: string]: Style}>;
     saveBrewery(brewery: Brewery): Observable<number>;
-    saveBreweries(breweries: Brewery[]): Observable<Brewery[]>;
+    saveBreweries(breweries: Brewery[]): Observable<{[BDBID: string]: Brewery}>;
 
     // retrieve data from previous searches
     getStyles(): Observable<Style[]>;

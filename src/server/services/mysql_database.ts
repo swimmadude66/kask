@@ -159,7 +159,7 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    saveStyles(styles: Style[]): Observable<Style[]> {
+    saveStyles(styles: Style[]): Observable<{[BDBID: string]: Style}> {
         let insert_args = styles.map(s => {
             return [s.StyleName, s.StyleDescription, s.SRMMin, s.SRMMax, s.IBUMin, s.IBUMax, s.ABVMin, s.ABVMax, s.StyleBDBID];
         });
@@ -171,7 +171,12 @@ export class MysqlDatabase implements Database {
                 let map_q = 'Select * from `styles` where `StyleBDBID` in (' + escape(styles.map(s => s.StyleBDBID + '')) + ');';
                 return this.query(map_q)
                 .map(results => {
-                    return results.map(r => this.mapStyle(r));
+                    let styleMap = {};
+                    results.forEach(r => {
+                        let clean_style = this.mapStyle(r);
+                        styleMap[clean_style.StyleBDBID + ''] = clean_style;
+                    });
+                    return styleMap;
                 });
             }
         );
@@ -189,7 +194,7 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    saveBreweries(breweries: Brewery[]): Observable<Brewery[]> {
+    saveBreweries(breweries: Brewery[]): Observable<{[BDBID: string]: Brewery}> {
         let insert_args = breweries.map(b => {
             return [b.BreweryName, b.BreweryDescription, b.Image, b.Established, b.Website, b.BreweryBDBID];
         });
@@ -201,7 +206,12 @@ export class MysqlDatabase implements Database {
                 let map_q = 'Select * from `breweries` where `BreweryBDBID` in (' + escape(breweries.map(b => b.BreweryBDBID)) + ');';
                 return this.query(map_q)
                 .map(results => {
-                    return results.map(r => this.mapBrewery(r));
+                    let breweryMap = {};
+                    results.forEach(r => {
+                        let clean_brewery = this.mapBrewery(r);
+                        breweryMap[clean_brewery.BreweryBDBID] = clean_brewery;
+                    });
+                    return breweryMap;
                 });
             }
         );
