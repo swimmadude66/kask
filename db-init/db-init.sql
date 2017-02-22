@@ -21,46 +21,48 @@ CREATE TABLE IF NOT EXISTS `off_tap_locations` (
 
 CREATE TABLE IF NOT EXISTS `styles` (
   `StyleId` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(128) NOT NULL,
-  `Description` longtext,
+  `StyleName` varchar(128) NOT NULL,
+  `StyleDescription` longtext,
   `SRMMin` int(3) DEFAULT NULL,
   `SRMMax` int(3) DEFAULT NULL,
   `IBUMin` int(6) DEFAULT NULL,
   `IBUMax` int(6) DEFAULT NULL,
   `ABVMin` decimal(8,5) DEFAULT NULL,
   `ABVMax` decimal(8,5) DEFAULT NULL,
-  `BDBID` varchar(32) NOT NULL,
+  `StyleBDBID` varchar(32) NOT NULL,
   PRIMARY KEY (`StyleId`),
   UNIQUE KEY `StyleId_UNIQUE` (`StyleId`),
-  UNIQUE KEY `BDBID_UNIQUE` (`BDBID`)
+  UNIQUE KEY `BDBID_UNIQUE` (`StyleBDBID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='More information about a style of beer';
+
 
 CREATE TABLE IF NOT EXISTS `breweries` (
   `BreweryId` int(11) NOT NULL AUTO_INCREMENT,
   `BreweryName` varchar(128) DEFAULT NULL,
-  `Description` longtext,
+  `BreweryDescription` longtext,
   `Image` varchar(1024) DEFAULT NULL,
   `Established` varchar(32) DEFAULT NULL,
   `Website` varchar(1024) DEFAULT NULL,
-  `BDBID` varchar(32) NOT NULL,
+  `BreweryBDBID` varchar(32) NOT NULL,
   PRIMARY KEY (`BreweryId`),
   UNIQUE KEY `BreweryId_UNIQUE` (`BreweryId`),
-  UNIQUE KEY `BDBID_UNIQUE` (`BDBID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='Information about breweries';
+  UNIQUE KEY `BDBID_UNIQUE` (`BreweryBDBID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Information about breweries';
+
 
 CREATE TABLE IF NOT EXISTS `beers` (
   `BeerId` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(128) NOT NULL,
-  `Description` longtext,
+  `BeerName` varchar(128) NOT NULL,
+  `BeerDescription` longtext,
   `StyleId` int(11) NOT NULL,
   `BreweryId` int(11) NOT NULL,
   `ABV` decimal(8,5) DEFAULT NULL,
   `IBU` int(6) DEFAULT NULL,
   `LabelUrl` varchar(512) DEFAULT NULL,
-  `BDBID` varchar(32) NOT NULL,
+  `BeerBDBID` varchar(32) NOT NULL,
   PRIMARY KEY (`BeerId`),
   UNIQUE KEY `BeerId_UNIQUE` (`BeerId`),
-  UNIQUE KEY `UN_BeerID_API` (`BDBID`),
+  UNIQUE KEY `UN_BeerID_API` (`BeerBDBID`),
   KEY `Brewery_idx` (`BreweryId`),
   KEY `Style_idx` (`StyleId`),
   CONSTRAINT `Brewery` FOREIGN KEY (`BreweryId`) REFERENCES `breweries` (`BreweryId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
