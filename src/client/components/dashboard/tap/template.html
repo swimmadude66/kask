@@ -1,32 +1,35 @@
-<div class="card card-inverse" [ngClass]="{'card-active': contents?.BeerId, 'card-inactive': !contents?.BeerId}">
-    <div class="card-block tap-info">
-        <h2 class="card-title tap-title">
-            {{info.TapName}} 
-            <small class="hidden-sm-down"><br /><i>{{info.Description}}</i></small>
-        </h2>
-    </div>
-    <div class="card-block beer-details" *ngIf="contents?.BeerId">
-        <h3 class="beer-title">
-            {{contents?.Name}}
-        </h3>
-        <!--<p class="beer-description">-->
-            <!--<i>{{contents?.Description}}</i>-->
-        <!--</p>-->
-        <ul class="dashed">
-            <li>
-                Style
-                <p><a *ngIf="contents?.Style?.Name" class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.Name}}</i></a></p>
-            </li>
-            <li>
-                Brewery
-                <p><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></p>
-            </li>
-        </ul>
+<div class="tap-container">
+    <div class="tap-card">
+        <div class="tap-info">
+            <h2 class="tap-title">
+                {{info.TapName}} 
+                <small class="hidden-sm-down"><br /><i>{{info.Description}}</i></small>
+            </h2>
+        </div>
+        <div class="beer-details" *ngIf="contents?.BeerId">
+            <h3 class="beer-title">
+                {{contents?.BeerName}}
+            </h3>
+            <p class="detail-line">
+                <span>* Style</span>
+                <span><a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a></span>
+            </p>
+            <p class="detail-line">
+                <span>* Brewery</span>
+                <span><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></span>
+            </p>
 
-        <p class="beer-info">
-            <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
-            <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
-            <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
-        </p>
+            <p class="beer-info">
+                <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
+                <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
+                <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
+            </p>
+        </div>
     </div>
+    <section class="hidden-md-down tap-handle-container text-center">
+        <img class="tap-handle" src="/assets/img/tap-handle.png">
+        <img class="tap-image" src="{{getImage()}}" alt="beer image" />
+    </section>
 </div>
+
+

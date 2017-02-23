@@ -29,4 +29,15 @@ export class TapComponent implements OnInit {
             );
         }
     }
+
+    getImage(): string {
+        if (this.contents) {
+            if (this.contents.LabelUrl) {
+                return this.contents.LabelUrl;
+            } else if (this.contents.Brewery && this.contents.Brewery.Image) {
+                return this.contents.Brewery.Image;
+            }
+        }
+        return BEER_IMG;
+    }
 }
