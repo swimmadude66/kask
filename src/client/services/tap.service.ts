@@ -1,7 +1,7 @@
 import {Observable} from 'rxjs/Rx';
 import {Http} from '@angular/http';
 import {Injectable} from '@angular/core';
-import {Tap, Beer, KegSize} from '../models';
+import {Tap, Keg} from '../models';
 
 @Injectable()
 export class TapService {
@@ -26,7 +26,7 @@ export class TapService {
         .map(res => res.json());
     }
 
-    getTapContents(tapId: number): Observable<Beer & {Size?: KegSize}> {
+    getTapContents(tapId: number): Observable<Keg> {
         return this.http.get(`/api/beers/contents/tap/${tapId}`)
         .map(res => res.json());
     }

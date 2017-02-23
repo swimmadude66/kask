@@ -1,7 +1,7 @@
 import {Observable} from 'rxjs/Rx';
 import {Http} from '@angular/http';
 import {Injectable} from '@angular/core';
-import {Location, Beer, KegSize} from '../models';
+import {Location, Keg} from '../models';
 
 @Injectable()
 export class LocationService {
@@ -16,6 +16,12 @@ export class LocationService {
         .map(res => res.LocationId);
     }
 
+    updateLocation(data): Observable<boolean> {
+        return this.http.patch('/api/admin/locations', data)
+        .map(res => res.json())
+        .map(res => res.Success);
+    }
+
     getLocations(): Observable<Location[]> {
         return this.http.get('/api/beers/locations')
         .map(res => res.json());
@@ -26,7 +32,7 @@ export class LocationService {
         .map(res => res.json());
     }
 
-    getLocationContents(locationId: number): Observable<(Beer & {Size?: KegSize})[]> {
+    getLocationContents(locationId: number): Observable<Keg[]> {
         return this.http.get(`/api/beers/contents/location/${locationId}`)
         .map(res => res.json());
     }

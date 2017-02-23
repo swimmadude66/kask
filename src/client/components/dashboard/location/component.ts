@@ -1,5 +1,5 @@
 import {LocationService} from '../../../services';
-import {Beer, Location, KegSize} from '../../../models';
+import {Location, Keg} from '../../../models';
 import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
@@ -9,8 +9,9 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class LocationComponent implements OnInit {
 
-    private contents: (Beer & {Size?: KegSize})[];
+    private contents: Keg[];
     private loaded: boolean;
+    private editing: boolean;
 
     @Input() info: Location;
 
@@ -26,6 +27,41 @@ export class LocationComponent implements OnInit {
                 error => console.log(error),
                 () => this.loaded = true
             );
+        } else {
+            this.editing = true;
+            this.loaded = true;
+        }
+    }
+
+    private addLocation() {
+        this.loaded = false;
+        this._locationService.addLocation(this.info)
+        .subscribe(
+            id => {
+                this.info.LocationId = id;
+            },
+            err => console.log(err),
+            () => this.loaded = true
+        );
+    }
+
+    private editLocation() {
+        this.loaded = false;
+        this._locationService.updateLocation(this.info)
+        .subscribe(
+            success => {
+                this.editing = false;
+            },
+            err => console.log(err),
+            () => this.loaded = true
+        );
+    }
+
+    private submitLocation() {
+        if (this.info.LocationId) {
+            this.editLocation();
+        } else {
+            this.addLocation();
         }
     }
 }

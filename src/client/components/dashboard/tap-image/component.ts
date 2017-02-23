@@ -1,5 +1,5 @@
 import {TapService} from '../../../services/tap.service';
-import {Beer, Tap, KegSize} from '../../../models';
+import {Tap, Keg} from '../../../models';
 import {Component, Input, OnInit} from '@angular/core';
 
 const BEER_IMG = 'assets/img/beer.jpg';
@@ -11,7 +11,7 @@ const BEER_IMG = 'assets/img/beer.jpg';
 })
 export class TapImageComponent implements OnInit {
 
-    private contents: Beer & {Size?: KegSize};
+    private contents: Keg;
     private loaded: boolean;
 
     @Input() info: Tap;

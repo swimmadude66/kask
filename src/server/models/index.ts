@@ -6,3 +6,7 @@ export * from './database.model';
 export * from './location.model';
 export * from './keg_size.model';
 export * from './error.model';
+
+import {Beer} from './beer.model';
+import {KegSize} from './keg_size.model';
+export type Keg = Beer & {Size?: KegSize};
