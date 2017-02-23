@@ -73,8 +73,8 @@ a {
 }
 
 .tap-handle {
-    position:absolute;
-    bottom: $tap-handle-offset-px * -1px;
+    margin: $tap-handle-offset-px * -1px 0;
+    position:relative;
     left: 0;
     right: 0;
 
