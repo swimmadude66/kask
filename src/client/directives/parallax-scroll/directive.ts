@@ -14,9 +14,11 @@ export class ParallaxScrollDirective {
     }
 
     scroll($event: Event): void {
-         let doc = $event.target['documentElement'];
-         let top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+        window.requestAnimationFrame(_ => {
+            let doc = window.document.documentElement;
+            let top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
 
-         this._element.nativeElement.style.top = (top * this.parallaxScale) + 'px';
+            this._element.nativeElement.style.top = (top * this.parallaxScale) + 'px';
+        })
     }
 }
