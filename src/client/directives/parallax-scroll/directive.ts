@@ -13,11 +13,9 @@ export class ParallaxScrollDirective {
         _element.nativeElement.style.position = 'relative';
     }
 
-
     scroll($event: Event): void {
          let doc = $event.target['documentElement'];
          let top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
-         console.log("Scroll Event", top, this.parallaxScale);
 
          this._element.nativeElement.style.top = (top * this.parallaxScale) + 'px';
     }
