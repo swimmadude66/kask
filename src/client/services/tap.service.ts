@@ -16,6 +16,12 @@ export class TapService {
         .map(res => res.TapId);
     }
 
+    updateTap(data): Observable<boolean> {
+        return this.http.patch('/api/admin/taps', data)
+        .map(res => res.json())
+        .map(res => res.Success);
+    }
+
     getTaps(): Observable<Tap[]> {
         return this.http.get('/api/beers/taps')
         .map(res => res.json());

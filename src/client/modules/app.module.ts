@@ -13,8 +13,7 @@ import { AppComponent } from '../components/';
     CommonModule,
     RouterModule.forRoot(
       [
-        { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' },
-        { path: 'admin', loadChildren: './+admin.module.ts#LazyAdminModule' },
+        { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' }
       ]
     )
   ],

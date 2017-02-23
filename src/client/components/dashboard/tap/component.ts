@@ -13,6 +13,7 @@ export class TapComponent implements OnInit {
 
     private contents: Keg;
     private loaded: boolean;
+    private editing: boolean;
 
     @Input() info: Tap;
 
@@ -27,6 +28,9 @@ export class TapComponent implements OnInit {
                 error => console.log(error),
                 () => this.loaded = true
             );
+        } else {
+            this.editing = true;
+            this.loaded = true;
         }
     }
 
@@ -39,5 +43,32 @@ export class TapComponent implements OnInit {
             }
         }
         return BEER_IMG;
+    }
+
+    private addTap() {
+        this._tapService.addTap(this.info)
+        .subscribe(
+            id => {
+                this.info.TapId = id;
+                this.editing = false;
+            }, err => console.log(err)
+        );
+    }
+
+    private editTap() {
+        this._tapService.updateTap(this.info)
+        .subscribe(
+            success => {
+                this.editing = false;
+            }, err => console.log(err)
+        );
+    }
+
+    private submitTap() {
+        if (this.info && this.info.TapId) {
+            this.editTap();
+        } else {
+            this.addTap();
+        }
     }
 }
