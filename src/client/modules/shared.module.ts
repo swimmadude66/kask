@@ -4,8 +4,6 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
 
-import {LocationComponent, TapComponent} from '../components/dashboard';
-
 @NgModule({
     imports: [
         HttpModule,
@@ -13,17 +11,11 @@ import {LocationComponent, TapComponent} from '../components/dashboard';
         CommonModule,
         RouterModule
     ],
-    declarations: [
-        LocationComponent,
-        TapComponent
-    ],
     exports: [
         HttpModule,
         FormsModule,
         CommonModule,
-        RouterModule,
-        LocationComponent,
-        TapComponent
+        RouterModule
     ]
 })
 export class SharedModule { }
