@@ -5,9 +5,8 @@
 }
 
 .tap-section {
-    box-shadow: 0px 20px 100px 50px rgba(0, 0, 0, 0.72);
     .tap-container {
-        background-image: url('../../assets/img/chalkboard.png');
+        background-image: url('/assets/img/chalkboard.png');
         padding: 2em 0 1px 0;
         box-shadow: inset 0px -20px 200px 20px rgba(0,0,0,0.8);
 
@@ -15,18 +14,22 @@
             content: "";
             display:block;
             height:40px;
-            background: url('../../assets/img/wood.jpg');
+            background: url('/assets/img/wood.jpg');
             box-shadow: inset 0px 10px 20px 0px rgb(49, 37, 19);
         }
-        .row-overlap {
-            margin-top:2em;
-            @media(min-width: 992px) {
-                margin-bottom: -100px;
-            }
-        }
+    }
+
+    &:after {
+        content: "";
+        display:block;
+        height:200px;
+        background: url('assets/img/brick.jpg');
+        box-shadow: inset 0px 20px 100px 50px rgba(0, 0, 0, 0.72);
+
     }
 }
 
 .storage-section {
-    margin-top: 60px;
+    position: relative;
+    background: #333;
 }

@@ -1,19 +1,23 @@
 @import url('https://fonts.googleapis.com/css?family=Schoolbell');
 @import '~bootstrap/scss/bootstrap-grid';
 
+$tap-handle-offset-px: 100;
+
 * {
     font-family: 'Schoolbell', cursive;
-    color: white;
 }
 
 .tap-card {
     background: none;
     border: none;
     min-height: 400px;
+    color: rgba(255,255,255,0.8);
 
     @include media-breakpoint-down(md) {
         margin: 20px 0;
     }
+
+    margin-bottom: $tap-handle-offset-px * 1px;
 
     .tap-info {
         padding-bottom: 0;
@@ -34,15 +38,6 @@
 }
 
 .beer-info {
-    text-align: center;
-    margin-bottom: 0;
-
-    span {
-        padding: 0 10px;
-    }
-}
-
-.beer-details {
     padding: 20px;
 
     .beer-title {
@@ -50,48 +45,70 @@
         text-align: center;
         margin-bottom: 25px;
     }
+
+    ul.beer-details {
+        margin: 0;
+        list-style-type: none;
+        > li {
+            text-indent: -5px;
+            &:before {
+                content: "*";
+                text-indent: -5px;
+            }
+        }
+    }
+
+    .beer-details-2 {
+        text-align: center;
+        margin-bottom: 0;
+
+        span {
+            padding: 0 10px;
+        }
+    }
 }
 
 a {
     color: rgba(122, 181, 232, 0.85);
 }
 
-.detail-line {
-    display: table;
-    width: 100%;
+.tap-handle {
+    margin: $tap-handle-offset-px * -1px 0;
+    position:relative;
+    left: 0;
+    right: 0;
 
-    span {
-        display: table-cell;
-        vertical-align: middle;
-
-        &:nth-of-type(1) {
-            text-align: left;
-            padding-right: 10px;
-        }
-        &:nth-of-type(2) {
-            text-align: right;
-        }
-    }
-}
-
-.tap-handle-container{
-    height: 405px;
-    overflow-y: hidden;
-    .tap-handle {
-        width:240px;
+    img {
+        position: absolute;
+        top: -22px;
+        left: -9999px;
+        right: -9999px;
+        margin: auto;
+        width: 240px;
     }
 
     .tap-image {
         border-radius: 50%;
-        height: 200px;
-        width: 200px;
+        height:200px;
+        width:200px;
         border: 3px solid #a59680;
-        background: white;
-        position: relative;
-        overflow: hidden;
-        top: -389px;
+        background: #fff;
+        position:relative;
         right: -13px;
-        transform: rotateY(30deg) rotateX(6deg);
-    }
+        overflow:hidden;
+        margin: 0 auto;
 
+        transform: rotateY(30deg) rotateX(6deg);
+
+        img {
+            position:absolute;
+            max-height:120%;
+            max-width: 200%;
+            top: -9999px;
+            bottom: -9999px;
+            left: -9999px;
+            right: -9999px;
+            margin: auto;
+        }
+    }
 }
