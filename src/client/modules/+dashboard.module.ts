@@ -3,7 +3,6 @@ import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
 import {DashboardComponent, LocationComponent, TapComponent} from '../components/dashboard';
-import {ParallaxScrollDirective} from '../directives';
 
 @NgModule({
     imports: [
@@ -18,14 +17,12 @@ import {ParallaxScrollDirective} from '../directives';
     declarations: [
         DashboardComponent,
         LocationComponent,
-        TapComponent,
-        ParallaxScrollDirective
+        TapComponent
     ],
     exports: [
         DashboardComponent,
         LocationComponent,
-        TapComponent,
-        ParallaxScrollDirective
+        TapComponent
     ]
 })
 export class LazyDashboardModule { }
