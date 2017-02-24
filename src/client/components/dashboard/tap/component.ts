@@ -1,6 +1,6 @@
 import {TapService} from '../../../services/tap.service';
 import {Tap, Keg} from '../../../models';
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 
 const BEER_IMG = 'assets/img/beer.jpg';
 
@@ -16,6 +16,7 @@ export class TapComponent implements OnInit {
     private editing: boolean = false;
 
     @Input() info: Tap;
+    @Output() remove: EventEmitter<number> = new EventEmitter<number>();
 
     constructor(
         private _tapService: TapService
@@ -72,6 +73,18 @@ export class TapComponent implements OnInit {
             this.editTap();
         } else {
             this.addTap();
+        }
+    }
+
+    private deleteTap() {
+        if (this.info && this.info.TapId) {
+            this.loaded = false;
+            this._tapService.deleteTap(this.info.TapId)
+            .subscribe(
+                success => this.remove.emit(this.info.TapId),
+                err => console.log(err),
+                () => this.loaded = true
+            )
         }
     }
 }

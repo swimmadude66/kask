@@ -1,11 +1,24 @@
 <section class="tap-section" parallax-scroll="0.5">
     <div class="tap-container">
         <div class="container container-wide">
-          <div class="row justify-content-center">
-            <div class="col-md-3" *ngFor="let tap of taps">
-                <tap [info]="tap"></tap>
+            <div class="row justify-content-center hidden-lg-up">
+                <div class="col-12" *ngFor="let tap of taps">
+                    <tap [info]="tap" (remove)="removeTap($event)"></tap>
+                </div>
             </div>
-          </div>
+            <div class="hidden-md-down">
+                <div class="row">
+                    <div class="arrow-buttons align-items-center">
+                        <span class="fa fa-chevron-left float-left" *ngIf="taps.length>4 && leftIndex>0" (click)="shiftLeft()"></span>
+                        <span class="fa fa-chevron-right float-right" *ngIf="taps.length>4 && leftIndex<taps.length-4" (click)="shiftRight()"></span>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-3" *ngFor="let tap of getVisibleTaps()">
+                        <tap [info]="tap" (remove)="removeTap($event)"></tap>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

@@ -22,6 +22,12 @@ export class TapService {
         .map(res => res.Success);
     }
 
+    deleteTap(tapid): Observable<boolean> {
+        return this.http.delete(`/api/admin/taps/${tapid}`)
+        .map(res => res.json())
+        .map(res => res.Success);
+    }
+
     getTaps(): Observable<Tap[]> {
         return this.http.get('/api/beers/taps')
         .map(res => res.json());
