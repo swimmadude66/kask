@@ -45,11 +45,6 @@ export class MysqlDatabase implements Database {
         });
     }
 
-    private mapKegs(results: any[]): Keg[] {
-        return results
-        .map(result => this.mapKeg(result));
-    }
-
     private mapKeg(result: any): Keg {
         let keg: Keg = {
             BeerId: result.BeerId,
@@ -506,16 +501,14 @@ export class MysqlDatabase implements Database {
     }
 
     getLocationContents(locationId: number): Observable<Keg[]> {
-        let q = 'Select ' +
-            '`beers`.*, `breweries`.*, `styles`.*, `beer_sessions`.`KegSize` ' +
-            'from `beer_sessions` ' +
-            'join `beers` on `beer_sessions`.`BeerId`=`beers`.`BeerId` ' +
+        let q = 'Select * from `off_tap_kegs` ' +
+            'join `beers` on `off_tap_kegs`.`BeerId`=`beers`.`BeerId` ' +
             'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
             'join  `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
             'where `off_tap_kegs`.`Active`=1 AND `LocationId`=?;';
         return this.query(q, [locationId])
         .map(
-            results => this.mapKegs(results),
+            results => results.map(keg => this.mapKeg(keg)),
             err => {
                 console.error(err);
                 return Observable.throw('Could not get contents of location');
@@ -524,12 +517,10 @@ export class MysqlDatabase implements Database {
     }
 
     getTapContents(tapId: number): Observable<Keg> {
-        let q = 'Select ' +
-            '`beers`.*, `breweries`.*, `styles`.*, `beer_sessions`.`KegSize` ' +
-            'from `beer_sessions` ' +
+        let q = 'Select * from `beer_sessions` ' +
             'join `beers` on `beer_sessions`.`BeerId`=`beers`.`BeerId` ' +
             'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
-            'join  `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
+            'join `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
             'where `beer_sessions`.`Active`=1 AND `TapId`=?;';
         return this.query(q, [tapId])
         .map(

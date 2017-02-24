@@ -9,7 +9,9 @@
     "tsc-server": "tsc -p src/server/tsconfig.json",
     "gulp": "gulp",
     "start": "node dist/server/app.js",
-    "dev": "gulp watch"
+    "start-dev": "node --debug dist/server/app.js",
+    "dev": "gulp watch",
+    "build": "gulp"
   },
   "repository": {
     "type": "git",
