@@ -17,7 +17,7 @@
             </ng-container>
         </div>
         <div class="beer-info" *ngIf="contents?.BeerId">
-            <h3 class="beer-title">
+            <h3 class="beer-title" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
                 {{contents?.BeerName}}
             </h3>
             <ul class="beer-details">

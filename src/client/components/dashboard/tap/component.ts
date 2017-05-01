@@ -16,6 +16,7 @@ export class TapComponent implements OnInit {
     private editing: boolean = false;
 
     @Input() info: Tap;
+    @Input() tapNum: number;
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
 
     constructor(
