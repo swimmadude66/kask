@@ -2,22 +2,30 @@
 @import '~bootstrap/scss/bootstrap-grid';
 
 $tap-handle-offset-px: 100;
+$chalk-color: rgba(255,255,255,0.8);
 
-* {
+h1,h2,h3,h4,h5,p,span,input {
     font-family: 'Schoolbell', cursive;
+
+    &.fa {
+        font-family: 'FontAwesome';
+    }
+}
+
+input {
+    border-bottom: 1px solid $chalk-color;
 }
 
 .tap-card {
     background: none;
     border: none;
-    min-height: 400px;
-    color: rgba(255,255,255,0.8);
-
-    @include media-breakpoint-down(md) {
-        margin: 20px 0;
-    }
-
+    color: $chalk-color;
+    margin: 0;
     margin-bottom: $tap-handle-offset-px * 1px;
+
+    @include media-breakpoint-up(md) {
+        min-height: 500px;
+    }
 
     .tap-info {
         padding-bottom: 0;
@@ -30,11 +38,67 @@ $tap-handle-offset-px: 100;
             background-size: 100% 20px;
         }
     }
+
+    .edit-header {
+        display: block;
+        width: 100%;
+        height: 20px;
+
+        .edit {
+            float: right;
+            display: none;
+            cursor: pointer;
+            opacity: 0.6;
+            margin-right: 30px;
+        }
+        
+        .delete {
+            color: red;
+            float: left;
+            display: none;
+            cursor: pointer;
+            margin-left: 30px;
+        }
+    }
+
+    .edit-footer {
+        display: block;
+        width: 100%;
+    }
+
+    &:hover {
+        .edit-header {
+            .edit {
+                display: inline-block;
+            }
+            .delete {
+                display: inline-block;
+            }
+        }
+    }
 }
 
 .tap-title {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 35px;
+    margin-bottom: 8px;
+    margin-top: 0px;
     text-align: center;
-    color: rgba(255,255,255,0.85);
+    width: 100%;
+    color: $chalk-color;
+    padding:0;
+}
+
+.tap-desc {
+    font-size: 26px;
+    font-style: italic;
+    line-height: 35px;
+    width: 100%;
+    text-align: center;
+    color: $chalk-color;
+    margin-bottom: 14px;
+    padding:0;
 }
 
 .beer-info {

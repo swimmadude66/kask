@@ -12,6 +12,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     private taps: Tap[] = [];
     private locations: Location[] = [];
+    private leftIndex: number = 0;
+
     constructor(
         private _tapService: TapService,
         private _locationService: LocationService
@@ -32,5 +34,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
+    }
+
+    getVisibleTaps(): Tap[] {
+        let visible = this.taps.slice(this.leftIndex, this.leftIndex + 4);
+        return visible;
+    }
+
+    shiftRight() {
+        this.leftIndex = Math.min(this.leftIndex + 4, this.taps.length - 4);
+    }
+
+    shiftLeft() {
+        this.leftIndex = Math.max(this.leftIndex - 4, 0);
+    }
+
+    removeTap(tapId) {
+        this.taps = this.taps.filter(tap => tap.TapId !== tapId);
+        if (this.taps.length >= 4 && this.getVisibleTaps().length < 4) {
+            this.shiftLeft();
+        }
     }
 }

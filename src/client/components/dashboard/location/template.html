@@ -45,7 +45,7 @@
       </tr>
     </tbody>
   </table>
-  <button type="button" name="submit" id="submit-location" class="btn btn-primary btn-lg btn-block" (click)="submitLocation()">
+  <button type="button" name="submit" id="submit-location" class="btn btn-primary btn-lg btn-block" (click)="submitLocation()" *ngIf="editing">
     Submit
   </button>
 </div>

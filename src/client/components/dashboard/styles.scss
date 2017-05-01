@@ -43,3 +43,21 @@
     //background: url('assets/img/dark-texture.jpg');
     background: #eee;
 }
+
+.arrow-buttons {
+    height: 30px;
+    width: 100%;
+    margin-bottom: 10px;
+
+    span {
+        color: white;
+        font-size: 26px;
+        padding: 2px 5px;
+        margin: 0 20px;
+        opacity: 0.4;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}

@@ -80,12 +80,8 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
-    router.delete('/taps', (req, res) => {
-        let body = req.body;
-        if (!body || !body.TapId) {
-            return res.status(400).send('Need TapId to remove');
-        }
-        db.deleteTap(body.TapId)
+    router.delete('/taps/:tapid', (req, res) => {
+        db.deleteTap(req.params.tapid)
         .subscribe(
             result => res.send({Success: result}),
             err => res.status(500).send(err)

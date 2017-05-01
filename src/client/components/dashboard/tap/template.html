@@ -1,31 +1,47 @@
 <div class="tap-card">
-    <div class="tap-info">
-        <h2 class="tap-title">
-            {{info.TapName}}
-            <small class="hidden-sm-down"><br /><i>{{info.Description}}</i></small>
-        </h2>
-    </div>
-    <div class="beer-info" *ngIf="contents?.BeerId">
-        <h3 class="beer-title">
-            {{contents?.BeerName}}
-        </h3>
-        <ul class="beer-details">
-            <li>
-                Style
-                <p><a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a></p>
-            </li>
-            <li>
-                Brewery
-                <p><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></p>
-            </li>
-        </ul>
+    <form name="tap-form" (submit)="submitTap()">
+            <div class="edit-header">
+            <span class="fa fa-times delete" (click)="deleteTap()" *ngIf="info.TapId"></span>
+            <span class="fa fa-pencil edit" (click)="editing=true" *ngIf="!editing"></span>
+        </div>
+        <div class="tap-info">
+            <ng-container *ngIf="!editing">
+                <h2 class="tap-title">
+                    {{info.TapName}}
+                </h2>
+                <p class="tap-desc">{{info.Description}}</p>
+            </ng-container>
+            <ng-container *ngIf="editing">
+                <input type="text" class="styled tap-title" name="tap-title" placeholder="Tap Name" [(ngModel)]="info.TapName">
+                <input type="text" class="styled tap-desc" name="tap-desc" placeholder="Tap Description" [(ngModel)]="info.Description">
+            </ng-container>
+        </div>
+        <div class="beer-info" *ngIf="contents?.BeerId">
+            <h3 class="beer-title">
+                {{contents?.BeerName}}
+            </h3>
+            <ul class="beer-details">
+                <li>
+                    Style
+                    <p><a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a></p>
+                </li>
+                <li>
+                    Brewery
+                    <p><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></p>
+                </li>
+            </ul>
 
-        <p class="beer-details-2">
-            <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
-            <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
-            <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
-        </p>
-    </div>
+            <p class="beer-details-2">
+                <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
+                <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
+                <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
+            </p>
+        </div>
+        <div class="edit-footer" *ngIf="editing">
+            <button type="button" name="cancel" id="edit-cancel" class="btn btn-info btn-lg btn-block" (click)="editing=false">Cancel</button>
+            <button type="submit" name="submit" id="edit-submit" class="btn btn-success btn-lg btn-block">Submit</button>
+        </div>
+    </form>
 </div>
 
 <section class="tap-handle hidden-md-down"> <!--parallax-scroll="-0.5"-->
