@@ -30,6 +30,16 @@
 }
 
 .storage-section {
+    &:before {
+        content: "";
+        display: block;
+        height: 100px;
+        background: url('assets/img/steel.jpg');
+        box-shadow: inset 0px 20px 60px 0px rgba(255, 255, 255, 0.58);
+        border-top: 2px solid #333;
+        margin-bottom: 2em;
+    }
     position: relative;
-    background: #333;
+    //background: url('assets/img/dark-texture.jpg');
+    background: #eee;
 }
