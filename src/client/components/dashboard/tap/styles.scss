@@ -105,9 +105,21 @@ input {
     padding: 20px;
 
     .beer-title {
-        color: #a59680;
         text-align: center;
         margin-bottom: 25px;
+
+        &.tap-color-1 {
+            color: #fc5b55;
+        }
+        &.tap-color-2 {
+            color: #72f25e;
+        }
+        &.tap-color-3 {
+            color: #fc6af0;
+        }
+        &.tap-color-4 {
+            color: #7aafff;
+        }
     }
 
     ul.beer-details {
@@ -173,6 +185,32 @@ a {
             left: -9999px;
             right: -9999px;
             margin: auto;
+        }
+    }
+}
+
+.keg-progress-bar {
+    background: url('assets/img/chalk_progress_border.png') no-repeat;
+    height: 30px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 297px;
+    > .keg-progress-fill {
+        mask-image: url('assets/img/chalk_progress_fill.png');
+        -webkit-mask-image: url('assets/img/chalk_progress_fill.png');
+        height: 30px;
+        background-repeat: no-repeat;
+        &.tap-color-1 {
+            background-color: #fc5b55;
+        }
+        &.tap-color-2 {
+            background-color: #72f25e;
+        }
+        &.tap-color-3 {
+            background-color: #fc6af0;
+        }
+        &.tap-color-4 {
+            background-color: #7aafff;
         }
     }
 }

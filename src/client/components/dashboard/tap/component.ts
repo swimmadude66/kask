@@ -15,7 +15,11 @@ export class TapComponent implements OnInit {
     private loaded: boolean;
     private editing: boolean = false;
 
+    //TODO: pull from flow sensors
+    private percentFull: number = Math.random()*100;
+
     @Input() info: Tap;
+    @Input() tapNum: number;
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
 
     constructor(

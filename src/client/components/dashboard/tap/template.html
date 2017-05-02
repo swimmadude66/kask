@@ -17,7 +17,7 @@
             </ng-container>
         </div>
         <div class="beer-info" *ngIf="contents?.BeerId">
-            <h3 class="beer-title">
+            <h3 class="beer-title" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
                 {{contents?.BeerName}}
             </h3>
             <ul class="beer-details">
@@ -37,6 +37,9 @@
                 <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
             </p>
         </div>
+        <div class="keg-progress-bar">
+            <div class="keg-progress-fill" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)" [style.width]="percentFull + '%'"></div>
+        </div>
         <div class="edit-footer" *ngIf="editing">
             <button type="button" name="cancel" id="edit-cancel" class="btn btn-info btn-lg btn-block" (click)="editing=false">Cancel</button>
             <button type="submit" name="submit" id="edit-submit" class="btn btn-success btn-lg btn-block">Submit</button>
@@ -44,7 +47,7 @@
     </form>
 </div>
 
-<section class="tap-handle hidden-md-down" parallax-scroll="-0.5">
+<section class="tap-handle hidden-md-down"> <!--parallax-scroll="-0.5"-->
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image">
         <img src="{{getImage()}}" alt="beer image" />

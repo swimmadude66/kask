@@ -1,4 +1,4 @@
-<section class="tap-section" parallax-scroll="0.5">
+<section class="tap-section"> <!--parallax-scroll="0.5"-->
     <div class="tap-container">
         <div class="container container-wide">
             <div class="row justify-content-center hidden-lg-up">
@@ -14,8 +14,8 @@
                     </div>
                 </div>
                 <div class="row justify-content-center">
-                    <div class="col-md-3" *ngFor="let tap of getVisibleTaps()">
-                        <tap [info]="tap" (remove)="removeTap($event)"></tap>
+                    <div class="col-md-3" *ngFor="let tap of getVisibleTaps(); let i = index">
+                        <tap [info]="tap" [tapNum]="i" (remove)="removeTap($event)"></tap>
                     </div>
                 </div>
             </div>
