@@ -136,15 +136,17 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    generateSession(session: string, userId: number): Observable<any> {
+    generateSession(session: string, userId: number): Observable<string> {
         let q = 'Insert into `sessions` (`SessionId`, `UserId`) VALUES(?,?);';
         let params = [session, userId];
-        return this.query(q, params);
+        return this.query(q, params).map(_ => session);
     }
 
     getUserInfoBySession(session: string): Observable<any> {
-        // tslint:disable-next-line:max-line-length
-        let q = 'Select `users`.* from `sessions` join `users` on `users`.`UserId` = `sessions`.`UserId` where `SessionId` = ? AND `sessions`.`Active`=1 AND `users`.`Active`=1 Limit 1;';
+        let q = 'Select `users`.* from `sessions`'
+        + ' join `users` on `users`.`UserId` = `sessions`.`UserId`'
+        + ' where `SessionId` = ? AND `sessions`.`Active`=1 AND `users`.`Active`=1'
+        + ' Limit 1;';
         let params = [session];
         return this.query(q, params)
         .map(
@@ -158,7 +160,7 @@ export class MysqlDatabase implements Database {
                 console.error(err);
                 return Observable.throw('Error getting user by session');
             }
-        )
+        );
     }
 
     invalidateSession(session: string): Observable<any> {

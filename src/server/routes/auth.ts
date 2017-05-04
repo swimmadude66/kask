@@ -33,7 +33,7 @@ module.exports = (APP_CONFIG) => {
                 });
                 return res.status(204).end();
             }, err => {
-                return Observable.throw('Could not login user');
+                return res.status(500).send('Could not complete signup');
             }
         );
     });
@@ -65,7 +65,7 @@ module.exports = (APP_CONFIG) => {
                 });
                 return res.status(204).end();
             }, err => {
-                return Observable.throw('Could not login user');
+                return res.status(500).send('Could not login');
             }
         );
     });
@@ -74,11 +74,11 @@ module.exports = (APP_CONFIG) => {
         if (!res.locals.session) {
             return res.send(400).send('you must be logged in to log out');
         }
+        res.clearCookie(APP_CONFIG.cookie_name);
         db.invalidateSession(res.locals.session).subscribe(
             _ => res.status(204).end()
         );
     });
 
     return router;
-}
-
+};

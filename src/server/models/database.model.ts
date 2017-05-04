@@ -12,7 +12,7 @@ export interface Database {
     // Auth methods
     registerUser(username: string, salt: string, passHash: string): Observable<number>;
     getPasswordInfo(username: string): Observable<any>;
-    generateSession(session: string, userId: number): Observable<any>;
+    generateSession(session: string, userId: number): Observable<string>;
     getUserInfoBySession(session: string): Observable<any>;
     invalidateSession(session: string): Observable<any>;
 

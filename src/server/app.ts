@@ -12,7 +12,7 @@ let BeerAPI = new BreweryDBService(process.env.BREWERY_DB_KEY, DB);
 
 const APP_CONFIG = {
   environment: process.env.ENVIRONMENT || 'dev',
-  cookie_name: process.env.COOKIE_NAME || 'cookie_name',
+  cookie_name: process.env.COOKIE_NAME || 'ot_auth',
   cookie_secret: process.env.COOKIE_SECRET || 'cookie_secret',
   port: process.env.NODE_PORT || 3000,
   log_level: process.env.MORGAN_LOG_LEVEL || 'dev',
