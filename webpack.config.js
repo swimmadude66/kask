@@ -7,7 +7,6 @@ module.exports = {
     entry: {
         'app': './src/client/main.ts',
         'vendor': './src/client/vendor.ts',
-        
     },
     output: {
         filename: '[name].min.js',

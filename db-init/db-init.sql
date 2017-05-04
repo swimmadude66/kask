@@ -1,6 +1,29 @@
 Create Schema if not exists ontap;
 Use `ontap`;
 
+CREATE TABLE IF NOT EXISTS `users` (
+  `UserId` int(11) NOT NULL AUTO_INCREMENT,
+  `Email` varchar(100) NOT NULL,
+  `Salt` varchar(100) NOT NULL,
+  `PasswordHash` varchar(256) NOT NULL,
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`UserId`),
+  UNIQUE KEY `Email_UNIQUE` (`Email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `sessions` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `SessionId` varchar(256) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`SessionId`),
+  UNIQUE KEY `sessionID` (`SessionId`),
+  KEY `user_session_idx` (`UserId`),
+  KEY `idindex` (`Id`),
+  CONSTRAINT `user_session` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE IF NOT EXISTS `taps` (
   `TapId` int(11) NOT NULL AUTO_INCREMENT,
   `TapName` varchar(128) NOT NULL,
