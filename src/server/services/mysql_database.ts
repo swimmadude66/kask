@@ -51,6 +51,7 @@ export class MysqlDatabase implements Database {
             SessionId: result.SessionId,
             NetVote: result.NetVote,
             UserVote: result.UserVote,
+            TapId: result.TapId,
             Keg: this.mapKeg(result)
         };
         return session;

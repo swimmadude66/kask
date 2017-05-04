@@ -5,4 +5,5 @@ export class BeerSession {
     NetVote: number;
     UserVote: number;
     Keg: Keg;
+    TapId: number;
 }
