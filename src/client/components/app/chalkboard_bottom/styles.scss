@@ -1,0 +1,16 @@
+@import '../../../scss/_variables';
+
+.chalkboard-bottom {
+    margin-top: 2em;
+    //box-shadow: 0 -50px 100px 0px rgba(0, 0, 0, 0.41);
+    box-shadow: 0 100px 400px 200px rgba(0,0,0,0.61);
+
+    > div:after {
+        content: "";
+        display: block;
+        height: 40px;
+        background: url('/assets/img/wood.jpg');
+        box-shadow: inset 0px 10px 20px 0px rgb(49, 37, 19);
+    }
+}
+

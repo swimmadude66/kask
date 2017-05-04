@@ -1,11 +1,13 @@
-@import url('https://fonts.googleapis.com/css?family=Schoolbell');
 @import '~bootstrap/scss/bootstrap-grid';
+@import '../../../scss/_variables';
 
-$tap-handle-offset-px: 100;
-$chalk-color: rgba(255,255,255,0.8);
+$tap-color-1: #fc5b55;
+$tap-color-2: #72f25e;
+$tap-color-3: #fc6af0;
+$tap-color-4: #7aafff;
 
 h1,h2,h3,h4,h5,p,span,input {
-    font-family: 'Schoolbell', cursive;
+    font-family: $chalk-font;
 
     &.fa {
         font-family: 'FontAwesome';
@@ -21,7 +23,7 @@ input {
     border: none;
     color: $chalk-color;
     margin: 0;
-    margin-bottom: $tap-handle-offset-px * 1px;
+    margin-bottom: 100px;
 
     @include media-breakpoint-up(md) {
         min-height: 500px;
@@ -109,16 +111,16 @@ input {
         margin-bottom: 25px;
 
         &.tap-color-1 {
-            color: #fc5b55;
+            color: $tap-color-1;
         }
         &.tap-color-2 {
-            color: #72f25e;
+            color: $tap-color-2;
         }
         &.tap-color-3 {
-            color: #fc6af0;
+            color: $tap-color-3;
         }
         &.tap-color-4 {
-            color: #7aafff;
+            color: $tap-color-4;
         }
     }
 
@@ -149,7 +151,7 @@ a {
 }
 
 .tap-handle {
-    margin: $tap-handle-offset-px * -1px 0;
+    margin: -150px 0;
     position:relative;
     left: 0;
     right: 0;
@@ -193,24 +195,44 @@ a {
     background: url('assets/img/chalk_progress_border.png') no-repeat;
     height: 30px;
     margin: 0 auto;
-    width: 100%;
+    width: 90%;
     max-width: 297px;
+    position: relative;
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            font-family: 'Schoolbell', cursive;
+            content: 'E';
+            position: absolute;
+            left: -15px;
+            top: 0;
+        }
+        &:after {
+            font-family: 'Schoolbell', cursive;
+            content: 'F';
+            position: absolute;
+            right: -15px;
+            top: 0;
+        }
+    }
+
     > .keg-progress-fill {
         mask-image: url('assets/img/chalk_progress_fill.png');
         -webkit-mask-image: url('assets/img/chalk_progress_fill.png');
         height: 30px;
         background-repeat: no-repeat;
         &.tap-color-1 {
-            background-color: #fc5b55;
+            background-color: $tap-color-1;
         }
         &.tap-color-2 {
-            background-color: #72f25e;
+            background-color: $tap-color-2;
         }
         &.tap-color-3 {
-            background-color: #fc6af0;
+          background-color: $tap-color-3;
         }
         &.tap-color-4 {
-            background-color: #7aafff;
+          background-color: $tap-color-4;
         }
     }
 }
+

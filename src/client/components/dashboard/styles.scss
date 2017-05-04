@@ -6,23 +6,11 @@
 
 .tap-section {
     .tap-container {
-        background-image: url('/assets/img/chalkboard.png');
-        padding: 2em 0 1px 0;
-        box-shadow: inset 0px -20px 200px 20px rgba(0,0,0,0.8);
-
-        &:after {
-            content: "";
-            display:block;
-            height:40px;
-            background: url('/assets/img/wood.jpg');
-            box-shadow: inset 0px 10px 20px 0px rgb(49, 37, 19);
-        }
+        padding: 1em 0 1px 0;
     }
 
-    &:after {
-        content: "";
-        display:block;
-        height:200px;
+    .divider-brick {
+        height: 250px;
         background: url('assets/img/brick.jpg');
         box-shadow: inset 0px 20px 100px 50px rgba(0, 0, 0, 0.72);
 
@@ -32,16 +20,16 @@
 .storage-section {
     &:before {
         content: "";
+
         display: block;
         height: 100px;
-        background: url('assets/img/steel.jpg');
-        box-shadow: inset 0px 20px 60px 0px rgba(255, 255, 255, 0.58);
+        background: linear-gradient(rgba(201, 133, 98, 0.52), rgba(1,1,1,0), rgba(1,1,1,0)),url('assets/img/steel.jpg');
         border-top: 2px solid #333;
         margin-bottom: 2em;
     }
     position: relative;
-    //background: url('assets/img/dark-texture.jpg');
-    background: #eee;
+    background: linear-gradient( rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5) ), url('assets/img/steel.jpg');
+    background-size: 500px 100%;
 }
 
 .arrow-buttons {
@@ -61,3 +49,4 @@
         }
     }
 }
+
