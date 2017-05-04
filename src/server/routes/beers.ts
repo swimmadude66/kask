@@ -77,7 +77,11 @@ module.exports = (APP_CONFIG) => {
     });
 
     router.get('/contents/tap/:tapId', (req, res) => {
-        db.getTapContents(+req.params.tapId)
+        let userId;
+        if (res.locals.user) {
+            userId = res.locals.user.UserId;
+        }
+        db.getTapContents(+req.params.tapId, userId)
         .subscribe(
             contents => {
                 return res.send(!!contents ? contents : false);

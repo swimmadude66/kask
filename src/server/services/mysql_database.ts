@@ -8,7 +8,8 @@ import {
     Tap,
     Location,
     KegSize,
-    Keg
+    Keg,
+    BeerSession
 } from '../models';
 
 export class MysqlDatabase implements Database {
@@ -43,6 +44,16 @@ export class MysqlDatabase implements Database {
                 });
             });
         });
+    }
+
+    private mapBeerSession(result: any): BeerSession {
+        let session: BeerSession = {
+            SessionId: result.SessionId,
+            NetVote: result.NetVote,
+            UserVote: result.UserVote,
+            Keg: this.mapKeg(result)
+        };
+        return session;
     }
 
     private mapKeg(result: any): Keg {
@@ -610,15 +621,55 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    getTapContents(tapId: number): Observable<Keg> {
+    getSessionVotes(sessionId: number, userId?: number): Observable<{netVote: number, userVote?: number}> {
+        let q = 'Select `UserId`, (`Vote`-2) as Vote from `beer_session_likes` Where `BeerSessionId` = ?;';
+        return this.query(q, [sessionId])
+        .map(
+            results => {
+                let netVote = results.reduce((previous, current) => {
+                    if (current && current.Vote) {
+                        return previous + current.Vote;
+                    } else {
+                        return previous;
+                    }
+                }, 0);
+                let userVote = 0;
+                if (userId) {
+                    let userVotes = results.find(v => v.UserId === userId);
+                    userVote = userVotes ? userVotes.Vote : 0;
+                }
+                return {netVote, userVote};
+            }, err => {
+                console.error(err);
+                return Observable.throw('Could not retrieve votes for beer session');
+            }
+        );
+    }
+
+    getTapContents(tapId: number, userId?: number): Observable<BeerSession> {
         let q = 'Select * from `beer_sessions` ' +
             'join `beers` on `beer_sessions`.`BeerId`=`beers`.`BeerId` ' +
             'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
             'join `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
-            'where `beer_sessions`.`Active`=1 AND `TapId`=?;';
+            'where `beer_sessions`.`Active`=1 AND `TapId`=? Limit 1;';
         return this.query(q, [tapId])
+        .flatMap(
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not retrive tap contents');
+                }
+                let contents = results[0];
+                return this.getSessionVotes(contents.SessionId, userId)
+                .map(
+                    votes => {
+                        contents.NetVote = votes.netVote;
+                        contents.UserVote = votes.userVote;
+                        return this.mapBeerSession(contents);
+                    }
+                );
+            })
         .map(
-            results => results.length > 0 ? this.mapKeg(results[0]) : null,
+            _ => _,
             err => {
                 console.error(err);
                 return Observable.throw('Could not get contents of location');

@@ -72,7 +72,6 @@ CREATE TABLE IF NOT EXISTS `breweries` (
   UNIQUE KEY `BDBID_UNIQUE` (`BreweryBDBID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Information about breweries';
 
-
 CREATE TABLE IF NOT EXISTS `beers` (
   `BeerId` int(11) NOT NULL AUTO_INCREMENT,
   `BeerName` varchar(128) NOT NULL,
@@ -96,7 +95,6 @@ CREATE TABLE IF NOT EXISTS `beer_sessions` (
   `SessionId` int(11) NOT NULL AUTO_INCREMENT,
   `TapId` int(11) NOT NULL,
   `BeerId` int(11) NOT NULL,
-  `NumVotes` int(11) DEFAULT NULL,
   `TappedTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Score` varchar(8) DEFAULT NULL,
   `KegSize` enum('1/6','1/4','1/2') DEFAULT NULL,
@@ -111,6 +109,18 @@ CREATE TABLE IF NOT EXISTS `beer_sessions` (
   CONSTRAINT `FK_Tap` FOREIGN KEY (`TapId`) REFERENCES `taps` (`TapId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Record of beer taptimes';
 
+CREATE TABLE IF NOT EXISTS `beer_session_likes` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `BeerSessionId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `Vote` enum('down','none','up') NOT NULL DEFAULT 'none',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `oneVote` (`BeerSessionId`,`UserId`),
+  KEY `bsession_idx` (`BeerSessionId`),
+  KEY `uservotes_idx` (`UserId`),
+  CONSTRAINT `bsession` FOREIGN KEY (`BeerSessionId`) REFERENCES `beer_sessions` (`SessionId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `uservotes` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE IF NOT EXISTS `off_tap_kegs` (

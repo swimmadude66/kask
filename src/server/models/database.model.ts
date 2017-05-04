@@ -1,3 +1,4 @@
+import {BeerSession} from './session.model';
 import {Observable} from 'rxjs/Rx';
 import {Style} from './style.model';
 import {Brewery} from './brewery.model';
@@ -48,7 +49,8 @@ export interface Database {
 
     // Get Contents
     getLocationContents(locationId: number): Observable<Keg[]>;
-    getTapContents(locationId: number): Observable<Keg>;
+    getSessionVotes(sessionId: number, userId?: number): Observable<{netVote: number, userVote?: number}>;
+    getTapContents(locationId: number): Observable<BeerSession>;
 
     // beer movement
     // -----------------
