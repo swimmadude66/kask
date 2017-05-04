@@ -622,25 +622,19 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    getSessionVotes(sessionId: number, userId?: number): Observable<{netVote: number, userVote?: number}> {
+    voteForSession(sessionId: number, userId: number, vote: string): Observable<any> {
+        let q = 'INSERT INTO `beer_session_likes` (`BeerSessionId`, `UserId`, `Vote`)'
+        + ' VALUES (?, ?, ?)'
+        + ' ON Duplicate Key Update `Vote`=Values(`Vote`);';
+        return this.query(q, [sessionId, userId, vote.toLowerCase()]);
+    }
+
+    getSessionVotes(sessionId: number, userId?: number): Observable<any[]> {
         let q = 'Select `UserId`, (`Vote`-2) as Vote from `beer_session_likes` Where `BeerSessionId` = ?;';
         return this.query(q, [sessionId])
         .map(
-            results => {
-                let netVote = results.reduce((previous, current) => {
-                    if (current && current.Vote) {
-                        return previous + current.Vote;
-                    } else {
-                        return previous;
-                    }
-                }, 0);
-                let userVote = 0;
-                if (userId) {
-                    let userVotes = results.find(v => v.UserId === userId);
-                    userVote = userVotes ? userVotes.Vote : 0;
-                }
-                return {netVote, userVote};
-            }, err => {
+            results => results,
+            err => {
                 console.error(err);
                 return Observable.throw('Could not retrieve votes for beer session');
             }
@@ -663,8 +657,20 @@ export class MysqlDatabase implements Database {
                 return this.getSessionVotes(contents.SessionId, userId)
                 .map(
                     votes => {
-                        contents.NetVote = votes.netVote;
-                        contents.UserVote = votes.userVote;
+                        let netVote = votes.reduce((previous, current) => {
+                            if (current && current.Vote) {
+                                return previous + current.Vote;
+                            } else {
+                                return previous;
+                            }
+                        }, 0);
+                        let userVote = 0;
+                        if (userId) {
+                            let userVotes = votes.find(v => v.UserId === userId);
+                            userVote = userVotes ? userVotes.Vote : 0;
+                        }
+                        contents.NetVote = netVote;
+                        contents.UserVote = userVote;
                         return this.mapBeerSession(contents);
                     }
                 );

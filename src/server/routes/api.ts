@@ -41,6 +41,7 @@ module.exports = (APP_CONFIG) => {
         }
     });
 
+    router.use('/votes', require('./votes')(APP_CONFIG));
     router.use('/admin', require('./admin')(APP_CONFIG));
 
     return router;

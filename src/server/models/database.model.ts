@@ -49,8 +49,11 @@ export interface Database {
 
     // Get Contents
     getLocationContents(locationId: number): Observable<Keg[]>;
-    getSessionVotes(sessionId: number, userId?: number): Observable<{netVote: number, userVote?: number}>;
     getTapContents(locationId: number): Observable<BeerSession>;
+
+    // Voting
+    voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;
+    getSessionVotes(sessionId: number, userId?: number): Observable<any[]>;
 
     // beer movement
     // -----------------
