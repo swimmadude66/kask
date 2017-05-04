@@ -225,10 +225,15 @@ export class MysqlDatabase implements Database {
     }
 
     getStyle(styleId: number): Observable<Style> {
-        let q = 'Select * from `styles` WHERE `StyleId` = ?;';
+        let q = 'Select * from `styles` WHERE `StyleId` = ? LIMIT 1;';
         return this.query(q, [styleId])
         .map(
-            results => results,
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not find style');
+                }
+                return results[0];
+            },
             error => {
                 console.error(error);
                 return Observable.throw('Error retrieving style');
@@ -249,10 +254,15 @@ export class MysqlDatabase implements Database {
     }
 
     getBrewery(breweryId: number): Observable<Brewery> {
-        let q = 'Select * from `breweries` WHERE `BreweryId` = ?;';
+        let q = 'Select * from `breweries` WHERE `BreweryId` = ? LIMIT 1;';
         return this.query(q, [breweryId])
         .map(
-            results => results,
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not find brewery');
+                }
+                return results[0];
+            },
             error => {
                 console.error(error);
                 return Observable.throw('Error retrieving brewery');
@@ -273,10 +283,15 @@ export class MysqlDatabase implements Database {
     }
 
     getBeer(beerId: number): Observable<Beer> {
-        let q = 'Select * from `beers` WHERE `BeerId` = ?;';
+        let q = 'Select * from `beers` WHERE `BeerId` = ? Limit 1;';
         return this.query(q, [beerId])
         .map(
-            results => results,
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not find beer');
+                }
+                return results[0];
+            },
             error => {
                 console.error(error);
                 return Observable.throw('Error retrieving beer');
@@ -297,10 +312,15 @@ export class MysqlDatabase implements Database {
     }
 
     getLocation(locationId: number): Observable<Location> {
-        let q = 'Select * from `off_tap_locations` WHERE `LocationId` = ?;';
+        let q = 'Select * from `off_tap_locations` WHERE `LocationId` = ? Limit 1;';
         return this.query(q, [locationId])
         .map(
-            results => results,
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not find location');
+                }
+                return results[0];
+            },
             error => {
                 console.error(error);
                 return Observable.throw('Error getting location');
@@ -357,10 +377,15 @@ export class MysqlDatabase implements Database {
     }
 
     getTap(tapId: number): Observable<Tap> {
-        let q = 'Select * from `taps` WHERE `TapId` = ?;';
+        let q = 'Select * from `taps` WHERE `TapId` = ? Limit 1;';
         return this.query(q, [tapId])
         .map(
-            results => results,
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not find tap');
+                }
+                return results[0];
+            },
             error => {
                 console.error(error);
                 return Observable.throw('Error getting tap');
