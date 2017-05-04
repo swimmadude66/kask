@@ -197,8 +197,27 @@ a {
     background: url('assets/img/chalk_progress_border.png') no-repeat;
     height: 30px;
     margin: 0 auto;
-    width: 100%;
+    width: 90%;
     max-width: 297px;
+    position: relative;
+    
+    @include media-breakpoint-up(lg) {
+        &:before {
+            font-family: 'Schoolbell', cursive;
+            content: 'E';
+            position: absolute;
+            left: -15px;
+            top: 0;
+        }
+        &:after {
+            font-family: 'Schoolbell', cursive;
+            content: 'F';
+            position: absolute;
+            right: -15px;
+            top: 0;
+        }
+    }
+
     > .keg-progress-fill {
         mask-image: url('assets/img/chalk_progress_fill.png');
         -webkit-mask-image: url('assets/img/chalk_progress_fill.png');
