@@ -18,16 +18,16 @@
         </div>
         <div class="beer-info" *ngIf="contents?.BeerId">
             <h3 class="beer-title">
-                {{contents?.BeerName}}
+                <a [routerLink]="'/info/beer/' + contents?.BeerId">{{contents?.BeerName}}</a>
             </h3>
             <ul class="beer-details">
                 <li>
                     Style
-                    <p><a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/styles/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a></p>
+                    <p><a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a></p>
                 </li>
                 <li>
                     Brewery
-                    <p><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/breweries/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></p>
+                    <p><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></p>
                 </li>
             </ul>
 
@@ -37,7 +37,7 @@
                 <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
             </p>
         </div>
-        <div class="keg-progress-bar">
+        <div class="keg-progress-bar" *ngIf="contents?.BeerId">
             <div class="keg-progress-fill" [style.width]="percentFull + '%'"></div>
         </div>
         <div class="edit-footer" *ngIf="editing">
@@ -50,7 +50,9 @@
 <section class="tap-handle hidden-md-down"> <!--parallax-scroll="-0.5"-->
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image">
-        <img src="{{getImage()}}" alt="beer image" />
+        <a [routerLink]="'/info/beer/' + contents?.BeerId">
+            <img src="{{getImage()}}" alt="beer image" />
+        </a>
     </div>
 </section>
 

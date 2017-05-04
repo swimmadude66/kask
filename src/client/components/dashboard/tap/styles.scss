@@ -51,7 +51,7 @@ input {
         background-size: 100% 20px;
     }
     &.tap-color-4 .tap-info:after {
-        background: url('/assets/img/Divider_18 Line.png');
+        background: url('/assets/img/Divider_19.png');
         content: "";
         display:block;
         height:20px;
@@ -131,16 +131,16 @@ input {
         text-align: center;
         margin-bottom: 25px;
 
-        .tap-color-1 & {
-            color: $tap-color-1;
+        .tap-color-1 & a {
+                color: $tap-color-1;
         }
-        .tap-color-2 & {
+        .tap-color-2 & a {
             color: $tap-color-2;
         }
-        .tap-color-3 & {
+        .tap-color-3 & a {
             color: $tap-color-3;
         }
-        .tap-color-4 & {
+        .tap-color-4 & a {
             color: $tap-color-4;
         }
     }
@@ -167,15 +167,11 @@ input {
     }
 }
 
-a {
-    color: rgba(122, 181, 232, 0.85);
-}
-
 .tap-handle {
-    margin: -150px 0;
-    position:relative;
+    position: absolute;
     left: 0;
     right: 0;
+    top: calc(100vh - 480px);
 
     img {
         position: absolute;

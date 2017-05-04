@@ -1,28 +1,33 @@
-<section class="container">
-  <h1>Beer name</h1>
+<section class="container" *ngIf="!!beer">
+  <h1>{{beer.BeerName}}</h1>
+
   <div class="row">
     <div class="col-md">
-      <dl>
-        <dt>Brewery</dt>
-        <dd>name of brewery</dd>
-        <dt>Style</dt>
-        <dd>Milk Stout</dd>
-      </dl>
+      <img class="beer-label" [src]="beer.LabelUrl" />
     </div>
     <div class="col-md">
       <dl>
-        <dt>Abv</dt>
-        <dd>10%</dd>
+        <dt>Brewery</dt>
+        <dd><a [routerLink]="'/info/brewery/' + beer.Brewery?.BreweryId">{{beer.Brewery?.BreweryName}}</a></dd>
+        <dt>Style</dt>
+        <dd><a [routerLink]="'/info/style/' + beer.Style?.StyleId">{{beer.Style?.StyleName}}</a></dd>
+        <dt>ABV</dt>
+        <dd>{{beer.ABV}}</dd>
+        <dt>IBU</dt>
+        <dd>{{beer.IBU}}</dd>
       </dl>
     </div>
   </div>
 
-  <h3>Description</h3>
-  <p>Beer description Beer description Beer descriptionBeer description Beer description Beer description Beer description Beer description
-    Beer description Beer description Beer descriptionBeer description Beer description Beer description Beer description Beer description
-    Beer description Beer description Beer descriptionBeer description Beer description Beer description Beer description Beer description
-    Beer description Beer description Beer descriptionBeer description Beer description Beer description Beer description Beer description
-    Beer description Beer description Beer descriptionBeer description Beer description Beer description Beer description Beer description</p>
+  <div class="row">
+    <div class="col-md">
+      <h3>Description</h3>
+      <p>
+        {{beer.BeerDescription}}
+      </p>
+    </div>
+  </div>
+
 </section>
 
 <chalkboard-bottom></chalkboard-bottom>

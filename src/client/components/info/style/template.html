@@ -1,0 +1,32 @@
+<section class="container" *ngIf="!!style">
+  <h1>{{style.StyleName}}</h1>
+
+  <div class="row">
+    <div class="col-md-3">
+      <dl>
+        <ng-container *ngIf="style.ABVMin">
+          <dt>ABV</dt>
+          <dd>{{style.ABVMin}}% - {{style.ABVMax}}%</dd>
+        </ng-container>
+        <ng-container *ngIf="style.IBUMin">
+          <dt>IBU</dt>
+          <dd>{{style.IBUMin}} - {{style.IBUMax}}</dd>
+        </ng-container>
+        <ng-container *ngIf="style.SRMMin">
+          <dt>SRM</dt>
+          <dd>{{style.SRMMin}} - {{style.SRMMax}} out of 40</dd>
+        </ng-container>
+      </dl>
+    </div>
+    <div class="col-md-9">
+      <h3>Description</h3>
+      <p>
+        {{style.StyleDescription}}
+      </p>
+    </div>
+  </div>
+
+</section>
+
+<chalkboard-bottom></chalkboard-bottom>
+

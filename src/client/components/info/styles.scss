@@ -1,0 +1,32 @@
+@import '../../scss/_variables';
+
+.container {
+
+    /deep/ a {
+        color: $link-color;
+    }
+
+    margin-top: 1em;
+
+    h1, h2, h3 {
+        margin-bottom: 1em;
+    }
+
+    h1, h2, h3, h4, dt {
+        font-family: $chalk-font;
+    }
+    *:not(a) {
+        color: $chalk-color;
+    }
+
+
+    .row {
+        margin-top: 1em;
+    }
+
+    .beer-label {
+        max-height: 300px;
+    }
+
+    min-height: 600px;
+}

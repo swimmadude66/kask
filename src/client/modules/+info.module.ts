@@ -3,6 +3,8 @@ import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
 import {BeerInfoComponent} from "../components/info/beer/component";
+import {BreweryInfoComponent} from "../components/info/brewery/component";
+import {StyleInfoComponent} from "../components/info/style/component";
 
 @NgModule({
     imports: [
@@ -10,21 +12,21 @@ import {BeerInfoComponent} from "../components/info/beer/component";
         FormsModule,
         RouterModule.forChild(
             [
-                {path: 'beer', component: BeerInfoComponent},
-                // {path: 'brewery', component: BreweryInfoComponent},
-                // {path: 'style', component: StyleInfoComponent},
+                {path: 'beer/:id', component: BeerInfoComponent},
+                {path: 'brewery/:id', component: BreweryInfoComponent},
+                {path: 'style/:id', component: StyleInfoComponent},
             ]
         )
     ],
     declarations: [
         BeerInfoComponent,
-        // BreweryInfoComponent,
-        // StyleInfoComponent
+        BreweryInfoComponent,
+        StyleInfoComponent
     ],
     exports: [
         BeerInfoComponent,
-        // BreweryInfoComponent,
-        // StyleInfoComponent
+        BreweryInfoComponent,
+        StyleInfoComponent
     ]
 })
 export class LazyInfoModule { }

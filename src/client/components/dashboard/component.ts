@@ -13,12 +13,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private taps: Tap[] = [];
     private locations: Location[] = [];
     private leftIndex: number = 0;
-
+    
     constructor(
         private _tapService: TapService,
         private _locationService: LocationService
     ) { }
 
+    
+    
     ngOnInit() {
         this.subscriptions.push(
             this._tapService.getTaps()

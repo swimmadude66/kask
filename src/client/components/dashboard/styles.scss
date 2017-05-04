@@ -4,9 +4,15 @@
     width: 1540px;
 }
 
+/deep/ a {
+    color: $link-color;
+}
+
 .tap-section {
     .tap-container {
         padding: 1em 0 1px 0;
+        height:  calc(100vh - 380px);
+        min-height: 600px;
     }
 
     .divider-brick {

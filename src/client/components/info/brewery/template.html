@@ -1,0 +1,29 @@
+<section class="container" *ngIf="!!brewery">
+  <h1>{{brewery.BreweryName}}</h1>
+
+  <div class="row">
+    <div class="col-md">
+      <img class="beer-label img-fluid" [src]="brewery.Image" />
+    </div>
+    <div class="col-md">
+      <dl>
+        <dt>Established</dt>
+        <dd>{{brewery.Established}}</dd>
+        <dd><a [href]="brewery.Website">Visit Website</a></dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <h3>Description</h3>
+      <p>
+        {{brewery.BreweryDescription}}
+      </p>
+    </div>
+  </div>
+
+</section>
+
+<chalkboard-bottom></chalkboard-bottom>
+

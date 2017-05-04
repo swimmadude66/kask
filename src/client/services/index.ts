@@ -1,12 +1,15 @@
 import {TapService} from './tap.service';
 import {LocationService} from './location.service';
+import {BeerService} from "./beer.service";
 
 export const ALL_PROVIDERS = [
     TapService,
-    LocationService
+    LocationService,
+    BeerService
 ];
 
 export {
     TapService,
-    LocationService
+    LocationService,
+    BeerService
 };
