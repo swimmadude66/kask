@@ -14,6 +14,8 @@ export class TapComponent implements OnInit {
     private contents: Keg;
     private loaded: boolean;
     private editing: boolean = false;
+    private hasVoted: boolean = false;
+    private rating: number = Math.round(Math.random() * 100) - 50;
 
     //TODO: pull from flow sensors
     private percentFull: number = Math.random()*100;
@@ -48,6 +50,12 @@ export class TapComponent implements OnInit {
             }
         }
         return BEER_IMG;
+    }
+
+
+    vote(isUpVote: boolean) {
+        this._tapService.vote('TODO', isUpVote)
+            .subscribe(success => this.hasVoted = success);
     }
 
     private addTap() {
