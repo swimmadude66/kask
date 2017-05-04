@@ -13,7 +13,9 @@ import { AppComponent } from '../components/';
     CommonModule,
     RouterModule.forRoot(
       [
-        { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' }
+          { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' },
+          { path: 'stats', loadChildren: './+stats.module.ts#LazyStatsModule' },
+          { path: 'votes', loadChildren: './+votes.module.ts#LazyVotesModule' },
       ]
     )
   ],

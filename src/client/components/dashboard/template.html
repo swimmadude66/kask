@@ -25,10 +25,15 @@
 
 <section class="storage-section">
     <div class="container container-wide">
-        <div class="row" *ngFor="let location of locations">
-            <div class="col-12">
-                <location [info]="location"></location>
+        <ng-container *ngFor="let location of locations; let i = index">
+            <div class="row" *ngIf="i%2 === 0">
+                <div class="col-md-6">
+                    <location [info]="locations[i]"></location>
+                </div>
+                <div class="col-md" *ngIf="i+1 < locations.length">
+                    <location [info]="locations[i+1]"></location>
+                </div>
             </div>
-        </div>
+        </ng-container>
     </div>
 </section>
