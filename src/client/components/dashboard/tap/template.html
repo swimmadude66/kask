@@ -16,30 +16,42 @@
                 <input type="text" class="styled tap-desc" name="tap-desc" placeholder="Tap Description" [(ngModel)]="info.Description">
             </ng-container>
         </div>
-        <div class="beer-info" *ngIf="contents?.BeerId">
-            <h3 class="beer-title">
-                <a [routerLink]="'/info/beer/' + contents?.BeerId">{{contents?.BeerName}}</a>
-            </h3>
-            <ul class="beer-details">
-                <li>
-                    Style
-                    <p><a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a></p>
-                </li>
-                <li>
-                    Brewery
-                    <p><a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a></p>
-                </li>
-            </ul>
 
-            <p class="beer-details-2">
-                <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
-                <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
-                <span *ngIf="contents?.Size"><strong>Size:</strong> <i>{{contents.Size}} Barrel</i></span>
-            </p>
-        </div>
-        <div class="keg-progress-bar" *ngIf="contents?.BeerId">
-            <div class="keg-progress-fill" [style.width]="percentFull + '%'"></div>
-        </div>
+        <ng-container *ngIf="contents?.BeerId">
+            <div class="beer-info">
+                <h3 class="beer-title">
+                    <a [routerLink]="'/info/beer/' + contents?.BeerId">{{contents?.BeerName}}</a>
+                </h3>
+                <div class="rating" *ngIf="!!rating">
+                    <i class="fa" [ngClass]="rating > 0 ? 'fa-thumbs-up' : 'fa-thumbs-down'"></i>
+                    <span [ngClass]="rating > 0 ? 'text-success' : 'text-danger'">{{(rating > 0 ? '+' : '') + rating}}</span>
+                </div>
+                <ul class="beer-details">
+                    <li>
+                        <a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a>
+                    </li>
+                    <li>
+                        <a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a>
+                    </li>
+                </ul>
+
+                <p class="beer-details-2">
+                    <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
+                    <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
+                    <span *ngIf="contents?.Size"><i>{{contents.Size}} Barrel</i></span>
+                </p>
+            </div>
+            <div class="keg-progress-bar">
+                <div class="keg-progress-fill" [style.width]="percentFull + '%'"></div>
+            </div>
+
+            <div class="text-center like-buttons" *ngIf="!hasVoted">
+                <button type="button" class="btn btn-outline-secondary" (click)="vote(false)"><i class="fa fa-fw fa-thumbs-down"></i></button>
+                <button type="button" class="btn btn-outline-secondary" (click)="vote(true)"><i class="fa fa-fw fa-thumbs-up"></i></button>
+            </div>
+        </ng-container>
+
+
         <div class="edit-footer" *ngIf="editing">
             <button type="button" name="cancel" id="edit-cancel" class="btn btn-info btn-lg btn-block" (click)="editing=false">Cancel</button>
             <button type="submit" name="submit" id="edit-submit" class="btn btn-success btn-lg btn-block">Submit</button>

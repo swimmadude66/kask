@@ -89,6 +89,24 @@ input {
         width: 100%;
     }
 
+    .rating {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        .fa-thumbs-up {
+            color: $btn-success-bg;
+        }
+        .fa-thumbs-down {
+            color: $btn-danger-bg;
+        }
+    }
+    .like-buttons {
+        display: none;
+        button {
+            margin: 1em;
+            cursor: pointer;
+        }
+    }
+
     &:hover {
         .edit-header {
             .edit {
@@ -98,7 +116,12 @@ input {
                 display: inline-block;
             }
         }
+        .like-buttons {
+            display: block;
+        }
     }
+
+
 }
 
 .tap-title {
@@ -128,8 +151,8 @@ input {
     padding: 20px;
 
     .beer-title {
+        font-size: 2rem;
         text-align: center;
-        margin-bottom: 25px;
 
         .tap-color-1 & a {
                 color: $tap-color-1;
@@ -146,10 +169,13 @@ input {
     }
 
     ul.beer-details {
-        margin: 0;
+        margin: 0 0 1.5rem 0;
+        line-height: 3rem;
         list-style-type: none;
+
         > li {
-            text-indent: -5px;
+            font-size: 1.3rem;
+            font-family: 'Schoolbell', cursive;
             &:before {
                 content: "*";
                 text-indent: -5px;
