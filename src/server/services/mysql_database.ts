@@ -105,6 +105,68 @@ export class MysqlDatabase implements Database {
         return brewery;
     }
 
+    registerUser(username: string, salt: string, passHash: string): Observable<number> {
+        let q = 'Insert into `users` (`Email`, `Salt`, `PasswordHash`) VALUES (?, ?, ?);';
+        let params = [username, salt, passHash];
+        return this.query(q, params)
+        .map(
+            result => result.insertId,
+            err => {
+                console.error(err);
+                return Observable.throw('Could not register new user');
+            }
+        );
+    }
+
+    getPasswordInfo(username: string): Observable<any> {
+        let q = 'Select * from `users` where `Email` = ? And `Active`=1 Limit 1;';
+        let params = [username];
+        return this.query(q, params)
+        .map(
+            results => {
+                if (results.length < 1) {
+                    console.log(`User ${username} could not be found`);
+                    return Observable.throw('Error logging in');
+                }
+                return results[0];
+            }, err => {
+                console.error(err);
+                return Observable.throw('Could not look up user ' + username);
+            }
+        );
+    }
+
+    generateSession(session: string, userId: number): Observable<any> {
+        let q = 'Insert into `sessions` (`SessionId`, `UserId`) VALUES(?,?);';
+        let params = [session, userId];
+        return this.query(q, params);
+    }
+
+    getUserInfoBySession(session: string): Observable<any> {
+        // tslint:disable-next-line:max-line-length
+        let q = 'Select `users`.* from `sessions` join `users` on `users`.`UserId` = `sessions`.`UserId` where `SessionId` = ? AND `sessions`.`Active`=1 AND `users`.`Active`=1 Limit 1;';
+        let params = [session];
+        return this.query(q, params)
+        .map(
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('No found users');
+                }
+                return results[0];
+            },
+            err => {
+                console.error(err);
+                return Observable.throw('Error getting user by session');
+            }
+        )
+    }
+
+    invalidateSession(session: string): Observable<any> {
+        let q = 'Update `sessions` Set `Active`=0 Where `SessionId` = ?;';
+        let params = [session];
+        return this.query(q, params);
+    }
+
     saveBeer(beer: Beer): Observable<number> {
         let q = 'Insert into `beers` SET ? ON DUPLICATE KEY Update `BeerId`=LAST_INSERT_ID(`BeerId`);';
         let params = {...beer, StyleId: beer.Style.StyleId, BreweryId: beer.Brewery.BreweryId};

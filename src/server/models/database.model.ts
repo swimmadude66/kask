@@ -9,6 +9,13 @@ import {KegSize} from './keg_size.model';
 export type Keg = Beer & {Size?: KegSize};
 
 export interface Database {
+    // Auth methods
+    registerUser(username: string, salt: string, passHash: string): Observable<number>;
+    getPasswordInfo(username: string): Observable<any>;
+    generateSession(session: string, userId: number): Observable<any>;
+    getUserInfoBySession(session: string): Observable<any>;
+    invalidateSession(session: string): Observable<any>;
+
     // Admin methods for saving data from searches
     saveBeer(beer: Beer): Observable<number>;
     saveBeers(beers: Beer[]): Observable<Beer[]>;
