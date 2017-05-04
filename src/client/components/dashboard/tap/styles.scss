@@ -1,15 +1,13 @@
-@import url('https://fonts.googleapis.com/css?family=Schoolbell');
 @import '~bootstrap/scss/bootstrap-grid';
 @import '../../../scss/_variables';
 
-$tap-handle-offset-px: 100;
 $tap-color-1: #fc5b55;
 $tap-color-2: #72f25e;
 $tap-color-3: #fc6af0;
 $tap-color-4: #7aafff;
 
 h1,h2,h3,h4,h5,p,span,input {
-    font-family: 'Schoolbell', cursive;
+    font-family: $chalk-font;
 
     &.fa {
         font-family: 'FontAwesome';
@@ -25,7 +23,7 @@ input {
     border: none;
     color: $chalk-color;
     margin: 0;
-    margin-bottom: $tap-handle-offset-px * 1px;
+    margin-bottom: 100px;
 
     @include media-breakpoint-up(md) {
         min-height: 500px;
@@ -153,7 +151,7 @@ a {
 }
 
 .tap-handle {
-    margin: $tap-handle-offset-px * -1px 0;
+    margin: -150px 0;
     position:relative;
     left: 0;
     right: 0;
@@ -200,7 +198,7 @@ a {
     width: 90%;
     max-width: 297px;
     position: relative;
-    
+
     @include media-breakpoint-up(lg) {
         &:before {
             font-family: 'Schoolbell', cursive;

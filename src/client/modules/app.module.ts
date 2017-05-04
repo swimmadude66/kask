@@ -5,17 +5,20 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from '../components/';
+import {SharedModule} from "./shared.module";
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpModule,
     CommonModule,
+    SharedModule,
     RouterModule.forRoot(
       [
           { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' },
           { path: 'stats', loadChildren: './+stats.module.ts#LazyStatsModule' },
           { path: 'votes', loadChildren: './+votes.module.ts#LazyVotesModule' },
+          { path: 'info', loadChildren: './+info.module.ts#LazyInfoModule' }
       ]
     )
   ],

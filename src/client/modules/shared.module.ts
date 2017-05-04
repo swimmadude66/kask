@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
 import {ParallaxScrollDirective} from '../directives';
+import {ChalkboardBottomComponent} from "../components/app/chalkboard_bottom/component";
 
 @NgModule({
     imports: [
@@ -13,14 +14,16 @@ import {ParallaxScrollDirective} from '../directives';
         RouterModule
     ],
     declarations: [
-        ParallaxScrollDirective
+        ParallaxScrollDirective,
+        ChalkboardBottomComponent
     ],
     exports: [
         HttpModule,
         FormsModule,
         CommonModule,
         RouterModule,
-        ParallaxScrollDirective
+        ParallaxScrollDirective,
+        ChalkboardBottomComponent
     ]
 })
 export class SharedModule { }
