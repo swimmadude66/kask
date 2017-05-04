@@ -1,4 +1,4 @@
-<div class="tap-card">
+<div class="tap-card" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
     <form name="tap-form" (submit)="submitTap()">
             <div class="edit-header">
             <span class="fa fa-times delete" (click)="deleteTap()" *ngIf="info.TapId"></span>
@@ -17,7 +17,7 @@
             </ng-container>
         </div>
         <div class="beer-info" *ngIf="contents?.BeerId">
-            <h3 class="beer-title" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
+            <h3 class="beer-title">
                 {{contents?.BeerName}}
             </h3>
             <ul class="beer-details">
@@ -38,7 +38,7 @@
             </p>
         </div>
         <div class="keg-progress-bar">
-            <div class="keg-progress-fill" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)" [style.width]="percentFull + '%'"></div>
+            <div class="keg-progress-fill" [style.width]="percentFull + '%'"></div>
         </div>
         <div class="edit-footer" *ngIf="editing">
             <button type="button" name="cancel" id="edit-cancel" class="btn btn-info btn-lg btn-block" (click)="editing=false">Cancel</button>

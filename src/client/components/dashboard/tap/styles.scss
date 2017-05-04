@@ -29,16 +29,37 @@ input {
         min-height: 500px;
     }
 
+    &.tap-color-1 .tap-info:after {
+        background: url('/assets/img/Divider_9 Line.png');
+        content: "";
+        display:block;
+        height:20px;
+        background-size: 100% 20px;
+    }
+    &.tap-color-2 .tap-info:after {
+        background: url('/assets/img/Divider_20.png');
+        content: "";
+        display:block;
+        height:20px;
+        background-size: 100% 20px;
+    }
+    &.tap-color-3 .tap-info:after {
+        background: url('/assets/img/Divider_17 Line.png');
+        content: "";
+        display:block;
+        height:20px;
+        background-size: 100% 20px;
+    }
+    &.tap-color-4 .tap-info:after {
+        background: url('/assets/img/Divider_18 Line.png');
+        content: "";
+        display:block;
+        height:20px;
+        background-size: 100% 20px;
+    }
+
     .tap-info {
         padding-bottom: 0;
-
-        &:after {
-            content: "";
-            display:block;
-            background: url('/assets/img/Divider_9 Line.png');
-            height:20px;
-            background-size: 100% 20px;
-        }
     }
 
     .edit-header {
@@ -110,16 +131,16 @@ input {
         text-align: center;
         margin-bottom: 25px;
 
-        &.tap-color-1 {
+        .tap-color-1 & {
             color: $tap-color-1;
         }
-        &.tap-color-2 {
+        .tap-color-2 & {
             color: $tap-color-2;
         }
-        &.tap-color-3 {
+        .tap-color-3 & {
             color: $tap-color-3;
         }
-        &.tap-color-4 {
+        .tap-color-4 & {
             color: $tap-color-4;
         }
     }
@@ -221,16 +242,16 @@ a {
         -webkit-mask-image: url('assets/img/chalk_progress_fill.png');
         height: 30px;
         background-repeat: no-repeat;
-        &.tap-color-1 {
+        .tap-color-1 & {
             background-color: $tap-color-1;
         }
-        &.tap-color-2 {
+        .tap-color-2 & {
             background-color: $tap-color-2;
         }
-        &.tap-color-3 {
+        .tap-color-3 & {
           background-color: $tap-color-3;
         }
-        &.tap-color-4 {
+        .tap-color-4 & {
           background-color: $tap-color-4;
         }
     }
