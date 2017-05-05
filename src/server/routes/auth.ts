@@ -8,6 +8,15 @@ module.exports = (APP_CONFIG) => {
     const router = express.Router();
     const db: Database = APP_CONFIG.database;
 
+    router.get('/', (req, res) => {
+        let user = res.locals.user;
+        if (user) {
+            return res.send({isAuth: true});
+        } else {
+            return res.send({isAuth: false});
+        }
+    });
+
     router.post('/signup', (req, res) => {
         let body = req.body;
         if (!body || !body.Email || !body.Password) {

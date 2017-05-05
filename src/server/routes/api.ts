@@ -7,7 +7,7 @@ module.exports = (APP_CONFIG) => {
 
     router.use((req, res, next) => {
         if (!req.signedCookies || !req.signedCookies[APP_CONFIG.cookie_name]) {
-            res.locals.user = null;
+            res.locals.user = undefined;
             return next();
         } else {
             let a_sess = req.signedCookies[APP_CONFIG.cookie_name];
