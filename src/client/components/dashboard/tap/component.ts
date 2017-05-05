@@ -2,7 +2,6 @@ import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models';
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {TapSession} from '../../../models/session.model';
-import {AuthService} from '../../../services/auth.service';
 
 const BEER_IMG = 'assets/img/beer.jpg';
 
@@ -98,7 +97,7 @@ export class TapComponent implements OnInit {
                 success => this.remove.emit(this.info.TapId),
                 err => console.log(err),
                 () => this.loaded = true
-            )
+            );
         }
     }
 }

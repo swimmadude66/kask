@@ -36,6 +36,7 @@ export class MysqlDatabase implements Database {
                 }
                 conn.query(q, params || [], (error, result) => {
                     if (error) {
+                        console.error('DATABASE ERROR', error);
                         return observer.error(error);
                     }
                     observer.next(result);
@@ -60,10 +61,10 @@ export class MysqlDatabase implements Database {
     private mapKeg(result: any): Keg {
         let gallons = 15.5;
         let mlPerGallon = 3785;
-        if ('KegSize' in result) {
-            if (result.KegSize === '1/2') {
+        if ('Size' in result) {
+            if (result.Size === '1/2') {
                 gallons = 15.5;
-            } else if (result.KegSize === '1/4') {
+            } else if (result.Size === '1/4') {
                 gallons = 7.75;
             } else {
                 gallons = 5.16;
@@ -691,6 +692,24 @@ export class MysqlDatabase implements Database {
             err => {
                 console.error(err);
                 return Observable.throw('Could not get contents of location');
+            }
+        );
+    }
+
+    adjustKegVolume(kegId: number, volume: number): Observable<any> {
+        let q = 'Update `kegs` set `RemovedVolume` = `RemovedVolume`+? Where `KegId`=?;';
+        return this.query(q, [volume, kegId]);
+    }
+
+    adjustTapVolume(tapId: number, volume): Observable<any> {
+        let q = 'Select `KegId` from `beer_sessions` Where `TapId`=? And `Active`=1 LIMIT 1;';
+        return this.query(q, [tapId])
+        .flatMap(
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not get Keg Id from tap');
+                }
+                return this.adjustKegVolume(results[0].KegId, volume);
             }
         );
     }

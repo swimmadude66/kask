@@ -145,5 +145,16 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
+    router.post('/completepour/:tapId', (req, res) => {
+        if (!req.body || !req.body.Volume) {
+            return res.status(400).send('Volume is required');
+        }
+        db.adjustTapVolume(req.params.tapId, req.body.Volume)
+        .subscribe(
+            _ => res.status(204).end(),
+            err => res.status(500).send('could not update poured volume')
+        );
+    });
+
     return router;
 };

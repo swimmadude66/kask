@@ -45,9 +45,11 @@ export interface Database {
     editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean>;
     deleteTap(tapId: number): Observable<boolean>;
 
-    // Get Contents
+    // Contents
     getLocationContents(locationId: number): Observable<Keg[]>;
     getTapContents(locationId: number): Observable<BeerSession>;
+    adjustKegVolume(kegId: number, volume: number): Observable<any>;
+    adjustTapVolume(tapId: number, volume): Observable<any>;
 
     // Voting
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;

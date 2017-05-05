@@ -42,7 +42,7 @@
                 </p>
             </div>
             <div class="keg-progress-bar">
-                <div class="keg-progress-fill" [style.width]="(100 - (tapSession?.Keg?.RemovedVolume/tapSession?.Keg?.InitialVolume)) + '%'"></div>
+                <div class="keg-progress-fill" [style.width]="(1 - (tapSession?.Keg?.RemovedVolume/tapSession?.Keg?.InitialVolume))*100 + '%'"></div>
             </div>
 
             <div class="text-center like-buttons" *ngIf="!tapSession.UserVote && isLoggedIn">
