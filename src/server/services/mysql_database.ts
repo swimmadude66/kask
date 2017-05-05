@@ -657,7 +657,7 @@ export class MysqlDatabase implements Database {
         .flatMap(
             results => {
                 if (!results || results.length < 1) {
-                    return Observable.throw('Could not retrive tap contents');
+                    return Observable.of(null);
                 }
                 let contents = results[0];
                 return this.getSessionVotes(contents.SessionId, userId)

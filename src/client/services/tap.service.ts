@@ -1,7 +1,8 @@
 import {Observable} from 'rxjs/Rx';
-import {Http} from '@angular/http';
+import {Http, Response} from '@angular/http';
 import {Injectable} from '@angular/core';
 import {Tap, Keg} from '../models';
+import {TapSession} from "../models/session.model";
 
 @Injectable()
 export class TapService {
@@ -22,9 +23,8 @@ export class TapService {
         .map(res => res.Success);
     }
 
-    vote(sessionId, isUpVote): Observable<boolean> {
-        return this.http.post(`/api/votes/${sessionId}`, {Vote: isUpVote ? 'up' : 'down'})
-            .map(res => res.Success);
+    vote(sessionId: number, isUpVote: string): Observable<Response> {
+        return this.http.post(`/api/votes/session/${sessionId}`, {Vote: isUpVote});
     }
     
     deleteTap(tapid): Observable<boolean> {
@@ -43,7 +43,7 @@ export class TapService {
         .map(res => res.json());
     }
 
-    getTapContents(tapId: number): Observable<Keg> {
+    getTapContents(tapId: number): Observable<TapSession> {
         return this.http.get(`/api/beers/contents/tap/${tapId}`)
         .map(res => res.json());
     }

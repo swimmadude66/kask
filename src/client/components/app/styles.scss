@@ -1,6 +1,12 @@
 @import '../../scss/_variables';
 
 
+/deep/ {
+    .btn {
+        cursor: pointer;
+    }
+}
+
 :host {
     .navbar {
         background-color: transparent;
