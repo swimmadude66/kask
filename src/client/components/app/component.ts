@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'onTap',
@@ -11,11 +12,16 @@ export class AppComponent implements OnInit {
     isLoggedIn: boolean;
     emailInput: string;
     passwordInput: string;
+    hideLoginForm: boolean;
 
-    constructor(private _authService: AuthService) {
+
+    constructor(private _authService: AuthService,  private _activatedRoute: ActivatedRoute) {
     }
 
     ngOnInit() {
+        if(location.href.split('display').length > 1)
+            this.hideLoginForm = true;
+
         this._authService.isLoggedIn().subscribe(_ => {
             this.isLoggedIn = _;
         });
@@ -24,9 +30,7 @@ export class AppComponent implements OnInit {
     }
 
     toggleSignUp() {
-        if (!this.isSigningUp) {
-            this.isSigningUp = true;
-        }
+        this.isSigningUp = !this.isSigningUp;
     }
 
     signUp() {
