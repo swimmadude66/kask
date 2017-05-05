@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
-        if(location.href.split('display').length > 1)
+        if (location.href.split('display').length > 1)
             this.hideLoginForm = true;
 
         this._authService.isLoggedIn().subscribe(_ => {

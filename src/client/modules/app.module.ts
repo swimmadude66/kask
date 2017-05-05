@@ -18,7 +18,8 @@ import {SharedModule} from './shared.module';
           { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' },
           { path: 'stats', loadChildren: './+stats.module.ts#LazyStatsModule' },
           { path: 'votes', loadChildren: './+votes.module.ts#LazyVotesModule' },
-          { path: 'info', loadChildren: './+info.module.ts#LazyInfoModule' }
+          { path: 'info', loadChildren: './+info.module.ts#LazyInfoModule' },
+          { path: 'user', loadChildren: './+user.module.ts#LazyUserModule'}
       ]
     )
   ],

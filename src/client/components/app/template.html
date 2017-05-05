@@ -29,6 +29,7 @@
                         <button class="btn btn-link my-2 my-sm-0" type="button" (click)="toggleSignUp()">Log In</button>
                     </form>
                     <form class="form-inline" *ngIf="isLoggedIn">
+                        <button class="btn btn-link my-2 my-sm-0" type="submit" routerLink="/user">Profile</button>
                         <button class="btn btn-link my-2 my-sm-0" type="submit" (click)="logOut()">Log Out</button>
                     </form>
                 </ng-container>

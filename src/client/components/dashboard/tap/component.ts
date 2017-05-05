@@ -4,8 +4,6 @@ import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {TapSession} from "../../../models/session.model";
 import {Observable} from "rxjs/Rx";
 
-const BEER_IMG = 'assets/img/beer.jpg';
-
 @Component({
     selector: 'tap',
     templateUrl: './template.html',
@@ -55,7 +53,7 @@ export class TapComponent implements OnInit {
                 return this.tapSession.Keg.Beer.Brewery.Image;
             }
         }
-        return BEER_IMG;
+        return '';
     }
 
     getPercentFull() {
