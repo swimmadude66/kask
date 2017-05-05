@@ -18,6 +18,7 @@ import {UserDetailComponent} from '../components/user_detail';
         UserDetailComponent,
     ],
     exports: [
-        UserDetailComponent,
+        UserDetailComponent
+    ]
 })
 export class LazyUserModule { }
