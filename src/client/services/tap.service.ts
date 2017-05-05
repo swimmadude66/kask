@@ -2,7 +2,7 @@ import {Observable} from 'rxjs/Rx';
 import {Http, Response} from '@angular/http';
 import {Injectable} from '@angular/core';
 import {Tap, Keg} from '../models';
-import {TapSession} from "../models/session.model";
+import {TapSession} from '../models/session.model';
 
 @Injectable()
 export class TapService {
@@ -26,7 +26,7 @@ export class TapService {
     vote(sessionId: number, isUpVote: string): Observable<Response> {
         return this.http.post(`/api/votes/session/${sessionId}`, {Vote: isUpVote});
     }
-    
+
     deleteTap(tapid): Observable<boolean> {
         return this.http.delete(`/api/admin/taps/${tapid}`)
         .map(res => res.json())

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from "../../services/auth.service";
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'onTap',
@@ -7,11 +7,11 @@ import {AuthService} from "../../services/auth.service";
   styleUrls: ['./styles.scss']
 })
 export class AppComponent implements OnInit {
-    private isSigningUp: boolean;
-    private isLoggedIn: boolean;
-    private emailInput: string;
-    private passwordInput: string;
-    
+    isSigningUp: boolean;
+    isLoggedIn: boolean;
+    emailInput: string;
+    passwordInput: string;
+
     constructor(private _authService: AuthService) {
     }
 
@@ -20,24 +20,25 @@ export class AppComponent implements OnInit {
             this.isLoggedIn = _;
         });
 
-        this._authService.checkIfLoggedIn().subscribe();
+        this._authService.checkIfLoggedIn();
     }
-    
+
     toggleSignUp() {
-        if(!this.isSigningUp)
+        if (!this.isSigningUp) {
             this.isSigningUp = true;
+        }
     }
-    
+
     signUp() {
         this._authService.signUp(this.emailInput, this.passwordInput)
             .subscribe();
     }
-    
+
     logIn() {
         this._authService.logIn(this.emailInput, this.passwordInput)
             .subscribe();
     }
-    
+
     logOut() {
         this._authService.logOut()
             .subscribe();

@@ -9,9 +9,9 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class LocationComponent implements OnInit {
 
-    private contents: Keg[];
-    private loaded: boolean;
-    private editing: boolean;
+    contents: Keg[];
+    loaded: boolean;
+    editing: boolean;
 
     @Input() info: Location;
 
