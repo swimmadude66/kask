@@ -1,13 +1,13 @@
 import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
-import {Observable, Subject, ReplaySubject} from "rxjs/Rx";
+import {Observable, Subject, BehaviorSubject} from "rxjs/Rx";
 @Injectable()
 export class AuthService {
     constructor(
         private http: Http
     ) {}
     
-    private loggedInSubject: Subject<boolean> = new ReplaySubject<boolean>(1);
+    private loggedInSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
     
     isLoggedIn(): Observable<boolean> {
         return this.loggedInSubject;
