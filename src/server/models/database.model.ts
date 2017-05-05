@@ -5,9 +5,7 @@ import {Brewery} from './brewery.model';
 import {Location} from './location.model';
 import {Beer} from './beer.model';
 import {Tap} from './tap.model';
-import {KegSize} from './keg_size.model';
-
-export type Keg = Beer & {Size?: KegSize};
+import {Keg, KegSize} from './keg.model';
 
 export interface Database {
     // Auth methods
@@ -47,9 +45,11 @@ export interface Database {
     editTap(tapId: number, name: string, description?: string, status?: string): Observable<boolean>;
     deleteTap(tapId: number): Observable<boolean>;
 
-    // Get Contents
+    // Contents
     getLocationContents(locationId: number): Observable<Keg[]>;
     getTapContents(locationId: number): Observable<BeerSession>;
+    adjustKegVolume(kegId: number, volume: number): Observable<any>;
+    adjustTapVolume(tapId: number, volume): Observable<any>;
 
     // Voting
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;
@@ -58,13 +58,13 @@ export interface Database {
     // beer movement
     // -----------------
     // Assign a beer from db to a storage location
-    assignBeerToLocation(beerId: number, locationId: number, size?: KegSize): Observable<boolean>;
+    assignBeerToLocation(beerId: number, locationId: number, size: KegSize): Observable<boolean>;
     // move a keg from one storage location to another
     moveKegLocation(kegId: number, newLocationId: number): Observable<boolean>;
     // move a keg from storage location to tap
     tapKeg(kegId: number, tapId: number): Observable<number>;
     // tap a beer without adding it to storage (straight from supplier?)
-    tapBeer(beerId: number, tapId: number, size?: KegSize): Observable<number>;
+    tapBeer(beerId: number, tapId: number, size: KegSize): Observable<number>;
     // remove keg from tap without replacing it with another keg (gasp!) only in a beer emergency
     emptyTap(tapId: number): Observable<boolean>;
 }

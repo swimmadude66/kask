@@ -17,10 +17,10 @@
             </ng-container>
         </div>
 
-        <ng-container *ngIf="tapSession?.Keg?.BeerId">
+        <ng-container *ngIf="tapSession?.Keg?.Beer?.BeerId">
             <div class="beer-info">
                 <h3 class="beer-title">
-                    <a [routerLink]="'/info/beer/' + tapSession?.Keg?.BeerId">{{tapSession?.Keg?.BeerName}}</a>
+                    <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">{{tapSession?.Keg?.Beer?.BeerName}}</a>
                 </h3>
                 <div class="rating" *ngIf="!!tapSession?.NetVote">
                     <i class="fa" [ngClass]="tapSession.NetVote > 0 ? 'fa-thumbs-up' : 'fa-thumbs-down'"></i>
@@ -28,21 +28,21 @@
                 </div>
                 <ul class="beer-details">
                     <li>
-                        <a *ngIf="tapSession?.Keg?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', tapSession?.Keg?.Style.StyleId]"><i>{{tapSession?.Keg?.Style.StyleName}}</i></a>
+                        <a *ngIf="tapSession?.Keg?.Beer?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', tapSession?.Keg?.Beer?.Style.StyleId]"><i>{{tapSession?.Keg?.Beer?.Style.StyleName}}</i></a>
                     </li>
                     <li>
-                        <a *ngIf="tapSession?.Keg?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', tapSession?.Keg?.Brewery.BreweryId]"><i>{{tapSession?.Keg?.Brewery.BreweryName}}</i></a>
+                        <a *ngIf="tapSession?.Keg?.Beer?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', tapSession?.Keg?.Beer?.Brewery.BreweryId]"><i>{{tapSession?.Keg?.Beer?.Brewery.BreweryName}}</i></a>
                     </li>
                 </ul>
 
                 <p class="beer-details-2">
-                    <span *ngIf="tapSession?.Keg?.ABV"><strong>ABV:</strong> <i>{{tapSession?.Keg?.ABV}}%</i></span>
-                    <span *ngIf="tapSession?.Keg?.IBU"><strong>IBU:</strong> <i>{{tapSession?.Keg?.IBU}}</i></span>
+                    <span *ngIf="tapSession?.Keg?.Beer?.ABV"><strong>ABV:</strong> <i>{{tapSession?.Keg?.Beer?.ABV}}%</i></span>
+                    <span *ngIf="tapSession?.Keg?.Beer?.IBU"><strong>IBU:</strong> <i>{{tapSession?.Keg?.Beer?.IBU}}</i></span>
                     <span *ngIf="tapSession?.Keg?.Size"><i>{{tapSession?.Keg?.Size}} Barrel</i></span>
                 </p>
             </div>
             <div class="keg-progress-bar">
-                <div class="keg-progress-fill" [style.width]="percentFull + '%'"></div>
+                <div class="keg-progress-fill" [style.width]="(1 - (tapSession?.Keg?.RemovedVolume/tapSession?.Keg?.InitialVolume))*100 + '%'"></div>
             </div>
 
             <div class="text-center like-buttons" *ngIf="isLoggedIn">
@@ -62,7 +62,7 @@
 <section class="tap-handle hidden-md-down"> <!--parallax-scroll="-0.5"-->
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image">
-        <a [routerLink]="'/info/beer/' + tapSession?.Keg?.BeerId">
+        <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">
             <img src="{{getImage()}}" alt="beer image" />
         </a>
     </div>

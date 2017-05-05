@@ -1,32 +1,34 @@
 import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 import {Observable, Subject, BehaviorSubject} from "rxjs/Rx";
+
 @Injectable()
 export class AuthService {
+
+    private loggedInSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
+
     constructor(
         private http: Http
     ) {}
-    
-    private loggedInSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
-    
+
     isLoggedIn(): Observable<boolean> {
         return this.loggedInSubject;
     }
-    
+
     checkIfLoggedIn(): Observable<boolean> {
         return this.http.get('/api/auth')
             .map(res => res.json())
             .map(res => res.isAuth)
             .do(_ => this.loggedInSubject.next(_));
     }
-    
+
     signUp(Email: string, Password: string) {
         return this.http.post('/api/auth/signup', {
             Email, Password
         })
         .do(() => this.checkIfLoggedIn().subscribe());
     }
-    
+
     logIn(Email: string, Password: string) {
         return this.http.post('/api/auth/login', {
             Email, Password

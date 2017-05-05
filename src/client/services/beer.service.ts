@@ -2,9 +2,9 @@ import {Observable} from 'rxjs/Rx';
 import {Http} from '@angular/http';
 import {Injectable} from '@angular/core';
 import {Tap, Keg} from '../models';
-import {Beer} from "../models/beer.model";
-import {Brewery} from "../models/brewery.model";
-import {Style} from "../models/style.model";
+import {Beer} from '../models/beer.model';
+import {Brewery} from '../models/brewery.model';
+import {Style} from '../models/style.model';
 
 @Injectable()
 export class BeerService {

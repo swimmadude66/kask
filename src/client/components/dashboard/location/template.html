@@ -33,13 +33,13 @@
           </ng-container>
         </td>
       </tr>
-      <tr *ngFor="let beer of contents">
-        <td>{{beer?.Name}}</td>
-        <td>{{beer?.Brewery?.BreweryName}}</td>
-        <td>{{beer?.Style?.Name}}</td>
+      <tr *ngFor="let keg of contents">
+        <td>{{keg?.Beer?.BeerName}}</td>
+        <td>{{keg?.Beer?.Brewery?.BreweryName}}</td>
+        <td>{{keg?.Beer?.Style?.StyleName}}</td>
         <td>
-          <ng-container *ngIf="beer?.Size">
-            {{beer?.Size}} Barrel
+          <ng-container *ngIf="keg?.Size">
+            {{keg?.Size}} Barrel
           </ng-container>
         </td>
       </tr>

@@ -1,4 +1,4 @@
-import {Keg} from "./index";
+import {Keg} from './index';
 
 export class TapSession {
     SessionId: number;

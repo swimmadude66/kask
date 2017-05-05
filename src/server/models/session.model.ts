@@ -1,4 +1,4 @@
-import {Keg} from './';
+import {Keg} from './keg.model';
 
 export class BeerSession {
     SessionId: number;

@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
 import {ParallaxScrollDirective} from '../directives';
-import {ChalkboardBottomComponent} from "../components/app/chalkboard_bottom/component";
+import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/component';
 
 @NgModule({
     imports: [

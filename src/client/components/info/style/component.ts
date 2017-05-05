@@ -1,8 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
-import {BeerService} from "../../../services/beer.service";
-import {Beer} from "../../../models/beer.model";
-import {Style} from "../../../models/style.model";
+import {ActivatedRoute} from '@angular/router';
+import {BeerService} from '../../../services/beer.service';
+import {Style} from '../../../models/style.model';
 
 @Component({
     selector: 'style-info',
@@ -11,9 +10,8 @@ import {Style} from "../../../models/style.model";
 })
 export class StyleInfoComponent implements OnInit, OnDestroy {
     private subscriptions = [];
-    private style: Style;
-    
-    
+    style: Style;
+
     constructor(
         private _route: ActivatedRoute,
         private _beerService: BeerService
@@ -21,11 +19,9 @@ export class StyleInfoComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         let id: number = this._route.snapshot.params['id'];
-        
         this._beerService.getStyle(id).subscribe(styleData => {
-            this.style = <Style>styleData
+            this.style = <Style>styleData;
         });
-        
     }
 
     ngOnDestroy() {

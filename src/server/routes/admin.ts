@@ -90,10 +90,10 @@ module.exports = (APP_CONFIG) => {
 
     router.post('/store/', (req, res) => {
         let body = req.body;
-        if (!body || !body.BeerId || !body.LocationId) {
+        if (!body || !body.BeerId || !body.LocationId || !body.Size) {
             return res.status(400).send('Missing required parameters');
         }
-        return db.assignBeerToLocation(body.BeerId, body.LocationId, body.Size || null)
+        return db.assignBeerToLocation(body.BeerId, body.LocationId, body.Size)
         .subscribe(
             result => res.send({Success: result}),
             err => res.status(500).send(err)
@@ -122,6 +122,9 @@ module.exports = (APP_CONFIG) => {
         if (body.KegId) {
             method = db.tapKeg(body.KegId, tapId);
         } else if (body.BeerId) {
+            if (!body.Size) {
+                return res.status(400).send('Size is required when BeerId is provided');
+            }
             method = db.tapBeer(body.BeerId, tapId, body.Size || null);
         } else {
             return res.status(400).send('Must specify one of KegId or BeerId');
@@ -139,6 +142,17 @@ module.exports = (APP_CONFIG) => {
         .subscribe(
             result => res.send({Success: result}),
             err => res.status(500).send(err)
+        );
+    });
+
+    router.post('/completepour/:tapId', (req, res) => {
+        if (!req.body || !req.body.Volume) {
+            return res.status(400).send('Volume is required');
+        }
+        db.adjustTapVolume(req.params.tapId, req.body.Volume)
+        .subscribe(
+            _ => res.status(204).end(),
+            err => res.status(500).send('could not update poured volume')
         );
     });
 

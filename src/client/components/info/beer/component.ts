@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
-import {BeerService} from "../../../services/beer.service";
-import {Beer} from "../../../models/beer.model";
+import {ActivatedRoute} from '@angular/router';
+import {BeerService} from '../../../services/beer.service';
+import {Beer} from '../../../models/beer.model';
 
 @Component({
     selector: 'beer-info',
@@ -10,9 +10,8 @@ import {Beer} from "../../../models/beer.model";
 })
 export class BeerInfoComponent implements OnInit, OnDestroy {
     private subscriptions = [];
-    private beer: Beer;
-    
-    
+    beer: Beer;
+
     constructor(
         private _route: ActivatedRoute,
         private _beerService: BeerService
@@ -20,11 +19,9 @@ export class BeerInfoComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         let beerId: number = this._route.snapshot.params['id'];
-        
         this._beerService.getBeer(beerId).subscribe(beerData => {
-            this.beer = <Beer>beerData
+            this.beer = <Beer>beerData;
         });
-        
     }
 
     ngOnDestroy() {
