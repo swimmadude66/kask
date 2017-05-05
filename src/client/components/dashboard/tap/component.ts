@@ -52,7 +52,7 @@ export class TapComponent implements OnInit {
     }
 
     getImage(): string {
-        if (this.tapSession && this.tapSession.Keg) {
+        if (this.tapSession && this.tapSession.Keg && this.tapSession.Keg.Beer) {
             if (this.tapSession.Keg.Beer.LabelUrl) {
                 return this.tapSession.Keg.Beer.LabelUrl;
             } else if (this.tapSession.Keg.Beer.Brewery && this.tapSession.Keg.Beer.Brewery.Image) {

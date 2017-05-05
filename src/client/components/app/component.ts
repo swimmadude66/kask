@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
             this.isLoggedIn = _;
         });
 
-        this._authService.checkIfLoggedIn();
+        this._authService.checkIfLoggedIn().subscribe();
     }
 
     toggleSignUp() {
