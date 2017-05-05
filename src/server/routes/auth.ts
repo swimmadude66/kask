@@ -85,7 +85,8 @@ module.exports = (APP_CONFIG) => {
         }
         res.clearCookie(APP_CONFIG.cookie_name);
         db.invalidateSession(res.locals.session).subscribe(
-            _ => res.status(204).end()
+            _ => res.status(204).end(),
+            err => res.status(204).end()
         );
     });
 
