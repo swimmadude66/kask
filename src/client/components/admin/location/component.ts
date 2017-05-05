@@ -1,11 +1,12 @@
-import {LocationService} from '../../../services';
-import {Location, Keg} from '../../../models';
 import {Component, Input, OnInit} from '@angular/core';
+import {Keg} from "../../../models/keg.model";
+import {Location} from "../../../models/location.model";
+import {LocationService} from "../../../services/location.service";
 
 @Component({
     selector: 'location',
     templateUrl: './template.html',
-    styleUrls: ['./styles.scss']
+    styleUrls: ['../../styles.scss', './styles.scss']
 })
 export class LocationComponent implements OnInit {
 

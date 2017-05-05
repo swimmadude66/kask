@@ -44,8 +44,7 @@
             <div class="keg-progress-bar">
                 <div class="keg-progress-fill" [style.width]="getPercentFull() + '%'"></div>
             </div>
-
-            <div class="text-center like-buttons" *ngIf="isLoggedIn">
+            <div class="text-center like-buttons" *ngIf="!editing">
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === -1 ? 'disabled active' : ''" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === 1 ? 'disabled active' : ''" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
             </div>
@@ -53,18 +52,21 @@
 
 
         <div class="edit-footer" *ngIf="editing">
-            <button type="button" name="cancel" id="edit-cancel" class="btn btn-info btn-lg btn-block" (click)="editing=false">Cancel</button>
-            <button type="submit" name="submit" id="edit-submit" class="btn btn-success btn-lg btn-block">Submit</button>
+            <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger" (click)="editing=false">Cancel</button>
+            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success pull-right">Submit</button>
         </div>
+
+
     </form>
 </div>
 
-<section class="tap-handle hidden-md-down"> <!--parallax-scroll="-0.5"-->
+<section class="tap-handle hidden-md-down">
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image" *ngIf="getImage()">
         <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">
-            <img src="{{getImage()}}" alt="beer image" />
+            <img src="{{getImage()}}" alt="beer image" [style.width]="imageScale + '%'"/>
         </a>
     </div>
+    <input *ngIf="editing" class="img-scale" type="range" id="weight" min="10" max="1000" [value]="imageScale" (input)="imageScale = $event.target.value" step="1" />
 </section>
 

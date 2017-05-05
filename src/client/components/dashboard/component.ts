@@ -1,5 +1,5 @@
-import {TapService, LocationService} from '../../services';
-import {Tap, Location} from '../../models';
+import {TapService} from '../../services';
+import {Tap} from '../../models';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
 
@@ -11,13 +11,11 @@ import {AuthService} from '../../services/auth.service';
 export class DashboardComponent implements OnInit, OnDestroy {
     private subscriptions = [];
     taps: Tap[] = [];
-    locations: Location[] = [];
     leftIndex: number = 0;
     isLoggedIn: boolean;
 
     constructor(
         private _tapService: TapService,
-        private _locationService: LocationService,
         private _authService: AuthService
     ) { }
 
@@ -25,11 +23,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this._tapService.getTaps()
             .subscribe(taps => this.taps = taps)
-        );
-
-        this.subscriptions.push(
-            this._locationService.getLocations()
-            .subscribe(locations => this.locations = locations)
         );
 
         this.subscriptions.push(

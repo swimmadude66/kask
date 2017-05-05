@@ -1,0 +1,14 @@
+<section class="container">
+  <div class="row">
+    <div class="col-md">
+      <section class="storage-section" *ngFor="let location of locations">
+          <location [info]="location"></location>
+      </section>
+    </div>
+    <div class="col-md">
+      other stuff here
+    </div>
+  </div>
+</section>
+
+<chalkboard-bottom></chalkboard-bottom>

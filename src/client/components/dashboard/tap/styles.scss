@@ -87,6 +87,12 @@ input {
     .edit-footer {
         display: block;
         width: 100%;
+        margin: 2rem 0;
+
+        .btn {
+            width: 45%;
+        }
+
     }
 
     .rating {
@@ -208,6 +214,14 @@ input {
         width: 240px;
     }
 
+    .img-scale {
+        position: absolute;
+        left: 0;
+        right: 0;
+        width: 100%;
+        top: 200px;
+    }
+
     .tap-image {
         border-radius: 50%;
         height:200px;
@@ -223,8 +237,8 @@ input {
 
         img {
             position:absolute;
-            max-height:120%;
-            max-width: 200%;
+            //max-height:120%;
+            //max-width: 200%;
             top: -9999px;
             bottom: -9999px;
             left: -9999px;

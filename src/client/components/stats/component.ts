@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 
 @Component({
-    selector: 'dashboard',
+    selector: 'stats',
     templateUrl: './template.html',
     styleUrls: ['../styles.scss', './styles.scss']
 })

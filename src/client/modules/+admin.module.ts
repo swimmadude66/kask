@@ -2,7 +2,8 @@ import {FormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
-import {DashboardComponent, TapComponent} from '../components/dashboard';
+import {AdminComponent} from '../components/admin';
+import {LocationComponent} from "../components/admin/location/component";
 
 @NgModule({
     imports: [
@@ -10,17 +11,17 @@ import {DashboardComponent, TapComponent} from '../components/dashboard';
         FormsModule,
         RouterModule.forChild(
             [
-                {path: '', component: DashboardComponent},
+                {path: '', component: AdminComponent},
             ]
         )
     ],
     declarations: [
-        DashboardComponent,
-        TapComponent
+        AdminComponent,
+        LocationComponent,
     ],
     exports: [
-        DashboardComponent,
-        TapComponent
+        AdminComponent,
+        LocationComponent,
     ]
 })
-export class LazyDashboardModule { }
+export class LazyAdminModule { }

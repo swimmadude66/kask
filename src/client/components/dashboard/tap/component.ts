@@ -14,6 +14,7 @@ export class TapComponent implements OnInit {
     tapSession: TapSession;
     loaded: boolean;
     editing: boolean = false;
+    imageScale = 100;
 
     //TODO: pull from flow sensors
     private percentFull: number = Math.random()*100;
