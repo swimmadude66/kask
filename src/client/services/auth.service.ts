@@ -13,7 +13,7 @@ export class AuthService {
         return this.loggedInSubject;
     }
     
-    checkLoggedIn(): Observable<boolean> {
+    checkIfLoggedIn(): Observable<boolean> {
         return this.http.get('/api/auth')
             .map(res => res.json())
             .map(res => res.isAuth)
@@ -24,18 +24,18 @@ export class AuthService {
         return this.http.post('/api/auth/signup', {
             Email, Password
         })
-        .do(() => this.checkLoggedIn());
+        .do(() => this.checkIfLoggedIn().subscribe());
     }
     
     logIn(Email: string, Password: string) {
         return this.http.post('/api/auth/login', {
             Email, Password
         })
-        .do(() => this.checkLoggedIn());
+        .do(() => this.checkIfLoggedIn().subscribe());
     }
 
     logOut() {
         return this.http.post('/api/auth/logout', {})
-            .do(() => this.checkLoggedIn());
+            .do(() => this.checkIfLoggedIn().subscribe());
     }
 }
