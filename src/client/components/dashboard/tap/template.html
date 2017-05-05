@@ -17,37 +17,37 @@
             </ng-container>
         </div>
 
-        <ng-container *ngIf="contents?.BeerId">
+        <ng-container *ngIf="tapSession?.Keg?.BeerId">
             <div class="beer-info">
                 <h3 class="beer-title">
-                    <a [routerLink]="'/info/beer/' + contents?.BeerId">{{contents?.BeerName}}</a>
+                    <a [routerLink]="'/info/beer/' + tapSession?.Keg?.BeerId">{{tapSession?.Keg?.BeerName}}</a>
                 </h3>
-                <div class="rating" *ngIf="!!rating">
-                    <i class="fa" [ngClass]="rating > 0 ? 'fa-thumbs-up' : 'fa-thumbs-down'"></i>
-                    <span [ngClass]="rating > 0 ? 'text-success' : 'text-danger'">{{(rating > 0 ? '+' : '') + rating}}</span>
+                <div class="rating" *ngIf="!!tapSession?.NetVote">
+                    <i class="fa" [ngClass]="tapSession.NetVote > 0 ? 'fa-thumbs-up' : 'fa-thumbs-down'"></i>
+                    <span [ngClass]="tapSession.NetVote > 0 ? 'text-success' : 'text-danger'">{{(tapSession.NetVote > 0 ? '+' : '') + tapSession.NetVote}}</span>
                 </div>
                 <ul class="beer-details">
                     <li>
-                        <a *ngIf="contents?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', contents.Style.StyleId]"><i>{{contents.Style.StyleName}}</i></a>
+                        <a *ngIf="tapSession?.Keg?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', tapSession?.Keg?.Style.StyleId]"><i>{{tapSession?.Keg?.Style.StyleName}}</i></a>
                     </li>
                     <li>
-                        <a *ngIf="contents?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', contents.Brewery.BreweryId]"><i>{{contents.Brewery.BreweryName}}</i></a>
+                        <a *ngIf="tapSession?.Keg?.Brewery?.BreweryName" class="info-page-link" [routerLink]="['/info/brewery/', tapSession?.Keg?.Brewery.BreweryId]"><i>{{tapSession?.Keg?.Brewery.BreweryName}}</i></a>
                     </li>
                 </ul>
 
                 <p class="beer-details-2">
-                    <span *ngIf="contents?.ABV"><strong>ABV:</strong> <i>{{contents.ABV}}%</i></span>
-                    <span *ngIf="contents?.IBU"><strong>IBU:</strong> <i>{{contents.IBU}}</i></span>
-                    <span *ngIf="contents?.Size"><i>{{contents.Size}} Barrel</i></span>
+                    <span *ngIf="tapSession?.Keg?.ABV"><strong>ABV:</strong> <i>{{tapSession?.Keg?.ABV}}%</i></span>
+                    <span *ngIf="tapSession?.Keg?.IBU"><strong>IBU:</strong> <i>{{tapSession?.Keg?.IBU}}</i></span>
+                    <span *ngIf="tapSession?.Keg?.Size"><i>{{tapSession?.Keg?.Size}} Barrel</i></span>
                 </p>
             </div>
             <div class="keg-progress-bar">
                 <div class="keg-progress-fill" [style.width]="percentFull + '%'"></div>
             </div>
 
-            <div class="text-center like-buttons" *ngIf="!hasVoted">
-                <button type="button" class="btn btn-outline-secondary" (click)="vote(false)"><i class="fa fa-fw fa-thumbs-down"></i></button>
-                <button type="button" class="btn btn-outline-secondary" (click)="vote(true)"><i class="fa fa-fw fa-thumbs-up"></i></button>
+            <div class="text-center like-buttons" *ngIf="!tapSession.UserVote && isLoggedIn">
+                <button type="button" class="btn btn-outline-secondary" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
+                <button type="button" class="btn btn-outline-secondary" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
             </div>
         </ng-container>
 
@@ -62,7 +62,7 @@
 <section class="tap-handle hidden-md-down"> <!--parallax-scroll="-0.5"-->
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image">
-        <a [routerLink]="'/info/beer/' + contents?.BeerId">
+        <a [routerLink]="'/info/beer/' + tapSession?.Keg?.BeerId">
             <img src="{{getImage()}}" alt="beer image" />
         </a>
     </div>

@@ -1,6 +1,8 @@
 import {TapService} from '../../../services/tap.service';
-import {Tap, Keg} from '../../../models';
+import {Tap} from '../../../models';
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+import {TapSession} from "../../../models/session.model";
+import {AuthService} from "../../../services/auth.service";
 
 const BEER_IMG = 'assets/img/beer.jpg';
 
@@ -11,17 +13,17 @@ const BEER_IMG = 'assets/img/beer.jpg';
 })
 export class TapComponent implements OnInit {
 
-    private contents: Keg;
+    private tapSession: TapSession;
     private loaded: boolean;
     private editing: boolean = false;
-    private hasVoted: boolean = false;
-    private rating: number = Math.round(Math.random() * 100) - 50;
 
     //TODO: pull from flow sensors
     private percentFull: number = Math.random()*100;
+    private isAuthed: boolean;
 
     @Input() info: Tap;
     @Input() tapNum: number;
+    @Input() isLoggedIn: boolean;
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
 
     constructor(
@@ -31,9 +33,10 @@ export class TapComponent implements OnInit {
     ngOnInit() {
         if (this.info && this.info.TapId) {
             this._tapService.getTapContents(this.info.TapId).subscribe(
-                beer => this.contents = beer,
+                tapSession => this.tapSession = tapSession,
                 error => console.log(error),
                 () => this.loaded = true
+                
             );
         } else {
             this.editing = true;
@@ -42,20 +45,22 @@ export class TapComponent implements OnInit {
     }
 
     getImage(): string {
-        if (this.contents) {
-            if (this.contents.LabelUrl) {
-                return this.contents.LabelUrl;
-            } else if (this.contents.Brewery && this.contents.Brewery.Image) {
-                return this.contents.Brewery.Image;
+        if (this.tapSession && this.tapSession.Keg) {
+            if (this.tapSession.Keg.LabelUrl) {
+                return this.tapSession.Keg.LabelUrl;
+            } else if (this.tapSession.Keg.Brewery && this.tapSession.Keg.Brewery.Image) {
+                return this.tapSession.Keg.Brewery.Image;
             }
         }
         return BEER_IMG;
     }
 
 
-    vote(isUpVote: boolean) {
-        this._tapService.vote('TODO', isUpVote)
-            .subscribe(success => this.hasVoted = success);
+    vote(vote: string) {
+        this._tapService.vote(this.tapSession.SessionId, vote)
+            .subscribe(
+                () => this.tapSession.UserVote = vote == 'up' ? 1 : -1
+            );
     }
 
     private addTap() {
