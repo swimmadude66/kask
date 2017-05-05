@@ -5,9 +5,7 @@ import {Brewery} from './brewery.model';
 import {Location} from './location.model';
 import {Beer} from './beer.model';
 import {Tap} from './tap.model';
-import {KegSize} from './keg_size.model';
-
-export type Keg = Beer & {Size?: KegSize};
+import {Keg, KegSize} from './keg.model';
 
 export interface Database {
     // Auth methods

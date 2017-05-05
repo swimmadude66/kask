@@ -58,17 +58,23 @@ export class MysqlDatabase implements Database {
     }
 
     private mapKeg(result: any): Keg {
+        let gallons = 15.5;
+        let mlPerGallon = 3785;
+        if ('KegSize' in result) {
+            if (result.KegSize === '1/2') {
+                gallons = 15.5;
+            } else if (result.KegSize === '1/4') {
+                gallons = 7.75;
+            } else {
+                gallons = 5.16;
+            }
+        }
+        let initialVolume = gallons * mlPerGallon;
         let keg: Keg = {
-            BeerId: result.BeerId,
-            BeerBDBID: result.BeerBDBID,
-            Brewery: this.mapBrewery(result),
-            Style: this.mapStyle(result),
-            BeerName: result.BeerName,
-            BeerDescription: result.BeerDescription,
-            ABV: result.ABV,
-            IBU: result.IBU,
-            LabelUrl: result.LabelUrl,
-            Size: result.KegSize
+            Beer: this.mapBeer(result),
+            Size: result.KegSize,
+            InitialVolume: initialVolume,
+            RemovedVolume: result.RemovedVolume || 0,
         };
         return keg;
     }
