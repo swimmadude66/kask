@@ -18,10 +18,9 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         this._authService.isLoggedIn().subscribe(_ => {
             this.isLoggedIn = _;
-            console.log(this.isLoggedIn);
         });
 
-        this._authService.checkLoggedIn();
+        this._authService.checkIfLoggedIn().subscribe();
     }
     
     toggleSignUp() {
