@@ -2,7 +2,7 @@ import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models';
 import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import {TapSession} from "../../../models/session.model";
-import {AuthService} from "../../../services/auth.service";
+import {Observable} from "rxjs/Rx";
 
 const BEER_IMG = 'assets/img/beer.jpg';
 
@@ -19,7 +19,6 @@ export class TapComponent implements OnInit {
 
     //TODO: pull from flow sensors
     private percentFull: number = Math.random()*100;
-    private isAuthed: boolean;
 
     @Input() info: Tap;
     @Input() tapNum: number;
@@ -32,12 +31,16 @@ export class TapComponent implements OnInit {
 
     ngOnInit() {
         if (this.info && this.info.TapId) {
-            this._tapService.getTapContents(this.info.TapId).subscribe(
+            this._tapService.observeTapContents(this.info.TapId).subscribe(
                 tapSession => this.tapSession = tapSession,
                 error => console.log(error),
                 () => this.loaded = true
-                
             );
+
+            //poll the tap
+            Observable.timer(0, 30000)
+                .switchMap(() => this._tapService.getTapContents(this.info.TapId))
+                .subscribe();
         } else {
             this.editing = true;
             this.loaded = true;
@@ -58,9 +61,8 @@ export class TapComponent implements OnInit {
 
     vote(vote: string) {
         this._tapService.vote(this.tapSession.SessionId, vote)
-            .subscribe(
-                () => this.tapSession.UserVote = vote == 'up' ? 1 : -1
-            );
+            .switchMap(() => this._tapService.getTapContents(this.info.TapId))
+            .subscribe();
     }
 
     private addTap() {

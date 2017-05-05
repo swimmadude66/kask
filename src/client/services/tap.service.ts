@@ -1,4 +1,4 @@
-import {Observable} from 'rxjs/Rx';
+import {Observable, ReplaySubject, Subject} from 'rxjs/Rx';
 import {Http, Response} from '@angular/http';
 import {Injectable} from '@angular/core';
 import {Tap, Keg} from '../models';
@@ -7,10 +7,12 @@ import {TapSession} from "../models/session.model";
 @Injectable()
 export class TapService {
 
+    private tapContents: {[key: any]: Subject<TapSession>} = {};
+    
     constructor(
         private http: Http
     ) {}
-
+    
     addTap(data): Observable<number> {
         return this.http.post('/api/admin/taps', data)
         .map(res => res.json())
@@ -43,8 +45,16 @@ export class TapService {
         .map(res => res.json());
     }
 
+    observeTapContents(tapId: number): Observable<TapSession> {
+        if (!this.tapContents[tapId]) {
+            this.tapContents[tapId] = new ReplaySubject<TapSession>(1);
+        }
+        return this.tapContents[tapId];
+    }
+    
     getTapContents(tapId: number): Observable<TapSession> {
         return this.http.get(`/api/beers/contents/tap/${tapId}`)
-        .map(res => res.json());
+        .map(res => res.json())
+            .do(_ => this.tapContents[tapId].next(_));
     }
 }

@@ -3,7 +3,7 @@
         <div class="container container-wide">
             <div class="row justify-content-center hidden-lg-up">
                 <div class="col-12" *ngFor="let tap of taps">
-                    <tap [info]="tap" (remove)="removeTap($event)"></tap>
+                    <tap [info]="tap" [tapNum]="i" [isLoggedIn]="isLoggedIn" (remove)="removeTap($event)"></tap>
                 </div>
             </div>
             <div class="hidden-md-down">
