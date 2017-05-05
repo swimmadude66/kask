@@ -56,13 +56,13 @@ export interface Database {
     // beer movement
     // -----------------
     // Assign a beer from db to a storage location
-    assignBeerToLocation(beerId: number, locationId: number, size?: KegSize): Observable<boolean>;
+    assignBeerToLocation(beerId: number, locationId: number, size: KegSize): Observable<boolean>;
     // move a keg from one storage location to another
     moveKegLocation(kegId: number, newLocationId: number): Observable<boolean>;
     // move a keg from storage location to tap
     tapKeg(kegId: number, tapId: number): Observable<number>;
     // tap a beer without adding it to storage (straight from supplier?)
-    tapBeer(beerId: number, tapId: number, size?: KegSize): Observable<number>;
+    tapBeer(beerId: number, tapId: number, size: KegSize): Observable<number>;
     // remove keg from tap without replacing it with another keg (gasp!) only in a beer emergency
     emptyTap(tapId: number): Observable<boolean>;
 }

@@ -23,25 +23,6 @@ CREATE TABLE IF NOT EXISTS `sessions` (
   CONSTRAINT `user_session` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-CREATE TABLE IF NOT EXISTS `taps` (
-  `TapId` int(11) NOT NULL AUTO_INCREMENT,
-  `TapName` varchar(128) NOT NULL,
-  `Description` varchar(256) DEFAULT NULL,
-  `Status` varchar(64) DEFAULT NULL COMMENT 'Any special information about the status of the tap. Is it overly frothy? Tart AF? leaky?',
-  PRIMARY KEY (`TapId`),
-  UNIQUE KEY `TapId_UNIQUE` (`TapId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Available taps go here';
-
-
-CREATE TABLE IF NOT EXISTS `off_tap_locations` (
-  `LocationId` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(256) NOT NULL,
-  `Description` longtext,
-  PRIMARY KEY (`LocationId`),
-  UNIQUE KEY `LocationId_UNIQUE` (`LocationId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Describe locations that are not the current tap. ie cold storage, warm storage, order-list';
-
 CREATE TABLE IF NOT EXISTS `styles` (
   `StyleId` int(11) NOT NULL AUTO_INCREMENT,
   `StyleName` varchar(128) NOT NULL,
@@ -57,7 +38,6 @@ CREATE TABLE IF NOT EXISTS `styles` (
   UNIQUE KEY `StyleId_UNIQUE` (`StyleId`),
   UNIQUE KEY `BDBID_UNIQUE` (`StyleBDBID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='More information about a style of beer';
-
 
 CREATE TABLE IF NOT EXISTS `breweries` (
   `BreweryId` int(11) NOT NULL AUTO_INCREMENT,
@@ -91,21 +71,46 @@ CREATE TABLE IF NOT EXISTS `beers` (
   CONSTRAINT `Style` FOREIGN KEY (`StyleId`) REFERENCES `styles` (`StyleId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Information about the beers';
 
+CREATE TABLE IF NOT EXISTS `kegs` (
+  `KegId` int(11) NOT NULL AUTO_INCREMENT,
+  `BeerId` int(11) NOT NULL,
+  `Size` enum('1/2','1/3','1/4','1/5','1/6') NOT NULL,
+  `RemovedVolume` decimal(10,0) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`KegId`),
+  KEY `KegContents_idx` (`BeerId`),
+  CONSTRAINT `KegContents` FOREIGN KEY (`BeerId`) REFERENCES `beers` (`BeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `taps` (
+  `TapId` int(11) NOT NULL AUTO_INCREMENT,
+  `TapName` varchar(128) NOT NULL,
+  `Description` varchar(256) DEFAULT NULL,
+  `Status` varchar(64) DEFAULT NULL COMMENT 'Any special information about the status of the tap. Is it overly frothy? Tart AF? leaky?',
+  PRIMARY KEY (`TapId`),
+  UNIQUE KEY `TapId_UNIQUE` (`TapId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Available taps go here';
+
+CREATE TABLE IF NOT EXISTS `off_tap_locations` (
+  `LocationId` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(256) NOT NULL,
+  `Description` longtext,
+  PRIMARY KEY (`LocationId`),
+  UNIQUE KEY `LocationId_UNIQUE` (`LocationId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Describe locations that are not the current tap. ie cold storage, warm storage, order-list';
+
 CREATE TABLE IF NOT EXISTS `beer_sessions` (
   `SessionId` int(11) NOT NULL AUTO_INCREMENT,
   `TapId` int(11) NOT NULL,
-  `BeerId` int(11) NOT NULL,
+  `KegId` int(11) NOT NULL,
   `TappedTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `Score` varchar(8) DEFAULT NULL,
-  `KegSize` enum('1/6','1/4','1/2') DEFAULT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   `RemovalTime` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`SessionId`),
   UNIQUE KEY `HistoryId_UNIQUE` (`SessionId`),
   UNIQUE KEY `ActiveBeer` (`TapId`,`Active`) COMMENT 'Only one beer can be active on a given tap at a time',
   KEY `Tap_idx` (`TapId`),
-  KEY `Beer_idx` (`BeerId`),
-  CONSTRAINT `FK_Beer` FOREIGN KEY (`BeerId`) REFERENCES `beers` (`BeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  KEY `FK_Keg_idx` (`KegId`),
+  CONSTRAINT `FK_Keg` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_Tap` FOREIGN KEY (`TapId`) REFERENCES `taps` (`TapId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Record of beer taptimes';
 
@@ -122,20 +127,18 @@ CREATE TABLE IF NOT EXISTS `beer_session_likes` (
   CONSTRAINT `uservotes` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-CREATE TABLE IF NOT EXISTS `off_tap_kegs` (
-  `KegId` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `keg_locations` (
+  `KegLocId` int(11) NOT NULL AUTO_INCREMENT,
   `LocationId` int(11) NOT NULL,
-  `BeerId` int(11) NOT NULL,
-  `KegSize` enum('1/6','1/4','1/2') DEFAULT NULL,
+  `KegId` int(11) NOT NULL,
   `EnteredStorage` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Active` tinyint(1) DEFAULT '1',
-  PRIMARY KEY (`KegId`),
-  UNIQUE KEY `KegId_UNIQUE` (`KegId`),
-  KEY `I_Size` (`KegSize`),
+  PRIMARY KEY (`KegLocId`),
+  UNIQUE KEY `KegId_UNIQUE` (`KegLocId`),
   KEY `FK_Location_idx` (`LocationId`),
-  KEY `FK_Keg_idx` (`BeerId`),
-  CONSTRAINT `FK_Keg` FOREIGN KEY (`BeerId`) REFERENCES `beers` (`BeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  KEY `FK_Keg_idx` (`KegId`),
+  CONSTRAINT `FK_Kegs` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_Location` FOREIGN KEY (`LocationId`) REFERENCES `off_tap_locations` (`LocationId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Map beers to their off-tap locations';
+
 

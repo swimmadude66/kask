@@ -90,10 +90,10 @@ module.exports = (APP_CONFIG) => {
 
     router.post('/store/', (req, res) => {
         let body = req.body;
-        if (!body || !body.BeerId || !body.LocationId) {
+        if (!body || !body.BeerId || !body.LocationId || !body.Size) {
             return res.status(400).send('Missing required parameters');
         }
-        return db.assignBeerToLocation(body.BeerId, body.LocationId, body.Size || null)
+        return db.assignBeerToLocation(body.BeerId, body.LocationId, body.Size)
         .subscribe(
             result => res.send({Success: result}),
             err => res.status(500).send(err)
