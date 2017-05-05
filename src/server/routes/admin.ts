@@ -122,6 +122,9 @@ module.exports = (APP_CONFIG) => {
         if (body.KegId) {
             method = db.tapKeg(body.KegId, tapId);
         } else if (body.BeerId) {
+            if (!body.Size) {
+                return res.status(400).send('Size is required when BeerId is provided');
+            }
             method = db.tapBeer(body.BeerId, tapId, body.Size || null);
         } else {
             return res.status(400).send('Must specify one of KegId or BeerId');
