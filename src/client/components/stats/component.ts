@@ -3,7 +3,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 @Component({
     selector: 'dashboard',
     templateUrl: './template.html',
-    styleUrls: ['./styles.scss']
+    styleUrls: ['../styles.scss', './styles.scss']
 })
 export class StatsComponent implements OnInit, OnDestroy {
     private subscriptions = [];

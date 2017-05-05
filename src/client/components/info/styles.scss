@@ -2,10 +2,6 @@
 
 .container {
 
-    /deep/ a {
-        color: $link-color;
-    }
-
     margin-top: 1em;
 
     h1, h2, h3 {
@@ -14,9 +10,6 @@
 
     h1, h2, h3, h4, dt {
         font-family: $chalk-font;
-    }
-    *:not(a) {
-        color: $chalk-color;
     }
 
 

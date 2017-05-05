@@ -6,7 +6,7 @@ import {Beer} from '../../../models/beer.model';
 @Component({
     selector: 'beer-info',
     templateUrl: './template.html',
-    styleUrls: ['../styles.scss', './styles.scss']
+    styleUrls: ['../../styles.scss', '../styles.scss', './styles.scss']
 })
 export class BeerInfoComponent implements OnInit, OnDestroy {
     private subscriptions = [];

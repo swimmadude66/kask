@@ -6,7 +6,7 @@ import {Style} from '../../../models/style.model';
 @Component({
     selector: 'style-info',
     templateUrl: './template.html',
-    styleUrls: ['../styles.scss', './styles.scss']
+    styleUrls: ['../../styles.scss', '../styles.scss', './styles.scss']
 })
 export class StyleInfoComponent implements OnInit, OnDestroy {
     private subscriptions = [];

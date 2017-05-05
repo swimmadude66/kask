@@ -4,7 +4,7 @@ import {ActivatedRoute} from "@angular/router";
 @Component({
     selector: 'dashboard',
     templateUrl: './template.html',
-    styleUrls: ['./styles.scss']
+    styleUrls: ['../styles.scss']
 })
 export class UserDetailComponent implements OnInit, OnDestroy {
     private subscriptions = [];
