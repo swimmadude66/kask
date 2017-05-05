@@ -20,10 +20,6 @@ export class TapComponent implements OnInit {
     //TODO: pull from flow sensors
     private percentFull: number = Math.random()*100;
 
-    tapSession: TapSession;
-    loaded: boolean;
-    editing: boolean = false;
-
     @Input() info: Tap;
     @Input() tapNum: number;
     @Input() isLoggedIn: boolean;
@@ -62,6 +58,11 @@ export class TapComponent implements OnInit {
         return BEER_IMG;
     }
 
+    getPercentFull() {
+        // min of 3% in case the flow sensor data predicts a premature kick.
+        return Math.max((1 - (this.tapSession.Keg.RemovedVolume/this.tapSession.Keg.InitialVolume))*100, 3);
+    }
+    
 
     vote(vote: string) {
         this._tapService.vote(this.tapSession.SessionId, vote)

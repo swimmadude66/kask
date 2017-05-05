@@ -7,7 +7,7 @@ import {TapSession} from '../models/session.model';
 @Injectable()
 export class TapService {
 
-    private tapContents: {[key: any]: Subject<TapSession>} = {};
+    private tapContents: {[key: number]: Subject<TapSession>} = {};
     
     constructor(
         private http: Http
