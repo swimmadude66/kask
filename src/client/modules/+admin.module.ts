@@ -6,6 +6,7 @@ import {AdminComponent} from '../components/admin';
 import {LocationComponent} from "../components/admin/location/component";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {TapEditComponent} from "../components/admin/tap/component";
+import {KegRowComponent} from "../components/admin/location/keg/component";
 
 @NgModule({
     imports: [
@@ -21,12 +22,14 @@ import {TapEditComponent} from "../components/admin/tap/component";
     declarations: [
         AdminComponent,
         LocationComponent,
-        TapEditComponent
+        TapEditComponent,
+        KegRowComponent
     ],
     exports: [
         AdminComponent,
         LocationComponent,
-        TapEditComponent
+        TapEditComponent,
+        KegRowComponent
     ]
 })
 export class LazyAdminModule { }

@@ -1,1 +1,23 @@
 @import '../../../scss/_variables';
+
+.beer {
+    font-size: 24px;
+    margin: 0 20px;
+    &.empty {
+        color: rgba(255, 255, 255, .4);
+    }
+}
+
+.beer-container {
+    margin-bottom: 2rem;
+    height: 2rem;
+    button {
+        display: none;
+
+    }
+    &:hover {
+       button{
+           display:inline-block;
+       }
+    }
+}

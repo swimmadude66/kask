@@ -1,0 +1,13 @@
+<div class="form-group text-right">
+  <select class="form-control" (change)="selectedTapId = $event.target.value">
+    <option>(Select Tap)</option>
+    <ng-container *ngFor="let tap of taps">
+      <option [value]="tap.TapId">{{tap.TapName}}</option>
+    </ng-container>
+  </select>
+
+  <button type="button" class="btn btn-outline-info" (click)="tapKeg()">Move</button>
+</div>
+
+
+

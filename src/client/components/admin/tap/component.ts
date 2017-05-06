@@ -3,6 +3,8 @@ import {Tap} from "../../../models/tap.model";
 import {Observable} from "rxjs/Rx";
 import {AdminService} from "../../../services/admin.service";
 import {Beer} from "../../../models/beer.model";
+import {TapService} from "../../../services/tap.service";
+import {TapSession} from "../../../models/session.model";
 
 @Component({
     selector: 'tap-edit',
@@ -11,41 +13,33 @@ import {Beer} from "../../../models/beer.model";
 })
 export class TapEditComponent implements OnInit, OnDestroy {
     private subscriptions = [];
+    tapSession: TapSession;
+
     private isEditing: boolean;
     beerToLoad: Beer;
     @Input() info: Tap;
     
     constructor(
-        private _adminService: AdminService
+        private _adminService: AdminService,
+        private _tapService: TapService
     ) { }
 
     ngOnInit() {
-    }
+        this.subscriptions.push(
+        this._tapService.observeTapContents(this.info.TapId).subscribe(
+            tapSession => this.tapSession = tapSession,
+            error => console.error(error)
+        ));
 
-    submitNewBeer() {
+        this._tapService.getTapContents(this.info.TapId).subscribe();
+    }
+    
+    submitEdit() {
         console.log(this.beerToLoad);
     }
 
-    search = (text$: Observable<string>) => {
-        return text$
-            .debounceTime(300)
-            .distinctUntilChanged()
-            .filter(term => term.length > 4)
-            .switchMap(term => this._adminService.search(term))
-            .map(result => result.beers)
-    };
-    
-    getBeerName(beer:Beer) {
-        return beer.BeerName
-    }
-
-    getBeerDisplay(beer:Beer) {
-        return `${beer.Brewery.BreweryName}: ${beer.BeerName}`;
-    }
-
-    beerSelected(selection:any) {
-        let beer: Beer = selection.item;
-        console.log(beer);
+    clear() {
+        this._adminService.clearTap(this.info.TapId).subscribe();
     }
 
     ngOnDestroy() {

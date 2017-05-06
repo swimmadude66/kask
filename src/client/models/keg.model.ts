@@ -7,6 +7,7 @@ export enum KegSize {
 }
 
 export class Keg {
+    KegId: number;
     Beer: Beer;
     Size: KegSize;
     InitialVolume: number;

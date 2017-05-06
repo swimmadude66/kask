@@ -1,29 +1,48 @@
 import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 import {Observable, Subject, BehaviorSubject} from "rxjs/Rx";
+import {Beer} from "../models/beer.model";
 
 @Injectable()
 export class AdminService {
-
-    private loggedInSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
-
     constructor(
         private http: Http
     ) {}
-
-    isLoggedIn(): Observable<boolean> {
-        return this.loggedInSubject;
-    }
-
-    checkIfLoggedIn(): Observable<boolean> {
-        return this.http.get('/api/auth')
-            .map(res => res.json())
-            .map(res => res.isAuth)
-            .do(_ => this.loggedInSubject.next(_));
-    }
-
+    
     search(beerName: string) {
         return this.http.get(`/api/admin/search/${beerName}`)
             .map(res => res.json());
+    }
+    
+    store(beerId: number, size: string, locationId: number) {
+        return this.http.post(`/api/admin/store`, {
+            BeerId: beerId,
+            Size: size,
+            LocationId: locationId
+        }).map(res => res.json());
+    }
+    
+    loadTap(tapId: number, beerId: number, size: string) {
+        return this.http.post(`/api/admin/tap/${tapId}`, {
+            BeerId: beerId,
+            Size: size
+        }).map(res => res.json());
+    }
+
+    loadTapFromStorage(tapId: number, kegId: number) {
+        return this.http.post(`/api/admin/tap/${tapId}`, {
+            KegId: kegId
+        }).map(res => res.json());
+    }
+    
+    clearTap(tapId: number) {
+        return this.http.post(`/api/admin/clear/${tapId}`, {});
+    }
+    
+    move(kegId: number, locationId: number) {
+        return this.http.post('/api/admin/move', {
+            KegId: kegId,
+            LocationId: locationId
+        });
     }
 }

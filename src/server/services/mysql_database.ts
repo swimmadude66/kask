@@ -72,6 +72,7 @@ export class MysqlDatabase implements Database {
         }
         let initialVolume = gallons * mlPerGallon;
         let keg: Keg = {
+            KegId: result.KegId,
             Beer: this.mapBeer(result),
             Size: result.KegSize,
             InitialVolume: initialVolume,
@@ -522,8 +523,8 @@ export class MysqlDatabase implements Database {
         return this.query(q, [beerId, size])
         .flatMap(
             result => {
-                let q2 = 'Insert into `keg_locations` (`LocationId`, `KegId`, `KegSize`) VALUES (?, ?, ?);';
-                return this.query(q2, [locationId, result.insertId, size])
+                let q2 = 'Insert into `keg_locations` (`LocationId`, `KegId`) VALUES (?, ?);';
+                return this.query(q2, [locationId, result.insertId])
                 .map(results => !!results);
             }
         );

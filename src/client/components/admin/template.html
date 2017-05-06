@@ -1,14 +1,16 @@
 <section class="container">
   <div class="row">
-    <div class="col-md">
-      <section class="storage-section" *ngFor="let location of locations">
-          <location [info]="location"></location>
-      </section>
-    </div>
-    <div class="col-md">
+    <div class="col-12">
       <div class="tap-edit" *ngFor="let tap of taps">
-       <tap-edit [info]="tap"></tap-edit>
+        <tap-edit [info]="tap"></tap-edit>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <section class="storage-section" *ngFor="let location of locations">
+          <location [info]="location" [taps]="taps"></location>
+      </section>
     </div>
   </div>
 </section>

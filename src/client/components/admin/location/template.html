@@ -1,5 +1,6 @@
 <div class="location-container">
   <ng-container *ngIf="!editing">
+    <button class="btn btn-outline-secondary pull-right" type="button" (click)="editing=true" *ngIf="!isAddingKeg">Edit</button>
     <h2 class="location-name">
       {{info?.Name}}
     </h2>
@@ -9,17 +10,18 @@
         </i>
     </p>
   </ng-container>
-  <ng-container *ngIf="editing">
-    <input class="styled title" type="text" [(ngModel)]="info.Name" placeholder="Location Name" />
-    <input class="styled description" type="text" [(ngModel)]="info.Description" placeholder="Describe this location" />
-  </ng-container>
+  <div class="form-group" *ngIf="editing">
+    <input class="form-control title" type="text" [(ngModel)]="info.Name" placeholder="Location Name" />
+  </div>
+  <div class="form-group" *ngIf="editing">
+    <input class="form-control description" type="text" [(ngModel)]="info.Description" placeholder="Describe this location" />
+  </div>
   <table class="table table-striped table-hover">
     <thead class="thead">
       <tr>
         <th>Name</th>
-        <th>Brewery</th>
-        <th>Style</th>
         <th>Size</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -33,19 +35,65 @@
           </ng-container>
         </td>
       </tr>
-      <tr *ngFor="let keg of contents">
-        <td>{{keg?.Beer?.BeerName}}</td>
-        <td>{{keg?.Beer?.Brewery?.BreweryName}}</td>
-        <td>{{keg?.Beer?.Style?.StyleName}}</td>
-        <td>
-          <ng-container *ngIf="keg?.Size">
-            {{keg?.Size}} Barrel
-          </ng-container>
-        </td>
-      </tr>
+      <ng-container *ngFor="let keg of contents">
+        <tr>
+          <td><a [routerLink]="'/info/beer/' + keg?.Beer?.BeerId">{{keg?.Beer?.BeerName}}</a></td>
+          <td>
+            <ng-container *ngIf="keg?.Size">
+              {{keg?.Size}} Barrel
+            </ng-container>
+          </td>
+          <td>
+            <keg-move [info]="keg" [taps]="taps"></keg-move>
+          </td>
+        </tr>
+      </ng-container>
+
     </tbody>
   </table>
-  <button type="button" name="submit" id="submit-location" class="btn btn-primary btn-lg btn-block" (click)="submitLocation()" *ngIf="editing">
-    Submit
-  </button>
+
+  <form *ngIf="isAddingKeg" (ngSubmit)="submitNewKeg()">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Beer</label>
+          <input
+                  placeholder="Search"
+                  type="text"
+                  name="newbeer"
+                  class="form-control"
+                  [(ngModel)]="beerToLoad"
+                  [ngbTypeahead]="search"
+                  [resultFormatter]="getBeerDisplay"
+                  [inputFormatter]="getBeerName"
+                  (selectItem)="beerSelected($event)"
+                  showHint="true" />
+        </div>
+        <div class="form-group">
+          <label>Keg Size</label>
+          <select class="form-control" (change)="kegSizeToLoad = $event.target.value">
+            <option value="1/2">1/2 Barrel</option>
+            <option value="1/4">1/4 Barrel</option>
+            <option value="1/6">1/6 Barrel</option>
+          </select>
+        </div>
+        <button type="submit" name="submit" id="keg-submit" class="btn btn-outline-success">
+          Submit
+        </button>
+        <button type="button" name="cancel" id="keg-cancel" class="btn btn-outline-danger pull-right" (click)="isAddingKeg=false">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <ng-container *ngIf="editing">
+    <button type="button" name="submit" id="edit-submit" class="btn btn-outline-success" (click)="submitLocation()">
+      Submit
+    </button>
+    <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger pull-right" (click)="editing=false">
+      Cancel
+    </button>
+  </ng-container>
+  <button class="btn btn-outline-info" type="button" (click)="isAddingKeg=true" *ngIf="!isAddingKeg && !editing">Add Keg To Location</button>
 </div>
