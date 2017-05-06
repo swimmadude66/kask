@@ -1,7 +1,7 @@
 <div class="tap-card" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
     <form name="tap-form" (submit)="submitTap()">
             <div class="edit-header">
-            <span class="fa fa-times delete" (click)="deleteTap()" *ngIf="info.TapId"></span>
+            <span class="fa fa-times delete" (click)="deleteTap()" *ngIf="info.TapId && !editing"></span>
             <span class="fa fa-pencil edit" (click)="editing=true" *ngIf="!editing"></span>
         </div>
         <div class="tap-info">
@@ -44,7 +44,7 @@
             <div class="keg-progress-bar">
                 <div class="keg-progress-fill" [style.width]="getPercentFull() + '%'"></div>
             </div>
-            <div class="text-center like-buttons" *ngIf="!editing">
+            <div class="text-center like-buttons" *ngIf="!editing && isLoggedIn">
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === -1 ? 'disabled active' : ''" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === 1 ? 'disabled active' : ''" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
             </div>
@@ -52,8 +52,8 @@
 
 
         <div class="edit-footer" *ngIf="editing">
-            <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger" (click)="editing=false">Cancel</button>
-            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success pull-right">Submit</button>
+            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success">Submit</button>
+            <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger pull-right" (click)="editing=false">Cancel</button>
         </div>
 
 

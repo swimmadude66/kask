@@ -6,7 +6,9 @@
       </section>
     </div>
     <div class="col-md">
-      other stuff here
+      <div class="tap-edit" *ngFor="let tap of taps">
+       <tap-edit [info]="tap"></tap-edit>
+      </div>
     </div>
   </div>
 </section>

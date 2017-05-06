@@ -65,8 +65,11 @@ export class BreweryDBService {
         return request.get(searchUrl)
         .map(data => JSON.parse(data.body))
         .flatMap(response => {
-            if (!response || !response.data || response.data.length < 1) {
-                return Observable.throw('No Results!');
+            if (!response) {
+                return Observable.throw('No Response!');
+            }
+            if( !response.data || response.data.length < 1) {
+                return Observable.of([]);
             }
             let styles = [];
             let breweries = [];

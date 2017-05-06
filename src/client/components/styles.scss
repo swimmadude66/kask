@@ -1,14 +1,14 @@
 @import '../scss/_variables';
 
-* {
+div, ul, h1, h2, h3, h4, p {
     color: $chalk-color;
 
-    a {
-        color: $link-color;
-    }
+
 
 }
-
+a {
+    color: $link-color;
+}
 h1, h2, h3, h4, li, dt {
     font-family: 'Schoolbell', cursive;
 }

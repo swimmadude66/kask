@@ -1,0 +1,26 @@
+<h3>{{info.TapName}}: <small>{{info.Description}}</small></h3>
+<div *ngIf="info.Beer">
+  <h4>{{info.Beer.BeerName}}</h4>
+  <button class="btn btn-outline-danger">Drop</button>
+</div>
+<button class="btn btn-outline-secondary" *ngIf="!isEditing" (click)="isEditing = true">Edit</button>
+<form *ngIf="isEditing" (ngSubmit)="submitNewBeer()">
+  <div class="form-group">
+    <label>Load New Beer</label>
+    <input
+            placeholder="Search"
+            type="text"
+            name="newbeer"
+            class="form-control"
+            [(ngModel)]="beerToLoad"
+            [ngbTypeahead]="search"
+            [resultFormatter]="getBeerDisplay"
+            [inputFormatter]="getBeerName"
+            (selectItem)="beerSelected($event)"
+            showHint="true" />
+  </div>
+
+  <button type="submit" class="btn btn-outline-success">Submit</button>
+  <button class="btn btn-outline-danger pull-right" *ngIf="isEditing" (click)="isEditing = false">Cancel</button>
+
+</form>
