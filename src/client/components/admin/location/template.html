@@ -1,6 +1,6 @@
 <div class="location-container">
   <ng-container *ngIf="!editing">
-    <button class="btn btn-outline-secondary pull-right" type="button" (click)="editing=true" *ngIf="!isAddingKeg">Edit</button>
+    <button class="btn btn-outline-secondary pull-right btn-hover" type="button" (click)="editing=true" *ngIf="!isAddingKeg">Edit</button>
     <h2 class="location-name">
       {{info?.Name}}
     </h2>
@@ -19,7 +19,8 @@
   <table class="table table-striped table-hover">
     <thead class="thead">
       <tr>
-        <th>Name</th>
+        <th>Beer Name</th>
+        <th>Style</th>
         <th>Size</th>
         <th></th>
       </tr>
@@ -38,13 +39,14 @@
       <ng-container *ngFor="let keg of contents">
         <tr>
           <td><a [routerLink]="'/info/beer/' + keg?.Beer?.BeerId">{{keg?.Beer?.BeerName}}</a></td>
+          <td><a [routerLink]="'/info/style/' + keg?.Beer?.Style?.StyleId">{{keg?.Beer?.Style?.StyleName}}</a></td>
           <td>
             <ng-container *ngIf="keg?.Size">
               {{keg?.Size}} Barrel
             </ng-container>
           </td>
           <td>
-            <keg-move [info]="keg" [taps]="taps"></keg-move>
+            <keg-move [info]="keg" [taps]="taps" [location]="info"></keg-move>
           </td>
         </tr>
       </ng-container>
@@ -72,12 +74,13 @@
         <div class="form-group">
           <label>Keg Size</label>
           <select class="form-control" (change)="kegSizeToLoad = $event.target.value">
+            <option value="">(Select Keg Size)</option>
             <option value="1/2">1/2 Barrel</option>
             <option value="1/4">1/4 Barrel</option>
             <option value="1/6">1/6 Barrel</option>
           </select>
         </div>
-        <button type="submit" name="submit" id="keg-submit" class="btn btn-outline-success">
+        <button type="submit" name="submit" id="keg-submit" class="btn btn-outline-success" [ngClass]="!kegSizeToLoad ? 'disabled': ''">
           Submit
         </button>
         <button type="button" name="cancel" id="keg-cancel" class="btn btn-outline-danger pull-right" (click)="isAddingKeg=false">
@@ -95,5 +98,5 @@
       Cancel
     </button>
   </ng-container>
-  <button class="btn btn-outline-info" type="button" (click)="isAddingKeg=true" *ngIf="!isAddingKeg && !editing">Add Keg To Location</button>
+  <button class="btn btn-outline-info" type="button" (click)="isAddingKeg=true" *ngIf="!isAddingKeg && !editing">New Keg</button>
 </div>

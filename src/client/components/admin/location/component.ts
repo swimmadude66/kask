@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {Keg} from "../../../models/keg.model";
 import {Location} from "../../../models/location.model";
 import {LocationService} from "../../../services/location.service";
@@ -12,8 +12,9 @@ import {Tap} from "../../../models/tap.model";
     templateUrl: './template.html',
     styleUrls: ['../../styles.scss', './styles.scss']
 })
-export class LocationComponent implements OnInit {
-
+export class LocationComponent implements OnInit, OnDestroy {
+    private subscriptions = [];
+    
     contents: Keg[];
     loaded: boolean;
     editing: boolean;
@@ -31,21 +32,29 @@ export class LocationComponent implements OnInit {
 
     ngOnInit() {
         if (this.info && this.info.LocationId) {
-            this._locationService.getLocationContents(this.info.LocationId)
+            this.subscriptions.push(
+                this._locationService.observeLocationContents(this.info.LocationId)
             .subscribe(
                 beers => this.contents = beers,
                 error => console.log(error),
                 () => this.loaded = true
-            );
+            ));
+            this._locationService.getLocationContents(this.info.LocationId).subscribe();
         } else {
             this.editing = true;
             this.loaded = true;
         }
     }
 
+    ngOnDestroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
+    }
+    
     submitNewKeg() {
         this.loaded = false;
        this._adminService.store(this.beerToLoad.BeerId, this.kegSizeToLoad, this.info.LocationId)
+           .switchMap(_ => this._locationService.getLocationContents(this.info.LocationId))
            .subscribe(
                () => this.isAddingKeg = false,
                err => console.error(err),

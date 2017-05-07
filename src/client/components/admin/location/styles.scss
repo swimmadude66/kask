@@ -7,3 +7,13 @@
 tbody {
     font-size:18px;
 }
+
+.btn-hover {
+    display: none;
+}
+
+:host:hover {
+    .btn-hover{
+        display:inline-block;
+    }
+}

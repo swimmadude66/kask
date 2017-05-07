@@ -11,13 +11,21 @@
 .beer-container {
     margin-bottom: 2rem;
     height: 2rem;
-    button {
-        display: none;
 
+
+}
+
+.btn-hover {
+    display: none;
+}
+
+:host:hover {
+    .btn-hover{
+        display:inline-block;
     }
-    &:hover {
-       button{
-           display:inline-block;
-       }
-    }
+}
+
+
+form {
+    margin-bottom: 2rem;
 }

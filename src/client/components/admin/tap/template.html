@@ -1,10 +1,10 @@
 <section>
-  <button class="btn btn-outline-secondary pull-right" *ngIf="!isEditing" (click)="isEditing = true">Edit</button>
+  <button class="btn btn-outline-secondary pull-right  btn-hover" *ngIf="!isEditing" (click)="isEditing = true">Edit</button>
 
   <h3>{{info.TapName}}: <small>{{info.Description}}</small></h3>
   <div class="beer-container" *ngIf="tapSession?.Keg?.Beer">
     <a class="beer" [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer.BeerId">{{tapSession?.Keg?.Beer.BeerName}}</a>
-    <button class="btn btn-sm btn-outline-danger" (click)="clear()">Remove From Tap</button>
+    <button class="btn btn-sm btn-outline-danger btn-hover" (click)="clear()">Remove From Tap</button>
   </div>
   <div class="beer-container" *ngIf="!tapSession?.Keg?.Beer">
     <span class="beer empty">Empty</span>

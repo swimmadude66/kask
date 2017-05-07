@@ -39,7 +39,9 @@ export class TapEditComponent implements OnInit, OnDestroy {
     }
 
     clear() {
-        this._adminService.clearTap(this.info.TapId).subscribe();
+        this._adminService.clearTap(this.info.TapId)
+            .switchMap(_ => this._tapService.getTapContents(this.info.TapId))
+            .subscribe();
     }
 
     ngOnDestroy() {
