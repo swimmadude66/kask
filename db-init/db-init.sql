@@ -107,7 +107,6 @@ CREATE TABLE IF NOT EXISTS `beer_sessions` (
   `RemovalTime` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`SessionId`),
   UNIQUE KEY `HistoryId_UNIQUE` (`SessionId`),
-  UNIQUE KEY `ActiveBeer` (`TapId`,`Active`) COMMENT 'Only one beer can be active on a given tap at a time',
   KEY `Tap_idx` (`TapId`),
   KEY `FK_Keg_idx` (`KegId`),
   CONSTRAINT `FK_Keg` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
