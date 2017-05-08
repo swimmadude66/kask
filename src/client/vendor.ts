@@ -6,3 +6,5 @@ import 'bootstrap';
 
 import 'rxjs';
 import 'rxjs/add/operator/map';
+
+import 'chart.js';
