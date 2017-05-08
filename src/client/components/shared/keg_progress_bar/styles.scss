@@ -11,14 +11,14 @@
 
     @include media-breakpoint-up(lg) {
         &:before {
-            font-family: 'Schoolbell', cursive;
+            font-family: $chalk-font;
             content: 'E';
             position: absolute;
             left: -15px;
             top: 0;
         }
         &:after {
-            font-family: 'Schoolbell', cursive;
+            font-family: $chalk-font;
             content: 'F';
             position: absolute;
             right: -15px;

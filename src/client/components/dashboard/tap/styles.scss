@@ -75,7 +75,7 @@ input {
         }
     }
     .like-buttons {
-        display: none;
+        visibility: hidden;
         button {
             margin: 1em;
             cursor: pointer;
@@ -84,13 +84,10 @@ input {
 
     &:hover {
         .like-buttons {
-            display: block;
+            visibility: visible;
         }
     }
 }
-
-
-
 
 .tap-title {
     font-size: 32px;
@@ -143,7 +140,7 @@ input {
 
         > li {
             font-size: 1.3rem;
-            font-family: 'Schoolbell', cursive;
+            font-family: $chalk-font;
             &:before {
                 content: "*";
                 text-indent: -5px;
@@ -224,4 +221,3 @@ input {
         }
     }
 }
-
