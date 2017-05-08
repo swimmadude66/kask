@@ -26,22 +26,35 @@ export class TapsChartComponent implements OnInit {
     set setTaps(taps: Tap[]) {
         this.taps = taps;
         for(let i in this.taps) {
-            this.lineChartData.push( {data: [
-                Math.round(Math.random()*100),
-                Math.round(Math.random()*100),
-                Math.round(Math.random()*100),
-                Math.round(Math.random()*100),
-                Math.round(Math.random()*100),
-                Math.round(Math.random()*100),
-                Math.round(Math.random()*100)
-            ], label: this.taps[i].TapName});
+            let d = new Date();
+            this.lineChartLabels = [
+                this.getNthDateStringBeforeToday(6),
+                this.getNthDateStringBeforeToday(5),
+                this.getNthDateStringBeforeToday(4),
+                this.getNthDateStringBeforeToday(3),
+                this.getNthDateStringBeforeToday(2),
+                this.getNthDateStringBeforeToday(1),
+                this.getNthDateStringBeforeToday(0),
+            ];
+            this.lineChartData.push({
+                data: [
+                    Math.round(Math.random()*100),
+                    Math.round(Math.random()*100),
+                    Math.round(Math.random()*100),
+                    Math.round(Math.random()*100),
+                    Math.round(Math.random()*100),
+                    Math.round(Math.random()*100),
+                    Math.round(Math.random()*100)
+                ],
+                label: this.taps[i].TapName
+            });
         }
     }
 
     // lineChart
     lineChartData:Array<any> = [];
 
-    lineChartLabels:Array<any> = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    lineChartLabels = [];
     lineChartOptions:any = {
         responsive: true
     };
@@ -90,5 +103,13 @@ export class TapsChartComponent implements OnInit {
 
     public chartHovered(e:any):void {
         console.log(e);
+    }
+
+    private getNthDateStringBeforeToday(n) {
+        let today = new Date();
+        let dateToReturn = new Date(today.getTime() - (n * 24 * 60 * 60 * 1000));
+
+        return  (dateToReturn.getMonth() + 1) + '/' + dateToReturn.getDate();
+
     }
 }
