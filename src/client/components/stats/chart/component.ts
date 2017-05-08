@@ -27,7 +27,7 @@ export class TapsChartComponent implements OnInit {
         this.taps = taps;
         for(let i in this.taps) {
             let d = new Date();
-            this.lineChartLabels = new Array(7).map((_, i) => this.getNthDateStringBeforeToday(i));
+            this.lineChartLabels = [6,5,4,3,2,1,0].map(x => this.getNthDateStringBeforeToday(x));
             this.lineChartData.push({
                 data: [
                     Math.round(Math.random()*100),
