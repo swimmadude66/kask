@@ -43,7 +43,7 @@
 
 
         <div class="edit-footer" *ngIf="editing">
-            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success">Submit</button>
+            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success" (click)="editing=false">Submit</button>
             <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger pull-right" (click)="editing=false">Cancel</button>
         </div>
 
