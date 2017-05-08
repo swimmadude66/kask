@@ -3,7 +3,7 @@
 
   <div class="row">
     <div class="col-md">
-      <img class="beer-label" [src]="beer.LabelUrl" />
+      <img class="beer-label" [src]="getImage()" />
     </div>
     <div class="col-md">
       <dl>
@@ -11,10 +11,14 @@
         <dd><a [routerLink]="'/info/brewery/' + beer.Brewery?.BreweryId">{{beer.Brewery?.BreweryName}}</a></dd>
         <dt>Style</dt>
         <dd><a [routerLink]="'/info/style/' + beer.Style?.StyleId">{{beer.Style?.StyleName}}</a></dd>
-        <dt>ABV</dt>
-        <dd>{{beer.ABV}}</dd>
-        <dt>IBU</dt>
-        <dd>{{beer.IBU}}</dd>
+        <ng-container *ngIf="beer?.ABV">
+          <dt>ABV</dt>
+          <dd>{{beer.ABV}}</dd>
+        </ng-container>
+        <ng-container *ngIf="beer?.IBU">
+          <dt>IBU</dt>
+          <dd>{{beer.IBU}}</dd>
+        </ng-container>
       </dl>
     </div>
   </div>
@@ -22,8 +26,11 @@
   <div class="row">
     <div class="col-md">
       <h3>Description</h3>
-      <p>
+      <p *ngIf="beer?.BeerDescription">
         {{beer.BeerDescription}}
+      </p>
+      <p *ngIf="!beer?.BeerDescription">
+        ¯\_(ツ)_/¯
       </p>
     </div>
   </div>

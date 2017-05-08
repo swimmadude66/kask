@@ -28,4 +28,15 @@ export class BeerInfoComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
     }
+
+    getImage(): string {
+        if (this.beer) {
+            if (this.beer.LabelUrl) {
+                return this.beer.LabelUrl;
+            } else if (this.beer.Brewery && this.beer.Brewery.Image) {
+                return this.beer.Brewery.Image;
+            }
+        }
+        return '';
+    }
 }

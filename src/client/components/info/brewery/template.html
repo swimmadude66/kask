@@ -19,8 +19,11 @@
   <div class="row">
     <div class="col-12">
       <h3>Description</h3>
-      <p>
-        {{brewery.BreweryDescription}}
+      <p *ngIf="brewery?.BreweryDescription">
+        {{brewery?.BreweryDescription}}
+      </p>
+      <p *ngIf="!brewery?.BreweryDescription">
+        ¯\_(ツ)_/¯
       </p>
     </div>
   </div>
@@ -28,4 +31,3 @@
 </section>
 
 <chalkboard-bottom></chalkboard-bottom>
-
