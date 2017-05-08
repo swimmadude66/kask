@@ -81,6 +81,12 @@ input {
             cursor: pointer;
         }
     }
+
+    &:hover {
+        .like-buttons {
+            display: block;
+        }
+    }
 }
 
 
