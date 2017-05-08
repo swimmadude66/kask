@@ -1,16 +1,17 @@
 import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models';
-import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter, OnDestroy} from '@angular/core';
 import {TapSession} from "../../../models/session.model";
-import {Observable} from "rxjs/Rx";
+import {Observable, Subscription} from "rxjs/Rx";
 
 @Component({
     selector: 'tap',
     templateUrl: './template.html',
     styleUrls: ['./styles.scss']
 })
-export class TapComponent implements OnInit {
-    
+export class TapComponent implements OnInit, OnDestroy {
+    private subscriptions: Subscription[] = [];
+
     tapSession: TapSession;
     loaded: boolean;
     editing: boolean = false;
@@ -27,20 +28,28 @@ export class TapComponent implements OnInit {
 
     ngOnInit() {
         if (this.info && this.info.TapId) {
-            this._tapService.observeTapContents(this.info.TapId).subscribe(
-                tapSession => this.tapSession = tapSession,
-                error => console.log(error),
-                () => this.loaded = true
-            );
+            this.subscriptions.push(
+                this._tapService.observeTapContents(this.info.TapId).subscribe(
+                    tapSession => this.tapSession = tapSession,
+                    error => console.log(error),
+                    () => this.loaded = true
+            ));
 
             //poll the tap
-            Observable.timer(0, 30000)
-                .switchMap(() => this._tapService.getTapContents(this.info.TapId))
-                .subscribe();
+            this.subscriptions.push(
+                Observable.timer(0, 30000)
+                    .switchMap(() => this._tapService.getTapContents(this.info.TapId))
+                    .subscribe()
+            );
         } else {
             this.editing = true;
             this.loaded = true;
         }
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+        this.subscriptions = [];
     }
 
     getImage(): string {
