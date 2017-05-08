@@ -10,9 +10,10 @@
 
 .beer-container {
     margin-bottom: 2rem;
-    height: 2rem;
-
-
+    div {
+        height: 2rem;
+        margin-bottom: 1rem;
+    }
 }
 
 .btn-hover {

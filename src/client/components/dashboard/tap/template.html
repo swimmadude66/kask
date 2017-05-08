@@ -1,23 +1,15 @@
 <div class="tap-card" [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
-    <form name="tap-form" (submit)="submitTap()">
-            <div class="edit-header">
-            <span class="fa fa-times delete" (click)="deleteTap()" *ngIf="info.TapId && !editing"></span>
-            <span class="fa fa-pencil edit" (click)="editing=true" *ngIf="!editing"></span>
-        </div>
+    <form name="tap-form">
         <div class="tap-info">
-            <ng-container *ngIf="!editing">
-                <h2 class="tap-title">
-                    {{info.TapName}}
-                </h2>
-                <p class="tap-desc">{{info.Description}}</p>
-            </ng-container>
-            <ng-container *ngIf="editing">
-                <input type="text" class="styled tap-title" name="tap-title" placeholder="Tap Name" [(ngModel)]="info.TapName">
-                <input type="text" class="styled tap-desc" name="tap-desc" placeholder="Tap Description" [(ngModel)]="info.Description">
-            </ng-container>
+            <h2 class="tap-title">
+                {{info.TapName}}
+            </h2>
+            <p class="tap-desc">{{info.Description}}</p>
         </div>
 
         <ng-container *ngIf="tapSession?.Keg?.Beer?.BeerId">
+            <keg-progress-bar [keg]="tapSession?.Keg"></keg-progress-bar>
+
             <div class="beer-info">
                 <h3 class="beer-title">
                     <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">{{tapSession?.Keg?.Beer?.BeerName}}</a>
@@ -26,6 +18,7 @@
                     <i class="fa" [ngClass]="tapSession.NetVote >= 0 ? 'fa-thumbs-up' : 'fa-thumbs-down'"></i>
                     <span [ngClass]="tapSession.NetVote >= 0 ? 'text-success' : 'text-danger'">{{(tapSession.NetVote > 0 ? '+' : '') + tapSession.NetVote}}</span>
                 </div>
+
                 <ul class="beer-details">
                     <li>
                         <a *ngIf="tapSession?.Keg?.Beer?.Style?.StyleName" class="info-page-link" [routerLink]="['/info/style/', tapSession?.Keg?.Beer?.Style.StyleId]"><i>{{tapSession?.Keg?.Beer?.Style.StyleName}}</i></a>
@@ -41,9 +34,7 @@
                     <span *ngIf="tapSession?.Keg?.Size"><i>{{tapSession?.Keg?.Size}} Barrel</i></span>
                 </p>
             </div>
-            <div class="keg-progress-bar">
-                <div class="keg-progress-fill" [style.width]="getPercentFull() + '%'"></div>
-            </div>
+
             <div class="text-center like-buttons" *ngIf="!editing && isLoggedIn">
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === -1 ? 'disabled active' : ''" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === 1 ? 'disabled active' : ''" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
@@ -61,6 +52,8 @@
 </div>
 
 <section class="tap-handle hidden-md-down">
+    <span class="fa fa-pencil edit" (click)="editing=true" *ngIf="!editing"></span>
+
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image" *ngIf="getImage()">
         <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">

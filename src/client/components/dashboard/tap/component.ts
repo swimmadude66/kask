@@ -16,9 +16,6 @@ export class TapComponent implements OnInit {
     editing: boolean = false;
     imageScale = 100;
 
-    //TODO: pull from flow sensors
-    private percentFull: number = Math.random()*100;
-
     @Input() info: Tap;
     @Input() tapNum: number;
     @Input() isLoggedIn: boolean;
@@ -56,58 +53,11 @@ export class TapComponent implements OnInit {
         }
         return '';
     }
-
-    getPercentFull() {
-        // min of 3% in case the flow sensor data predicts a premature kick.
-        return Math.max((1 - (this.tapSession.Keg.RemovedVolume/this.tapSession.Keg.InitialVolume))*100, 3);
-    }
     
 
     vote(vote: string) {
         this._tapService.vote(this.tapSession.SessionId, vote)
             .switchMap(() => this._tapService.getTapContents(this.info.TapId))
             .subscribe();
-    }
-
-    addTap() {
-        this._tapService.addTap(this.info)
-        .subscribe(
-            id => {
-                this.info.TapId = id;
-                this.editing = false;
-            }, err => console.log(err),
-            () => this.loaded = true
-        );
-    }
-
-    editTap() {
-        this._tapService.updateTap(this.info)
-        .subscribe(
-            success => {
-                this.editing = false;
-            }, err => console.log(err),
-            () => this.loaded = true
-        );
-    }
-
-    submitTap() {
-        this.loaded = false;
-        if (this.info && this.info.TapId) {
-            this.editTap();
-        } else {
-            this.addTap();
-        }
-    }
-
-    deleteTap() {
-        if (this.info && this.info.TapId) {
-            this.loaded = false;
-            this._tapService.deleteTap(this.info.TapId)
-            .subscribe(
-                success => this.remove.emit(this.info.TapId),
-                err => console.log(err),
-                () => this.loaded = true
-            );
-        }
     }
 }

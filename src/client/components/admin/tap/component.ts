@@ -18,6 +18,7 @@ export class TapEditComponent implements OnInit, OnDestroy {
     private isEditing: boolean;
     beerToLoad: Beer;
     @Input() info: Tap;
+    @Input() tapNum: number;
     
     constructor(
         private _adminService: AdminService,
@@ -35,9 +36,25 @@ export class TapEditComponent implements OnInit, OnDestroy {
     }
     
     submitEdit() {
-        console.log(this.beerToLoad);
+        this._tapService.updateTap(this.info)
+            .subscribe(
+                success => {
+                    this.isEditing = false;
+                }, err => console.log(err)
+            );
     }
 
+    // deleteTap() {
+    //     if (this.info && this.info.TapId) {
+    //         this._tapService.deleteTap(this.info.TapId)
+    //             .subscribe(
+    //                 success => this.remove.emit(this.info.TapId),
+    //                 err => console.log(err),
+    //                 () => this.loaded = true
+    //             );
+    //     }
+    // }
+    
     clear() {
         this._adminService.clearTap(this.info.TapId)
             .switchMap(_ => this._tapService.getTapContents(this.info.TapId))

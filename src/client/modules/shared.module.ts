@@ -5,6 +5,7 @@ import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
 import {ParallaxScrollDirective} from '../directives';
 import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/component';
+import {KegProgressComponent} from "../components/shared/keg_progress_bar/component";
 
 @NgModule({
     imports: [
@@ -15,7 +16,8 @@ import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/com
     ],
     declarations: [
         ParallaxScrollDirective,
-        ChalkboardBottomComponent
+        ChalkboardBottomComponent,
+        KegProgressComponent
     ],
     exports: [
         HttpModule,
@@ -23,7 +25,8 @@ import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/com
         CommonModule,
         RouterModule,
         ParallaxScrollDirective,
-        ChalkboardBottomComponent
+        ChalkboardBottomComponent,
+        KegProgressComponent
     ]
 })
 export class SharedModule { }

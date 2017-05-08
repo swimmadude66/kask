@@ -32,6 +32,17 @@ export class AdminComponent implements OnInit, OnDestroy {
 
     }
 
+    // addTap() {
+    //     this._tapService.addTap(this.info)
+    //         .subscribe(
+    //             id => {
+    //                 this.info.TapId = id;
+    //                 this.editing = false;
+    //             }, err => console.log(err),
+    //             () => this.loaded = true
+    //         );
+    // }
+    
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];

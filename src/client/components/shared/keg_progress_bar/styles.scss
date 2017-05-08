@@ -1,0 +1,47 @@
+@import '../../../scss/_variables';
+@import '~bootstrap/scss/bootstrap-grid';
+
+.keg-progress-bar {
+    background: url('assets/img/chalk_progress_border.png') no-repeat;
+    height: 30px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 297px;
+    position: relative;
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            font-family: 'Schoolbell', cursive;
+            content: 'E';
+            position: absolute;
+            left: -15px;
+            top: 0;
+        }
+        &:after {
+            font-family: 'Schoolbell', cursive;
+            content: 'F';
+            position: absolute;
+            right: -15px;
+            top: 0;
+        }
+    }
+
+    > .keg-progress-fill {
+        mask-image: url('assets/img/chalk_progress_fill.png');
+        -webkit-mask-image: url('assets/img/chalk_progress_fill.png');
+        height: 30px;
+        background-repeat: no-repeat;
+        /deep/ .tap-color-1 & {
+            background-color: $tap-color-1;
+        }
+        /deep/ .tap-color-2 & {
+            background-color: $tap-color-2;
+        }
+        /deep/ .tap-color-3 & {
+            background-color: $tap-color-3;
+        }
+        /deep/ .tap-color-4 & {
+            background-color: $tap-color-4;
+        }
+    }
+}

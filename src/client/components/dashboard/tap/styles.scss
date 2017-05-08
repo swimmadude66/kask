@@ -1,11 +1,6 @@
 @import '~bootstrap/scss/bootstrap-grid';
 @import '../../../scss/_variables';
 
-$tap-color-1: #fc5b55;
-$tap-color-2: #72f25e;
-$tap-color-3: #fc6af0;
-$tap-color-4: #7aafff;
-
 h1,h2,h3,h4,h5,p,span,input {
     font-family: $chalk-font;
 
@@ -60,37 +55,13 @@ input {
 
     .tap-info {
         padding-bottom: 0;
-    }
-
-    .edit-header {
-        display: block;
-        width: 100%;
-        height: 20px;
-
-        .edit {
-            float: right;
-            display: none;
-            cursor: pointer;
-            opacity: 0.6;
-            margin-right: 30px;
-        }
-        
-        .delete {
-            color: red;
-            float: left;
-            display: none;
-            cursor: pointer;
-            margin-left: 30px;
-        }
+        margin-bottom: 2rem;
     }
 
     .edit-footer {
         display: block;
         width: 100%;
         margin: 2rem 0;
-
-
-
     }
 
     .rating {
@@ -110,23 +81,10 @@ input {
             cursor: pointer;
         }
     }
-
-    &:hover {
-        .edit-header {
-            .edit {
-                display: inline-block;
-            }
-            .delete {
-                display: inline-block;
-            }
-        }
-        .like-buttons {
-            display: block;
-        }
-    }
-
-
 }
+
+
+
 
 .tap-title {
     font-size: 32px;
@@ -190,7 +148,7 @@ input {
     .beer-details-2 {
         text-align: center;
         margin-bottom: 0;
-
+        font-size: 22px;
         span {
             padding: 0 10px;
         }
@@ -222,19 +180,19 @@ input {
 
     .tap-image {
         border-radius: 50%;
-        height:200px;
-        width:200px;
+        height: 200px;
+        width: 200px;
         border: 3px solid #a59680;
         background: #fff;
-        position:relative;
+        position: relative;
         right: -13px;
-        overflow:hidden;
+        overflow: hidden;
         margin: 0 auto;
 
         transform: rotateY(30deg) rotateX(6deg);
 
         img {
-            position:absolute;
+            position: absolute;
             //max-height:120%;
             //max-width: 200%;
             top: -9999px;
@@ -244,49 +202,19 @@ input {
             margin: auto;
         }
     }
-}
 
-.keg-progress-bar {
-    background: url('assets/img/chalk_progress_border.png') no-repeat;
-    height: 30px;
-    margin: 0 auto;
-    width: 90%;
-    max-width: 297px;
-    position: relative;
-
-    @include media-breakpoint-up(lg) {
-        &:before {
-            font-family: 'Schoolbell', cursive;
-            content: 'E';
-            position: absolute;
-            left: -15px;
-            top: 0;
-        }
-        &:after {
-            font-family: 'Schoolbell', cursive;
-            content: 'F';
-            position: absolute;
-            right: -15px;
-            top: 0;
-        }
+    span.edit {
+        position: absolute;
+        color: $chalk-color;
+        left: 12%;
+        cursor: pointer;
+        z-index: 1;
+        display:none;
     }
 
-    > .keg-progress-fill {
-        mask-image: url('assets/img/chalk_progress_fill.png');
-        -webkit-mask-image: url('assets/img/chalk_progress_fill.png');
-        height: 30px;
-        background-repeat: no-repeat;
-        .tap-color-1 & {
-            background-color: $tap-color-1;
-        }
-        .tap-color-2 & {
-            background-color: $tap-color-2;
-        }
-        .tap-color-3 & {
-          background-color: $tap-color-3;
-        }
-        .tap-color-4 & {
-          background-color: $tap-color-4;
+    &:hover {
+        span.edit {
+            display: inline-block;
         }
     }
 }

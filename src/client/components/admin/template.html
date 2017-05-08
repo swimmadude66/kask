@@ -1,8 +1,8 @@
 <section class="container">
   <div class="row">
-    <div class="col-md-6" *ngFor="let tap of taps">
+    <div class="col-md-6" *ngFor="let tap of taps; let i = index">
       <div class="tap-edit">
-        <tap-edit [info]="tap"></tap-edit>
+        <tap-edit [info]="tap" [tapNum]="i"></tap-edit>
       </div>
     </div>
   </div>

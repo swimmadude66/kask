@@ -1,18 +1,33 @@
-<section>
-  <button class="btn btn-outline-secondary pull-right  btn-hover" *ngIf="!isEditing" (click)="isEditing = true">Edit</button>
+<section [ngClass]="'tap-color-' + ((tapNum % 4) + 1)">
+  <ng-container *ngIf="!isEditing">
+    <button class="btn btn-outline-secondary pull-right  btn-hover" (click)="isEditing = true">Edit</button>
+    <h3>{{info.TapName}}: <small>{{info.Description}}</small></h3>
 
-  <h3>{{info.TapName}}: <small>{{info.Description}}</small></h3>
-  <div class="beer-container" *ngIf="tapSession?.Keg?.Beer">
-    <a class="beer" [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer.BeerId">{{tapSession?.Keg?.Beer.BeerName}}</a>
-    <button class="btn btn-sm btn-outline-danger btn-hover" (click)="clear()">Remove From Tap</button>
-  </div>
-  <div class="beer-container" *ngIf="!tapSession?.Keg?.Beer">
-    <span class="beer empty">Empty</span>
-  </div>
+    <div class="beer-container">
+      <div *ngIf="tapSession?.Keg?.Beer">
+        <a class="beer" [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer.BeerId">{{tapSession?.Keg?.Beer.BeerName}}</a>
+        <button class="btn btn-sm btn-outline-danger btn-hover" (click)="clear()">Remove From Tap</button>
+      </div>
+      <div *ngIf="!tapSession?.Keg?.Beer">
+        <span class="beer empty">Empty</span>
+      </div>
+      <keg-progress-bar *ngIf="tapSession?.Keg" [keg]="tapSession?.Keg"></keg-progress-bar>
+    </div>
+
+  </ng-container>
+
 
   <form *ngIf="isEditing" (ngSubmit)="submitEdit()">
-    <button type="submit" class="btn btn-outline-success">Submit</button>
-    <button class="btn btn-outline-danger pull-right" *ngIf="isEditing" (click)="isEditing = false">Cancel</button>
-  </form>
+    <div class="form-group">
+      <label>Tap Name</label>
+      <input type="text" class="form-control" name="tapName" [(ngModel)]="info.TapName"/>
+    </div>
+    <div class="form-group">
+      <label>Tap Description</label>
+      <input type="text" class="form-control" name="tapDesc" [(ngModel)]="info.Description"/>
+    </div>
 
+      <button type="submit" class="btn btn-outline-success">Submit</button>
+      <button class="btn btn-outline-danger pull-right" (click)="isEditing = false">Cancel</button>
+  </form>
 </section>
