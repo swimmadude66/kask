@@ -7,9 +7,11 @@
     </div>
     <div class="col-md">
       <dl>
-        <dt>Established</dt>
-        <dd>{{brewery.Established}}</dd>
-        <dd><a [href]="brewery.Website" target="_blank">Visit Website</a></dd>
+        <ng-container *ngIf="brewery?.Established">
+          <dt>Established</dt>
+          <dd>{{brewery.Established}}</dd>
+        </ng-container>
+        <dd><a *ngIf="brewery?.Website" [href]="brewery?.Website" target="_blank">Visit Website</a></dd>
       </dl>
     </div>
   </div>
