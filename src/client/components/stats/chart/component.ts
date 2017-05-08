@@ -26,18 +26,10 @@ export class TapsChartComponent implements OnInit {
     set setTaps(taps: Tap[]) {
         this.taps = taps;
         for(let i in this.taps) {
-            let d = new Date();
-            this.lineChartLabels = [6,5,4,3,2,1,0].map(x => this.getNthDateStringBeforeToday(x));
+            let daysAgo = [6,5,4,3,2,1,0];
+            this.lineChartLabels = daysAgo.map(x => this.getNthDateStringBeforeToday(x));
             this.lineChartData.push({
-                data: [
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100)
-                ],
+                data: daysAgo.map(_ =>  Math.round(Math.random()*100)),
                 label: this.taps[i].TapName
             });
         }
@@ -48,7 +40,28 @@ export class TapsChartComponent implements OnInit {
 
     lineChartLabels = [];
     lineChartOptions:any = {
-        responsive: true
+        responsive: true,
+        tooltips: {
+            callbacks: {
+                label: function(tooltipItems, data) {
+                    return data.datasets[tooltipItems.datasetIndex].label +': ' + tooltipItems.yLabel + ' oz. poured';
+                }
+            }
+        },
+        scales: {
+            yAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Fl oz. Poured'
+                }
+            }],
+            xAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date'
+                }
+            }]
+        }
     };
 
     lineChartColors:Array<any> = [
