@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, Input} from '@angular/core';
 import {TapService} from "../../../services/tap.service";
 import {Tap} from "../../../models/tap.model";
 
@@ -7,9 +7,7 @@ import {Tap} from "../../../models/tap.model";
     templateUrl: './template.html',
     styleUrls: ['./styles.scss']
 })
-export class TapsChartComponent implements OnInit, OnDestroy {
-    private subscriptions = [];
-
+export class TapsChartComponent implements OnInit {
     private taps: Tap[];
 
     constructor(
@@ -21,41 +19,36 @@ export class TapsChartComponent implements OnInit, OnDestroy {
 
         window['Chart'].defaults.global.defaultFontColor = 'rgba(255, 255, 255, 0.8)';
         window['Chart'].defaults.global.defaultFontSize = 16;
-
-
-        this._tapService.getTaps().subscribe(taps => {
-            this.taps = taps;
-
-            for(let i in taps) {
-                this.lineChartData.push( {data: [
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100),
-                    Math.round(Math.random()*100)
-                ], label: taps[i].TapName});
-            }
-        });
     }
 
-    ngOnDestroy() {
-        this.subscriptions.forEach(sub => sub.unsubscribe());
-        this.subscriptions = [];
+
+    @Input('taps')
+    set setTaps(taps: Tap[]) {
+        this.taps = taps;
+        for(let i in this.taps) {
+            this.lineChartData.push( {data: [
+                Math.round(Math.random()*100),
+                Math.round(Math.random()*100),
+                Math.round(Math.random()*100),
+                Math.round(Math.random()*100),
+                Math.round(Math.random()*100),
+                Math.round(Math.random()*100),
+                Math.round(Math.random()*100)
+            ], label: this.taps[i].TapName});
+        }
     }
 
     // lineChart
     lineChartData:Array<any> = [];
 
-    public lineChartLabels:Array<any> = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    public lineChartOptions:any = {
+    lineChartLabels:Array<any> = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    lineChartOptions:any = {
         responsive: true
     };
 
-    public lineChartColors:Array<any> = [
+    lineChartColors:Array<any> = [
         { // tap-color-1
-            //backgroundColor: 'rgba(252,91,85,0.2)',
+            backgroundColor: 'rgba(252,91,85,0.05)',
             borderColor: 'rgba(252,91,85,1)',
             pointBackgroundColor: 'rgba(252,91,85,1)',
             pointBorderColor: '#fff',
@@ -63,7 +56,7 @@ export class TapsChartComponent implements OnInit, OnDestroy {
             pointHoverBorderColor: 'rgba(252,91,85,0.8)'
         },
         { // tap-color-2
-            //backgroundColor: 'rgba(114,242,94,0.2)',
+            backgroundColor: 'rgba(114,242,94,0.05)',
             borderColor: 'rgba(114,242,94,1)',
             pointBackgroundColor: 'rgba(114,242,94,1)',
             pointBorderColor: '#fff',
@@ -71,7 +64,7 @@ export class TapsChartComponent implements OnInit, OnDestroy {
             pointHoverBorderColor: 'rgba(114,242,94,0.8)'
         },
         { // tap-color-3
-            //backgroundColor: 'rgba(252,106,240,0.2)',
+            backgroundColor: 'rgba(252,106,240,0.05)',
             borderColor: 'rgba(252,106,240,1)',
             pointBackgroundColor: 'rgba(252,106,240,1)',
             pointBorderColor: '#fff',
@@ -79,7 +72,7 @@ export class TapsChartComponent implements OnInit, OnDestroy {
             pointHoverBorderColor: 'rgba(252,106,240,0.8)'
         },
         { // tap-color-4
-            //backgroundColor: 'rgba(122,175,255, 0.2)',
+            backgroundColor: 'rgba(122,175,255, 0.05)',
             borderColor: 'rgba(122,175,255, 1)',
             pointBackgroundColor: 'rgba(122,175,255, 1)',
             pointBorderColor: '#fff',
@@ -87,8 +80,8 @@ export class TapsChartComponent implements OnInit, OnDestroy {
             pointHoverBorderColor: 'rgba(122,175,255, 0.8)'
         }
     ];
-    public lineChartLegend:boolean = true;
-    public lineChartType:string = 'line';
+    lineChartLegend:boolean = true;
+    lineChartType:string = 'line';
 
     // events
     public chartClicked(e:any):void {
