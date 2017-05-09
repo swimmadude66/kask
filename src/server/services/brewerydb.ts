@@ -54,6 +54,7 @@ export class BreweryDBService {
             ABV: (beerInfo && beerInfo.abv && NUMBER_REGEX.test(beerInfo.abv)) ? +beerInfo.abv : undefined,
             IBU: (beerInfo && beerInfo.ibu && NUMBER_REGEX.test(beerInfo.ibu)) ? +beerInfo.ibu : undefined,
             LabelUrl: (beerInfo && beerInfo.labels && beerInfo.labels.large) ? beerInfo.labels.large : undefined,
+            LabelScalingFactor: 100,
             Style: style,
             Brewery: brewery
         };
