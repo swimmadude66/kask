@@ -36,8 +36,8 @@
             </div>
 
             <div class="text-center like-buttons" *ngIf="isLoggedIn">
-                <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === -1 ? 'disabled active' : ''" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
-                <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === 1 ? 'disabled active' : ''" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
+                <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === -1 ? 'active' : ''" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
+                <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === 1 ? 'active' : ''" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
             </div>
         </ng-container>
 

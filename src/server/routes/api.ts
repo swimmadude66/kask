@@ -33,6 +33,8 @@ module.exports = (APP_CONFIG) => {
 
     router.use('/beers', require('./beers')(APP_CONFIG));
 
+    router.use('/stats', require('./stats')(APP_CONFIG));
+
     router.use((req, res, next) => {
         if (!res.locals.user) {
             return res.status(401).send('401 UNAUTHORIZED');

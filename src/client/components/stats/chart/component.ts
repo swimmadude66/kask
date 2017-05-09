@@ -1,4 +1,6 @@
-import {Component, OnInit, Input} from '@angular/core';
+import {Observable} from 'rxjs/Rx';
+import {StatsService} from '../../../services/stats.service';
+import {Component, OnInit} from '@angular/core';
 import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models/tap.model';
 
@@ -28,6 +30,8 @@ export class TapsChartComponent implements OnInit {
                 }
             }],
             xAxes: [{
+                type: 'time',
+                display: true,
                 scaleLabel: {
                     display: true,
                     labelString: 'Date'
@@ -74,8 +78,11 @@ export class TapsChartComponent implements OnInit {
     lineChartLegend: boolean = true;
     lineChartType: string = 'line';
 
+    pourData: any[] = [];
+
     constructor(
-        private _tapService: TapService
+        private _tapService: TapService,
+        private _statService: StatsService
     ) { }
 
     ngOnInit() {
@@ -83,39 +90,47 @@ export class TapsChartComponent implements OnInit {
 
         window['Chart'].defaults.global.defaultFontColor = 'rgba(255, 255, 255, 0.8)';
         window['Chart'].defaults.global.defaultFontSize = 16;
-    }
 
-
-    @Input('taps')
-    set setTaps(taps: Tap[]) {
-        if (!taps) {
-            return;
-        }
-        this.taps = taps;
-        taps.forEach((tap, i) => {
-            let daysAgo = [6, 5, 4, 3, 2, 1, 0];
-            this.lineChartLabels = daysAgo.map(x => this.getNthDateStringBeforeToday(x));
-            this.lineChartData.push({
-                data: daysAgo.map(_ =>  Math.round(Math.random() * 100)),
-                label: this.taps[i].TapName
+        Observable.forkJoin(
+            this._statService.getPours(),
+            this._tapService.getTaps()
+        ).subscribe(results => {
+            let pours = results[0];
+            let taps = results[1];
+            this.pourData = pours.map(p => {
+                let dt = new Date(p.Timestamp);
+                p.Date = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+                p.Volume = Math.ceil(p.Volume / 29.57);
+                return p;
+            });
+            this.taps = taps;
+            let chartData = pours.reduce((prev, curr) => {
+                if (!(curr.TapId in prev)) {
+                    prev[curr.TapId] = [];
+                }
+                let tapDate = prev[curr.TapId].findIndex(data => data.x === curr.Date);
+                if (tapDate < 0) {
+                    prev[curr.TapId].push({x: curr.Date, y: curr.Volume});
+                } else {
+                     prev[curr.TapId][tapDate].y += curr.Volume;
+                }
+                return prev;
+            }, {});
+            this.lineChartLabels = pours.map(p => (p.x.getMonth() + 1) + '/' + p.x.getDate() + '/' + p.x.getFullYear());
+            taps.forEach((tap, i) => {
+                this.lineChartData.push({
+                    data: chartData[tap.TapId],
+                    label: tap.TapName
+                });
             });
         });
     }
-
     // events
     public chartClicked(e: any): void {
-        console.log(e);
+        // console.log(e);
     }
 
     public chartHovered(e: any): void {
-        console.log(e);
-    }
-
-    private getNthDateStringBeforeToday(n) {
-        let today = new Date();
-        let dateToReturn = new Date(today.getTime() - (n * 24 * 60 * 60 * 1000));
-
-        return  (dateToReturn.getMonth() + 1) + '/' + dateToReturn.getDate();
-
+        // console.log(e);
     }
 }

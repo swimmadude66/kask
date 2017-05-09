@@ -65,6 +65,11 @@ export class TapComponent implements OnInit, OnDestroy {
     }
 
     vote(vote: string) {
+        if (this.tapSession && this.tapSession.UserVote) {
+            if (((this.tapSession.UserVote === 1) && (vote === 'up')) || ((this.tapSession.UserVote === -1) && (vote === 'down'))) {
+                vote = 'none';
+            }
+        }
         this._tapService.vote(this.tapSession.SessionId, vote)
             .switchMap(() => this._tapService.getTapContents(this.info.TapId))
             .subscribe();

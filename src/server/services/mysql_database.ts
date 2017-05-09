@@ -724,4 +724,10 @@ export class MysqlDatabase implements Database {
             }
         );
     }
+
+    getPours(): Observable<any[]> {
+        let q = 'Select `PourId`, `Volume`, `Timestamp`, `TapId` from `pours`' +
+        ' join `beer_sessions` on `beer_sessions`.`KegId`=`pours`.`KegId`;';
+        return this.query(q);
+    }
 }
