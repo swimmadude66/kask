@@ -17,9 +17,7 @@ export class TapsChartComponent implements OnInit {
         responsive: true,
         tooltips: {
             callbacks: {
-                label: function(tooltipItems, data) {
-                    return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.yLabel + ' oz. poured';
-                }
+                label: (tooltipItems, data) => data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.yLabel + ' oz. poured'
             }
         },
         scales: {
@@ -90,8 +88,11 @@ export class TapsChartComponent implements OnInit {
 
     @Input('taps')
     set setTaps(taps: Tap[]) {
+        if (!taps) {
+            return;
+        }
         this.taps = taps;
-       this.taps.forEach((tap, i) => {
+        taps.forEach((tap, i) => {
             let daysAgo = [6, 5, 4, 3, 2, 1, 0];
             this.lineChartLabels = daysAgo.map(x => this.getNthDateStringBeforeToday(x));
             this.lineChartData.push({
