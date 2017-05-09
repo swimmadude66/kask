@@ -699,7 +699,11 @@ export class MysqlDatabase implements Database {
 
     adjustKegVolume(kegId: number, volume: number): Observable<any> {
         let q = 'Update `kegs` set `RemovedVolume` = `RemovedVolume`+? Where `KegId`=?;';
-        return this.query(q, [volume, kegId]);
+        return this.query(q, [volume, kegId])
+        .flatMap(_ => {
+            let pourQ = 'Insert into `pours` (`KegId`, `Volume`) VALUES (?, ?);';
+            return this.query(pourQ, [kegId, volume]);
+        });
     }
 
     adjustTapVolume(tapId: number, volume): Observable<any> {

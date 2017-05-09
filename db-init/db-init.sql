@@ -140,4 +140,15 @@ CREATE TABLE IF NOT EXISTS `keg_locations` (
   CONSTRAINT `FK_Location` FOREIGN KEY (`LocationId`) REFERENCES `off_tap_locations` (`LocationId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Map beers to their off-tap locations';
 
+CREATE TABLE IF NOT EXISTS `pours` (
+  `PourId` int(11) NOT NULL AUTO_INCREMENT,
+  `KegId` int(11) NOT NULL,
+  `Volume` decimal(10,0) NOT NULL DEFAULT '0',
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`PourId`),
+  UNIQUE KEY `PourId_UNIQUE` (`PourId`),
+  KEY `pourfromkeg_idx` (`KegId`),
+  CONSTRAINT `pourfromkeg` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
