@@ -19,6 +19,6 @@ export class ParallaxScrollDirective {
             let top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
 
             this._element.nativeElement.style.top = (top * this.parallaxScale) + 'px';
-        })
+        });
     }
 }

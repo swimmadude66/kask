@@ -1,11 +1,11 @@
 import {Component, Input, OnInit, OnDestroy} from '@angular/core';
-import {Keg} from "../../../models/keg.model";
-import {Location} from "../../../models/location.model";
-import {LocationService} from "../../../services/location.service";
-import {Beer} from "../../../models/beer.model";
-import {Observable} from "rxjs/Rx";
-import {AdminService} from "../../../services/admin.service";
-import {Tap} from "../../../models/tap.model";
+import {Keg} from '../../../models/keg.model';
+import {Location} from '../../../models/location.model';
+import {LocationService} from '../../../services/location.service';
+import {Beer} from '../../../models/beer.model';
+import {Observable} from 'rxjs/Rx';
+import {AdminService} from '../../../services/admin.service';
+import {Tap} from '../../../models/tap.model';
 
 @Component({
     selector: 'location',
@@ -14,7 +14,7 @@ import {Tap} from "../../../models/tap.model";
 })
 export class LocationComponent implements OnInit, OnDestroy {
     private subscriptions = [];
-    
+
     contents: Keg[];
     loaded: boolean;
     editing: boolean;
@@ -50,7 +50,7 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
     }
-    
+
     submitNewKeg() {
         this.loaded = false;
        this._adminService.store(this.beerToLoad.BeerId, this.kegSizeToLoad, this.info.LocationId)
@@ -68,14 +68,14 @@ export class LocationComponent implements OnInit, OnDestroy {
             .distinctUntilChanged()
             .filter(term => term.length > 4)
             .switchMap(term => this._adminService.search(term))
-            .map(result => result.beers)
+            .map(result => result.beers);
     };
 
-    getBeerName(beer:Beer) {
-        return beer.BeerName
+    getBeerName(beer: Beer) {
+        return beer.BeerName;
     }
 
-    getBeerDisplay(beer:Beer) {
+    getBeerDisplay(beer: Beer) {
         return `${beer.Brewery.BreweryName}: ${beer.BeerName}`;
     }
 
@@ -84,7 +84,7 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.beerToLoad = beer;
     }
 
-    private addLocation() {
+    addLocation() {
         this.loaded = false;
         this._locationService.addLocation(this.info)
         .subscribe(
@@ -96,7 +96,7 @@ export class LocationComponent implements OnInit, OnDestroy {
         );
     }
 
-    private editLocation() {
+    editLocation() {
         this.loaded = false;
         this._locationService.updateLocation(this.info)
         .subscribe(
@@ -108,7 +108,7 @@ export class LocationComponent implements OnInit, OnDestroy {
         );
     }
 
-    private submitLocation() {
+    submitLocation() {
         if (this.info.LocationId) {
             this.editLocation();
         } else {

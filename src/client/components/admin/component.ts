@@ -1,10 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {LocationService} from "../../services/location.service";
-import {Location} from "../../models";
-import {Observable} from "rxjs/Rx";
-import {AdminService} from "../../services/admin.service";
-import {TapService} from "../../services/tap.service";
-import {Tap} from "../../models/tap.model";
+import {LocationService} from '../../services/location.service';
+import {Location} from '../../models';
+import {AdminService} from '../../services/admin.service';
+import {TapService} from '../../services/tap.service';
+import {Tap} from '../../models/tap.model';
 
 @Component({
     selector: 'admin',
@@ -16,7 +15,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
     locations: Location[] = [];
     taps: Tap[] = [];
-    
+
     constructor (
         private _locationService: LocationService,
         private _adminService: AdminService,
@@ -26,7 +25,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this._locationService.getLocations()
             .subscribe(locations => this.locations = locations);
-        
+
         this._tapService.getTaps()
             .subscribe(taps => this.taps = taps);
 
@@ -42,11 +41,10 @@ export class AdminComponent implements OnInit, OnDestroy {
     //             () => this.loaded = true
     //         );
     // }
-    
+
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
     }
 
-    
 }

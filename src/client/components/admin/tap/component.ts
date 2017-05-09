@@ -1,10 +1,9 @@
 import {Component, OnDestroy, OnInit, Input} from '@angular/core';
-import {Tap} from "../../../models/tap.model";
-import {Observable} from "rxjs/Rx";
-import {AdminService} from "../../../services/admin.service";
-import {Beer} from "../../../models/beer.model";
-import {TapService} from "../../../services/tap.service";
-import {TapSession} from "../../../models/session.model";
+import {Tap} from '../../../models/tap.model';
+import {AdminService} from '../../../services/admin.service';
+import {Beer} from '../../../models/beer.model';
+import {TapService} from '../../../services/tap.service';
+import {TapSession} from '../../../models/session.model';
 
 @Component({
     selector: 'tap-edit',
@@ -19,7 +18,7 @@ export class TapEditComponent implements OnInit, OnDestroy {
     beerToLoad: Beer;
     @Input() info: Tap;
     @Input() tapNum: number;
-    
+
     constructor(
         private _adminService: AdminService,
         private _tapService: TapService
@@ -34,7 +33,7 @@ export class TapEditComponent implements OnInit, OnDestroy {
 
         this._tapService.getTapContents(this.info.TapId).subscribe();
     }
-    
+
     submitEdit() {
         this._tapService.updateTap(this.info)
             .subscribe(
@@ -54,7 +53,7 @@ export class TapEditComponent implements OnInit, OnDestroy {
     //             );
     //     }
     // }
-    
+
     clear() {
         this._adminService.clearTap(this.info.TapId)
             .switchMap(_ => this._tapService.getTapContents(this.info.TapId))

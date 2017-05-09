@@ -1,8 +1,8 @@
 import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models';
 import {Component, Input, OnInit, Output, EventEmitter, OnDestroy} from '@angular/core';
-import {TapSession} from "../../../models/session.model";
-import {Observable, Subscription} from "rxjs/Rx";
+import {TapSession} from '../../../models/session.model';
+import {Observable, Subscription} from 'rxjs/Rx';
 
 @Component({
     selector: 'tap',
@@ -35,7 +35,7 @@ export class TapComponent implements OnInit, OnDestroy {
                     () => this.loaded = true
             ));
 
-            //poll the tap
+            // poll the tap
             this.subscriptions.push(
                 Observable.timer(0, 30000)
                     .switchMap(() => this._tapService.getTapContents(this.info.TapId))
@@ -62,7 +62,6 @@ export class TapComponent implements OnInit, OnDestroy {
         }
         return '';
     }
-    
 
     vote(vote: string) {
         this._tapService.vote(this.tapSession.SessionId, vote)

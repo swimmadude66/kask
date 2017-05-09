@@ -7,7 +7,7 @@ import {Location, Keg} from '../models';
 export class LocationService {
 
     private locationContents: {[key: number]: Subject<Keg[]>} = {};
-    
+
     constructor(
         private http: Http
     ) {}

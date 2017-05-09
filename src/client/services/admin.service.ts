@@ -1,19 +1,17 @@
-import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
-import {Observable, Subject, BehaviorSubject} from "rxjs/Rx";
-import {Beer} from "../models/beer.model";
+import {Injectable} from '@angular/core';
+import {Http} from '@angular/http';
 
 @Injectable()
 export class AdminService {
     constructor(
         private http: Http
     ) {}
-    
+
     search(beerName: string) {
         return this.http.get(`/api/admin/search/${beerName}`)
             .map(res => res.json());
     }
-    
+
     store(beerId: number, size: string, locationId: number) {
         return this.http.post(`/api/admin/store`, {
             BeerId: beerId,
@@ -21,7 +19,7 @@ export class AdminService {
             LocationId: locationId
         }).map(res => res.json());
     }
-    
+
     loadTap(tapId: number, beerId: number, size: string) {
         return this.http.post(`/api/admin/tap/${tapId}`, {
             BeerId: beerId,
@@ -34,11 +32,11 @@ export class AdminService {
             KegId: kegId
         }).map(res => res.json());
     }
-    
+
     clearTap(tapId: number) {
         return this.http.post(`/api/admin/clear/${tapId}`, {});
     }
-    
+
     move(kegId: number, locationId: number) {
         return this.http.post('/api/admin/move', {
             KegId: kegId,

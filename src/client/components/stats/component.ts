@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Tap} from "../../models/tap.model";
-import {TapService} from "../../services/tap.service";
+import {Tap} from '../../models/tap.model';
+import {TapService} from '../../services/tap.service';
 
 @Component({
     selector: 'stats',
@@ -11,7 +11,7 @@ export class StatsComponent implements OnInit, OnDestroy {
     private subscriptions = [];
 
     private taps: Tap[];
-    
+
     constructor(
         private _tapService: TapService
     ) { }

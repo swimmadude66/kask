@@ -68,7 +68,7 @@ export class BreweryDBService {
             if (!response) {
                 return Observable.throw('No Response!');
             }
-            if( !response.data || response.data.length < 1) {
+            if (!response.data || response.data.length < 1) {
                 return Observable.of([]);
             }
             let styles = [];

@@ -5,7 +5,7 @@ import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
 import {ParallaxScrollDirective} from '../directives';
 import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/component';
-import {KegProgressComponent} from "../components/shared/keg_progress_bar/component";
+import {KegProgressComponent} from '../components/shared/keg_progress_bar/component';
 
 @NgModule({
     imports: [

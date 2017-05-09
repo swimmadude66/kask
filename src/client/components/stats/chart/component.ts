@@ -1,6 +1,6 @@
-import {Component, OnDestroy, OnInit, Input} from '@angular/core';
-import {TapService} from "../../../services/tap.service";
-import {Tap} from "../../../models/tap.model";
+import {Component, OnInit, Input} from '@angular/core';
+import {TapService} from '../../../services/tap.service';
+import {Tap} from '../../../models/tap.model';
 
 @Component({
     selector: 'taps-chart',
@@ -9,42 +9,16 @@ import {Tap} from "../../../models/tap.model";
 })
 export class TapsChartComponent implements OnInit {
     private taps: Tap[];
-
-    constructor(
-        private _tapService: TapService
-    ) { }
-
-    ngOnInit() {
-        // http://www.chartjs.org/docs/#chart-configuration-global-configuration
-
-        window['Chart'].defaults.global.defaultFontColor = 'rgba(255, 255, 255, 0.8)';
-        window['Chart'].defaults.global.defaultFontSize = 16;
-    }
-
-
-    @Input('taps')
-    set setTaps(taps: Tap[]) {
-        this.taps = taps;
-        for(let i in this.taps) {
-            let daysAgo = [6,5,4,3,2,1,0];
-            this.lineChartLabels = daysAgo.map(x => this.getNthDateStringBeforeToday(x));
-            this.lineChartData.push({
-                data: daysAgo.map(_ =>  Math.round(Math.random()*100)),
-                label: this.taps[i].TapName
-            });
-        }
-    }
-
     // lineChart
-    lineChartData:Array<any> = [];
-
+    lineChartData: any[] = [];
     lineChartLabels = [];
-    lineChartOptions:any = {
+
+    lineChartOptions: any = {
         responsive: true,
         tooltips: {
             callbacks: {
                 label: function(tooltipItems, data) {
-                    return data.datasets[tooltipItems.datasetIndex].label +': ' + tooltipItems.yLabel + ' oz. poured';
+                    return data.datasets[tooltipItems.datasetIndex].label + ': ' + tooltipItems.yLabel + ' oz. poured';
                 }
             }
         },
@@ -64,7 +38,7 @@ export class TapsChartComponent implements OnInit {
         }
     };
 
-    lineChartColors:Array<any> = [
+    lineChartColors: any[] = [
         { // tap-color-1
             backgroundColor: 'rgba(252,91,85,0.05)',
             borderColor: 'rgba(252,91,85,1)',
@@ -98,15 +72,41 @@ export class TapsChartComponent implements OnInit {
             pointHoverBorderColor: 'rgba(122,175,255, 0.8)'
         }
     ];
-    lineChartLegend:boolean = true;
-    lineChartType:string = 'line';
+
+    lineChartLegend: boolean = true;
+    lineChartType: string = 'line';
+
+    constructor(
+        private _tapService: TapService
+    ) { }
+
+    ngOnInit() {
+        // http://www.chartjs.org/docs/#chart-configuration-global-configuration
+
+        window['Chart'].defaults.global.defaultFontColor = 'rgba(255, 255, 255, 0.8)';
+        window['Chart'].defaults.global.defaultFontSize = 16;
+    }
+
+
+    @Input('taps')
+    set setTaps(taps: Tap[]) {
+        this.taps = taps;
+       this.taps.forEach((tap, i) => {
+            let daysAgo = [6, 5, 4, 3, 2, 1, 0];
+            this.lineChartLabels = daysAgo.map(x => this.getNthDateStringBeforeToday(x));
+            this.lineChartData.push({
+                data: daysAgo.map(_ =>  Math.round(Math.random() * 100)),
+                label: this.taps[i].TapName
+            });
+        });
+    }
 
     // events
-    public chartClicked(e:any):void {
+    public chartClicked(e: any): void {
         console.log(e);
     }
 
-    public chartHovered(e:any):void {
+    public chartHovered(e: any): void {
         console.log(e);
     }
 

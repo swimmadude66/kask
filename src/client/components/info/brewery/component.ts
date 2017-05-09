@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {BeerService} from '../../../services/beer.service';
-import {Beer} from '../../../models/beer.model';
 import {Brewery} from '../../../models/brewery.model';
 
 @Component({

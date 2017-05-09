@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
     selector: 'dashboard',
@@ -9,16 +9,16 @@ import {ActivatedRoute} from "@angular/router";
 export class UserDetailComponent implements OnInit, OnDestroy {
     private subscriptions = [];
     private userId: number;
-    
-    
+
     constructor(
         private _activatedRoute: ActivatedRoute
     ) { }
 
     ngOnInit() {
-        let idString = this._activatedRoute.snapshot.queryParams['id']
-        if(!!idString)
-            this.userId = parseInt(idString);
+        let idString = this._activatedRoute.snapshot.queryParams['id'];
+        if (!!idString) {
+            this.userId = parseInt(idString, 10);
+        }
     }
 
     ngOnDestroy() {
