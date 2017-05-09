@@ -18,6 +18,7 @@ export interface Database {
     // Admin methods for saving data from searches
     saveBeer(beer: Beer): Observable<number>;
     saveBeers(beers: Beer[]): Observable<Beer[]>;
+    saveBeerLabelScale(beerId: number, scale: number): Observable<any>;
     saveStyle(style: Style): Observable<number>;
     saveStyles(styles: Style[]): Observable<{[BDBID: string]: Style}>;
     saveBrewery(brewery: Brewery): Observable<number>;

@@ -5,6 +5,5 @@ export class TapSession {
     NetVote: number;
     UserVote: number;
     TapId: number;
-
     Keg: Keg;
 }

@@ -156,5 +156,19 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
+    router.post('/beers/scale/', (req, res) => {
+        let body = req.body;
+        if (!body || !body.BeerId || !body.Scale) {
+            return res.status(400).send('BeerId and Scale are required fields');
+        }
+        db.saveBeerLabelScale(body.BeerId, body.Scale).subscribe(
+            _ => res.status(204).end(),
+            err => {
+                console.error(err);
+                return res.status(500).send('Could not scale label scale');
+            }
+        );
+    });
+
     return router;
 };

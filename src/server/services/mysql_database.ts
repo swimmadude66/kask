@@ -91,7 +91,8 @@ export class MysqlDatabase implements Database {
             BeerDescription: result.BeerDescription,
             ABV: result.ABV,
             IBU: result.IBU,
-            LabelUrl: result.LabelUrl
+            LabelUrl: result.LabelUrl,
+            LabelScalingFactor: result.LabelScalingFactor
         };
         return beer;
     }
@@ -224,6 +225,11 @@ export class MysqlDatabase implements Database {
                 });
             }
         );
+    }
+
+    saveBeerLabelScale(beerId: number, scale: number): Observable<any> {
+        let q = 'Update `beers` set `LabelScalingFactor`=? Where `BeerId`=?;';
+        return this.query(q, [scale, beerId]);
     }
 
     saveStyle(style: Style): Observable<number> {

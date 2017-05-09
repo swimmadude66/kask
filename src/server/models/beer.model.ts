@@ -8,6 +8,7 @@ export class Beer {
     ABV: number;
     IBU: number;
     LabelUrl: string;
+    LabelScalingFactor: number;
     Style: Style;
     Brewery: Brewery;
     BeerBDBID: string;

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `beers` (
   `ABV` decimal(8,5) DEFAULT NULL,
   `IBU` int(6) DEFAULT NULL,
   `LabelUrl` varchar(512) DEFAULT NULL,
+  `LabelScalingFactor` int(11) NOT NULL DEFAULT '100',
   `BeerBDBID` varchar(32) NOT NULL,
   PRIMARY KEY (`BeerId`),
   UNIQUE KEY `BeerId_UNIQUE` (`BeerId`),
@@ -70,6 +71,7 @@ CREATE TABLE IF NOT EXISTS `beers` (
   CONSTRAINT `Brewery` FOREIGN KEY (`BreweryId`) REFERENCES `breweries` (`BreweryId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `Style` FOREIGN KEY (`StyleId`) REFERENCES `styles` (`StyleId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Information about the beers';
+
 
 CREATE TABLE IF NOT EXISTS `kegs` (
   `KegId` int(11) NOT NULL AUTO_INCREMENT,

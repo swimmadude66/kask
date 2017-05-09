@@ -43,4 +43,10 @@ export class AdminService {
             LocationId: locationId
         });
     }
+    saveBeerLabelScale(beerId: number, scale: number) {
+        return this.http.post('/api/admin/beers/scale', {
+            BeerId: beerId,
+            Scale: scale
+        });
+    }
 }

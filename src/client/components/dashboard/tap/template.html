@@ -43,8 +43,8 @@
 
 
         <div class="edit-footer" *ngIf="editing">
-            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success" (click)="editing=false">Submit</button>
-            <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger pull-right" (click)="editing=false">Cancel</button>
+            <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success" (click)="submitTapScale()">Submit</button>
+            <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger pull-right" (click)="cancelTapScale()">Cancel</button>
         </div>
 
 
@@ -52,14 +52,14 @@
 </div>
 
 <section class="tap-handle hidden-md-down">
-    <span class="fa fa-pencil edit" (click)="editing=true" *ngIf="!editing"></span>
+    <span class="fa fa-pencil edit" (click)="editTapScale()" *ngIf="isLoggedIn && !!tapSession?.Keg && !editing"></span>
 
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image" *ngIf="getImage()">
         <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">
-            <img src="{{getImage()}}" alt="beer image" [style.width]="imageScale + '%'"/>
+            <img src="{{getImage()}}" alt="beer image" [style.width]="(tapSession?.Keg?.Beer?.LabelScalingFactor || 100) + '%'"/>
         </a>
     </div>
-    <input *ngIf="editing" class="img-scale" type="range" id="weight" min="10" max="1000" [value]="imageScale" (input)="imageScale = $event.target.value" step="1" />
+    <input *ngIf="isLoggedIn && !!tapSession?.Keg && editing" class="img-scale" type="range" id="weight" min="10" max="1000" [(ngModel)]="tapSession.Keg.Beer.LabelScalingFactor" step="1"/>
 </section>
 

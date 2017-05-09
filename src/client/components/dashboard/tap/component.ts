@@ -1,7 +1,7 @@
+import {AdminService} from '../../../services/admin.service';
 import {TapService} from '../../../services/tap.service';
-import {Tap} from '../../../models';
+import {Tap, TapSession} from '../../../models';
 import {Component, Input, OnInit, Output, EventEmitter, OnDestroy} from '@angular/core';
-import {TapSession} from '../../../models/session.model';
 import {Observable, Subscription} from 'rxjs/Rx';
 
 @Component({
@@ -15,7 +15,7 @@ export class TapComponent implements OnInit, OnDestroy {
     tapSession: TapSession;
     loaded: boolean;
     editing: boolean = false;
-    imageScale = 100;
+    originalScale = 100;
 
     @Input() info: Tap;
     @Input() tapNum: number;
@@ -23,7 +23,8 @@ export class TapComponent implements OnInit, OnDestroy {
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
 
     constructor(
-        private _tapService: TapService
+        private _tapService: TapService,
+        private _adminService: AdminService
     ) { }
 
     ngOnInit() {
@@ -67,5 +68,24 @@ export class TapComponent implements OnInit, OnDestroy {
         this._tapService.vote(this.tapSession.SessionId, vote)
             .switchMap(() => this._tapService.getTapContents(this.info.TapId))
             .subscribe();
+    }
+
+    editTapScale() {
+        this.originalScale = this.tapSession.Keg.Beer.LabelScalingFactor;
+        this.editing = true;
+    }
+
+    cancelTapScale() {
+        this.editing = false;
+        this.tapSession.Keg.Beer.LabelScalingFactor = this.originalScale;
+    }
+
+    submitTapScale() {
+        if (!this.tapSession || !this.tapSession.Keg || !this.tapSession.Keg.Beer) {
+            return;
+        }
+        this.editing = false;
+        let beer = this.tapSession.Keg.Beer;
+        this._adminService.saveBeerLabelScale(beer.BeerId, beer.LabelScalingFactor).subscribe();
     }
 }
