@@ -12,8 +12,8 @@
                 <div class="navbar-nav mr-auto">
                     <a class="nav-item nav-link" routerLink="/" routerLinkActive="active">Dashboard</a>
                     <a class="nav-item nav-link" routerLink="/stats" routerLinkActive="active">Stats</a>
-                    <a class="nav-item nav-link" routerLink="/votes" routerLinkActive="active">Votes</a>
-                    <a class="nav-item nav-link" routerLink="/admin" routerLinkActive="active">Admin</a>
+                    <a class="nav-item nav-link" routerLink="/admin" routerLinkActive="active" *ngIf="isLoggedIn">Admin</a>
+                    <!--<a class="nav-item nav-link" routerLink="/votes" routerLinkActive="active">Votes</a>-->
                 </div>
 
                 <ng-container *ngIf="!hideLoginForm">
