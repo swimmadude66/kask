@@ -1,3 +1,4 @@
+import {NgbTypeaheadConfig} from '@ng-bootstrap/ng-bootstrap';
 import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {Keg} from '../../../models/keg.model';
 import {Location} from '../../../models/location.model';
@@ -27,8 +28,11 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     constructor(
         private _locationService: LocationService,
-        private _adminService: AdminService
-    ) { }
+        private _adminService: AdminService,
+        config: NgbTypeaheadConfig
+    ) { 
+        config.focusFirst = false;
+    }
 
     ngOnInit() {
         if (this.info && this.info.LocationId) {
@@ -62,9 +66,9 @@ export class LocationComponent implements OnInit, OnDestroy {
            );
     }
 
-    search = (text$: Observable<string>) => {
-        return text$
-            .debounceTime(300)
+    search = (text: Observable<string>) => {
+        return text
+            .debounceTime(500)
             .distinctUntilChanged()
             .filter(term => term.length > 4)
             .switchMap(term => this._adminService.search(term))
