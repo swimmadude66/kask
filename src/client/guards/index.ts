@@ -1,9 +1,12 @@
 import {LoggedInGuard} from './logged_in';
+import {AdminGuard} from './admin';
 
 export {
-    LoggedInGuard
+    LoggedInGuard,
+    AdminGuard
 }
 
 export const GUARDS = [
-    LoggedInGuard
+    LoggedInGuard,
+    AdminGuard
 ];

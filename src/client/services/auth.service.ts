@@ -6,6 +6,7 @@ import {Observable, Subject, BehaviorSubject} from 'rxjs/Rx';
 export class AuthService {
 
     private loggedInSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
+    private adminSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
 
     constructor(
         private http: Http
@@ -15,11 +16,28 @@ export class AuthService {
         return this.loggedInSubject;
     }
 
+    isAdmin(): Observable<boolean> {
+        return this.adminSubject;
+    }
+
     checkIfLoggedIn(): Observable<boolean> {
         return this.http.get('/api/auth')
             .map(res => res.json())
-            .map(res => res.isAuth)
-            .do(_ => this.loggedInSubject.next(_));
+            .do(_ => {
+                this.loggedInSubject.next(_.isAuth);
+                this.adminSubject.next(_.isAdmin);
+            })
+            .map(res => res.isAuth);
+    }
+
+    checkIfAdmin(): Observable<boolean> {
+        return this.http.get('/api/auth')
+            .map(res => res.json())
+            .do(_ => {
+                this.loggedInSubject.next(_.isAuth);
+                this.adminSubject.next(_.isAdmin);
+            })
+            .map(res => res.isAdmin);
     }
 
     signUp(Email: string, Password: string) {

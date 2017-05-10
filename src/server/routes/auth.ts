@@ -5,13 +5,13 @@ import * as uuid from 'uuid/v4';
 import {createHash} from 'crypto';
 
 module.exports = (APP_CONFIG) => {
-            const router = express.Router();
-            const db: Database = APP_CONFIG.database;
+    const router = express.Router();
+    const db: Database = APP_CONFIG.database;
 
-            router.get('/', (req, res) => {
-                let user = res.locals.user;
-                if (user) {
-            return res.send({isAuth: true});
+    router.get('/', (req, res) => {
+        let user = res.locals.user;
+        if (user) {
+            return res.send({isAuth: true, isAdmin: !!user.IsAdmin});
         } else {
             return res.send({isAuth: false});
         }

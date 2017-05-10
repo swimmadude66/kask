@@ -10,6 +10,7 @@ import {ActivatedRoute} from '@angular/router';
 export class AppComponent implements OnInit {
     isSigningUp: boolean;
     isLoggedIn: boolean;
+    isAdmin: boolean;
     emailInput: string;
     passwordInput: string;
     hideLoginForm: boolean;
@@ -25,6 +26,10 @@ export class AppComponent implements OnInit {
 
         this._authService.isLoggedIn().subscribe(_ => {
             this.isLoggedIn = _;
+        });
+
+        this._authService.isAdmin().subscribe(_ => {
+            this.isAdmin = _;
         });
 
         this._authService.checkIfLoggedIn().subscribe();

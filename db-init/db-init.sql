@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `Email` varchar(100) NOT NULL,
   `Salt` varchar(100) NOT NULL,
   `PasswordHash` varchar(256) NOT NULL,
+  `IsAdmin` tinyint(1) NOT NULL DEFAULT '0',
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`UserId`),
   UNIQUE KEY `Email_UNIQUE` (`Email`)
