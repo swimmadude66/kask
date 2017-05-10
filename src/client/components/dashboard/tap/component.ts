@@ -20,6 +20,7 @@ export class TapComponent implements OnInit, OnDestroy {
     @Input() info: Tap;
     @Input() tapNum: number;
     @Input() isLoggedIn: boolean;
+    @Input() isAdmin: boolean;
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
 
     constructor(

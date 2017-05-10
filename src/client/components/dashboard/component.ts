@@ -13,6 +13,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     taps: Tap[] = [];
     leftIndex: number = 0;
     isLoggedIn: boolean;
+    isAdmin: boolean;
 
     constructor(
         private _tapService: TapService,
@@ -28,6 +29,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
           this._authService.isLoggedIn()
               .subscribe(_ => this.isLoggedIn = _)
+        );
+
+        this.subscriptions.push(
+          this._authService.isAdmin()
+              .subscribe(_ => this.isAdmin = _)
+        );
+
+        this.subscriptions.push(
+          this._authService.checkIfLoggedIn().subscribe()
         );
     }
 

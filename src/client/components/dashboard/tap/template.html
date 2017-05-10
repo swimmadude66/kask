@@ -7,7 +7,7 @@
             <p class="tap-desc">{{info.Description}}</p>
         </div>
 
-        <ng-container *ngIf="tapSession?.Keg?.Beer?.BeerId">
+        <ng-container *ngIf="tapSession?.Keg?.Beer">
             <keg-progress-bar [keg]="tapSession?.Keg"></keg-progress-bar>
 
             <div class="beer-info">
@@ -35,14 +35,14 @@
                 </p>
             </div>
 
-            <div class="text-center like-buttons" *ngIf="isLoggedIn">
+            <div class="text-center like-buttons" *ngIf="isLoggedIn && !!tapSession">
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === -1 ? 'active' : ''" (click)="vote('down')"><i class="fa fa-fw fa-thumbs-down"></i></button>
                 <button type="button" class="btn btn-outline-secondary" [ngClass]="tapSession.UserVote === 1 ? 'active' : ''" (click)="vote('up')"><i class="fa fa-fw fa-thumbs-up"></i></button>
             </div>
         </ng-container>
 
 
-        <div class="edit-footer" *ngIf="editing">
+        <div class="edit-footer" *ngIf="isLoggedIn && isAdmin && editing">
             <button type="submit" name="submit" id="edit-submit" class="btn btn-outline-success" (click)="submitTapScale()">Submit</button>
             <button type="button" name="cancel" id="edit-cancel" class="btn btn-outline-danger pull-right" (click)="cancelTapScale()">Cancel</button>
         </div>
@@ -52,7 +52,7 @@
 </div>
 
 <section class="tap-handle hidden-md-down">
-    <span class="fa fa-pencil edit" (click)="editTapScale()" *ngIf="isLoggedIn && !!tapSession?.Keg && !editing"></span>
+    <span class="fa fa-pencil edit" (click)="editTapScale()" *ngIf="isLoggedIn && isAdmin && !!tapSession?.Keg && !editing"></span>
 
     <img src="/assets/img/tap-handle.png">
     <div class="tap-image" *ngIf="getImage()">
