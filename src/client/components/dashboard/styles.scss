@@ -2,7 +2,9 @@
 @import '../../scss/_variables';
 
 .container-wide {
-    width: 1540px;
+    @include media-breakpoint-up(md) {
+        width: 1540px;
+    }
 }
 
 /deep/ a {

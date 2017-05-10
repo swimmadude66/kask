@@ -75,16 +75,9 @@ input {
         }
     }
     .like-buttons {
-        visibility: hidden;
         button {
             margin: 1em;
             cursor: pointer;
-        }
-    }
-
-    &:hover {
-        .like-buttons {
-            visibility: visible;
         }
     }
 }
@@ -116,11 +109,11 @@ input {
     padding: 20px;
 
     .beer-title {
-        font-size: 2rem;
+        font-size: 24px;
         text-align: center;
 
         .tap-color-1 & a {
-                color: $tap-color-1;
+            color: $tap-color-1;
         }
         .tap-color-2 & a {
             color: $tap-color-2;
@@ -134,12 +127,14 @@ input {
     }
 
     ul.beer-details {
-        margin: 0 0 1.5rem 0;
-        line-height: 3rem;
+        margin: 0 0 1rem 0;
+        line-height: 16px;
         list-style-type: none;
 
         > li {
-            font-size: 1.3rem;
+            font-size: 16px;
+            padding:5px;
+            margin:10px;
             font-family: $chalk-font;
             &:before {
                 content: "*";
@@ -162,7 +157,6 @@ input {
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(100vh - 480px);
 
     img {
         position: absolute;
