@@ -22,7 +22,7 @@ import {SharedModule} from './shared.module';
             // { path: 'stats', loadChildren: './+stats.module.ts#LazyStatsModule' },
             // { path: 'votes', canActivate: [LoggedInGuard], loadChildren: './+votes.module.ts#LazyVotesModule' },
             { path: 'info', loadChildren: './+info.module.ts#LazyInfoModule' },
-            { path: 'user', canActivate: [LoggedInGuard], loadChildren: './+user.module.ts#LazyUserModule'}
+            // { path: 'user', canActivate: [LoggedInGuard], loadChildren: './+user.module.ts#LazyUserModule'}
         ]
     )
   ],
