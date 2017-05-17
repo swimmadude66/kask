@@ -52,10 +52,11 @@
 </div>
 
 <section class="tap-handle hidden-md-down">
-    <span class="fa fa-pencil edit" (click)="editTapScale()" *ngIf="isLoggedIn && isAdmin && !!tapSession?.Keg && !editing"></span>
+
 
     <div class="positioner">
         <div class="tap-image-container">
+            <span class="fa fa-pencil edit" (click)="editTapScale()" *ngIf="isLoggedIn && isAdmin && !!tapSession?.Keg && !editing"></span>
             <img src="/assets/img/tap-handle.png">
             <div class="tap-image" *ngIf="getImage()">
                 <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">
