@@ -11,7 +11,7 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav mr-auto">
                     <a class="nav-item nav-link" routerLink="/" routerLinkActive="active">Dashboard</a>
-                    <a class="nav-item nav-link" routerLink="/stats" routerLinkActive="active">Stats</a>
+                    <!--<a class="nav-item nav-link" routerLink="/stats" routerLinkActive="active">Stats</a>-->
                     <a class="nav-item nav-link" routerLink="/admin" routerLinkActive="active" *ngIf="isAdmin">Admin</a>
                     <!--<a class="nav-item nav-link" routerLink="/votes" routerLinkActive="active">Votes</a>-->
                 </div>
@@ -30,7 +30,7 @@
                         <button class="btn btn-link my-2 my-sm-0" type="button" (click)="toggleSignUp()">Log In</button>
                     </form>
                     <form class="form-inline" *ngIf="isLoggedIn">
-                        <button class="btn btn-link my-2 my-sm-0" type="submit" routerLink="/user">Profile</button>
+                        <!--<button class="btn btn-link my-2 my-sm-0" type="submit" routerLink="/user">Profile</button>-->
                         <button class="btn btn-link my-2 my-sm-0" type="submit" (click)="logOut()">Log Out</button>
                     </form>
                 </ng-container>
