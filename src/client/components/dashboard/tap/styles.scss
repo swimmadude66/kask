@@ -109,7 +109,7 @@ input {
     padding: 20px;
 
     .beer-title {
-        font-size: 24px;
+        font-size: 2rem;
         text-align: center;
 
         .tap-color-1 & a {
@@ -127,14 +127,12 @@ input {
     }
 
     ul.beer-details {
-        margin: 0 0 1rem 0;
-        line-height: 16px;
+        margin: 0 0 1.5rem 0;
+        line-height: 3rem;
         list-style-type: none;
 
         > li {
-            font-size: 16px;
-            padding:5px;
-            margin:10px;
+            font-size: 1.3rem;
             font-family: $chalk-font;
             &:before {
                 content: "*";
@@ -154,18 +152,23 @@ input {
 }
 
 .tap-handle {
-    position: absolute;
-    left: 0;
-    right: 0;
+    position: relative;
 
-    img {
+    .positioner {
         position: absolute;
-        top: -22px;
-        left: -9999px;
-        right: -9999px;
-        margin: auto;
-        width: 240px;
+        left: calc(50% - 120px);
+
+        .tap-image-container {
+            position: fixed;
+            top: calc(100vh - 410px);
+            > img {
+                position: absolute;
+                width: 240px;
+                height: 410px;
+            }
+        }
     }
+
 
     .img-scale {
         position: absolute;
@@ -182,16 +185,14 @@ input {
         border: 3px solid #a59680;
         background: #fff;
         position: relative;
-        right: -13px;
+        top:22px;
+        left: 33px;
         overflow: hidden;
-        margin: 0 auto;
 
         transform: rotateY(30deg) rotateX(6deg);
 
         img {
             position: absolute;
-            //max-height:120%;
-            //max-width: 200%;
             top: -9999px;
             bottom: -9999px;
             left: -9999px;
