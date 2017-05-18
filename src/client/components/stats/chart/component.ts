@@ -100,7 +100,7 @@ export class TapsChartComponent implements OnInit, OnChanges {
         this._statService.getPours()
             .subscribe(pours => {
                 this.pourData = pours.filter(x => x.Volume < 1000).map(p => {
-                    let dt = new Date(p.Timestamp);
+                    let dt = new Date(p.Timestamp.slice(0, -1));
                     p.Date = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
                     p.Volume = Math.ceil(p.Volume / 29.57);
                     return p;
@@ -131,6 +131,7 @@ export class TapsChartComponent implements OnInit, OnChanges {
             if (!(curr.TapId in prev)) {
                 prev[curr.TapId] = [];
             }
+
             for(let tapId in prev) {
                 let tapIndexForDate = prev[tapId].findIndex(data => data.x.getTime() === curr.Date.getTime());
                 if (tapIndexForDate < 0) {
