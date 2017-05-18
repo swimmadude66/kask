@@ -1,7 +1,6 @@
 import {join} from 'path';
 import {readFileSync} from 'fs';
 import * as https from 'https';
-import * as http from 'http';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
