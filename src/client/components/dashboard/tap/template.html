@@ -9,7 +9,6 @@
 
         <ng-container *ngIf="tapSession?.Keg?.Beer">
             <keg-progress-bar [keg]="tapSession?.Keg"></keg-progress-bar>
-
             <div class="beer-info">
                 <h3 class="beer-title">
                     <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">{{tapSession?.Keg?.Beer?.BeerName}}</a>
@@ -31,7 +30,6 @@
                 <p class="beer-details-2">
                     <span *ngIf="tapSession?.Keg?.Beer?.ABV"><strong>ABV:</strong> <i>{{tapSession?.Keg?.Beer?.ABV}}%</i></span>
                     <span *ngIf="tapSession?.Keg?.Beer?.IBU"><i>{{tapSession?.Keg?.Beer?.IBU}}</i> IBU</span>
-                    <span *ngIf="tapSession?.Keg?.Size"><i>{{tapSession?.Keg?.Size}} Barrel</i></span>
                 </p>
             </div>
 

@@ -1,3 +1,5 @@
 <div class="keg-progress-bar">
     <div class="keg-progress-fill" [style.width]="getPercentFull() + '%'"></div>
+    <div class="keg-size" *ngIf="keg?.Size"><i>{{keg?.Size}} Barrel</i></div>
 </div>
+
