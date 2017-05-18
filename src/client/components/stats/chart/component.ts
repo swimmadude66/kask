@@ -82,13 +82,11 @@ export class TapsChartComponent implements OnInit, OnChanges {
     lineChartLegend: boolean = true;
     lineChartType: string = 'line';
 
-    pourData: any[];
+    @Input() pours: any[];
 
     @Input() taps: Tap[];
 
     constructor(
-        private _tapService: TapService,
-        private _statService: StatsService
     ) { }
 
     ngOnInit() {
@@ -96,18 +94,6 @@ export class TapsChartComponent implements OnInit, OnChanges {
 
         window['Chart'].defaults.global.defaultFontColor = 'rgba(255, 255, 255, 0.8)';
         window['Chart'].defaults.global.defaultFontSize = 16;
-
-        this._statService.getPours()
-            .subscribe(pours => {
-                this.pourData = pours.filter(x => x.Volume < 1000).map(p => {
-                    let dt = new Date(p.Timestamp.slice(0, -1));
-                    p.Date = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-                    p.Volume = Math.ceil(p.Volume / 29.57);
-                    return p;
-                });
-
-                this.loadChartIfReady();
-            });
     }
 
     ngOnChanges(changes: any) {
@@ -124,10 +110,10 @@ export class TapsChartComponent implements OnInit, OnChanges {
     }
 
     private loadChartIfReady() {
-        if (!this.taps || !this.pourData) {
+        if (!this.taps || !this.pours) {
             return;
         }
-        let chartData = this.pourData.reduce((prev, curr) => {
+        let chartData = this.pours.reduce((prev, curr) => {
             if (!(curr.TapId in prev)) {
                 prev[curr.TapId] = [];
             }
