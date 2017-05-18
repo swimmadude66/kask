@@ -15,8 +15,10 @@
     .tap-container {
         padding: 1em 0 1px 0;
         @include media-breakpoint-up(lg) {
-            height: calc(100vh - 380px);
-            min-height: 600px;
+            @media (min-height: $tap-handle-height-breakpoint) {
+                height: calc(100vh - 380px);
+                min-height: 600px;
+            }
         }
     }
 

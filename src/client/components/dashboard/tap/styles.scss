@@ -1,6 +1,9 @@
 @import '~bootstrap/scss/bootstrap-grid';
 @import '../../../scss/_variables';
 
+$tap-handle-height: 410px;
+$tap-handle-width: 240px;
+
 h1,h2,h3,h4,h5,p,span,input {
     font-family: $chalk-font;
 
@@ -156,15 +159,21 @@ input {
 
     .positioner {
         position: absolute;
-        left: calc(50% - 120px);
+        left: calc(50% - #{$tap-handle-width / 2});
 
         .tap-image-container {
+            display:none;
             position: fixed;
-            top: calc(100vh - 410px);
+            top: calc(100vh - #{$tap-handle-height});
+
+            @media (min-height: $tap-handle-height-breakpoint) {
+                display:block
+            }
+
             > img {
                 position: absolute;
-                width: 240px;
-                height: 410px;
+                width: $tap-handle-width;
+                height:$tap-handle-height;
             }
         }
     }
