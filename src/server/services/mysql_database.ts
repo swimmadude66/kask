@@ -74,7 +74,7 @@ export class MysqlDatabase implements Database {
         let keg: Keg = {
             KegId: result.KegId,
             Beer: this.mapBeer(result),
-            Size: result.KegSize,
+            Size: result.Size,
             InitialVolume: initialVolume,
             RemovedVolume: result.RemovedVolume || 0,
         };
