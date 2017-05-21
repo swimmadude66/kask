@@ -1,6 +1,31 @@
 <section class="container">
   <h1>Stats</h1>
-  <h2>Tap Usage</h2>
+
+  <form class="form-inline">
+    <div class="form-group mr-sm-4">
+      <label class="mr-sm-2">From Date: </label>
+      <div class="input-group">
+        <input class="form-control" placeholder="yyyy-mm-dd"
+               name="fromDate" [ngModel]="fromDate" (ngModelChange)="onFromDateChange($event)" ngbDatepicker #d1="ngbDatepicker">
+        <div class="input-group-addon" (click)="d1.toggle()" >
+          <i class="fa fa-calendar"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group mr-sm-4">
+      <label class="mr-sm-2">To Date: </label>
+      <div class="input-group">
+        <input class="form-control" placeholder="yyyy-mm-dd"
+               name="toDate" [ngModel]="toDate" (ngModelChange)="onToDateChange($event)" ngbDatepicker #d2="ngbDatepicker">
+        <span class="input-group-addon" (click)="d2.toggle()" >
+          <i class="fa fa-calendar"></i>
+        </span>
+      </div>
+    </div>
+  </form>
+
+  <h2>Activity</h2>
   <taps-chart [taps]="taps" [pours]="pourData"></taps-chart>
 </section>
 

@@ -725,9 +725,10 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    getPours(): Observable<any[]> {
+    getPours(fromDate: string, toDate: string): Observable<any[]> {
         let q = 'Select `PourId`, `Volume`, `Timestamp`, `TapId` from `pours`' +
-        ' join `beer_sessions` on `beer_sessions`.`KegId`=`pours`.`KegId`;';
-        return this.query(q);
+            ' join `beer_sessions` on `beer_sessions`.`KegId`=`pours`.`KegId`' +
+            ' where `pours`.`Timestamp` > ? AND `pours`.`Timestamp` <= ?;';
+        return this.query(q, [fromDate, toDate]);
     }
 }

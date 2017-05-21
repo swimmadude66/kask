@@ -51,7 +51,7 @@ export interface Database {
     getTapContents(locationId: number): Observable<BeerSession>;
     adjustKegVolume(kegId: number, volume: number): Observable<any>;
     adjustTapVolume(tapId: number, volume): Observable<any>;
-    getPours(): Observable<any[]>;
+    getPours(fromDate: string, toDate: string): Observable<any[]>;
 
     // Voting
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;

@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs/Rx';
 import {StatsService} from '../../../services/stats.service';
-import {Component, OnInit, Input, OnChanges} from '@angular/core';
+import {Component, OnInit, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models/tap.model';
 
@@ -25,10 +25,10 @@ export class TapsChartComponent implements OnInit, OnChanges {
         },
         scales: {
             yAxes: [{
-                // scaleLabel: {
-                //     display: true,
-                //     labelString: 'Amount Poured'
-                // },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Amount Poured'
+                },
                 ticks: {
                     callback: function(label, index, labels) {
                         return Math.round(label) +' oz';
@@ -83,7 +83,6 @@ export class TapsChartComponent implements OnInit, OnChanges {
     lineChartType: string = 'line';
 
     @Input() pours: any[];
-
     @Input() taps: Tap[];
 
     constructor(
@@ -91,12 +90,11 @@ export class TapsChartComponent implements OnInit, OnChanges {
 
     ngOnInit() {
         // http://www.chartjs.org/docs/#chart-configuration-global-configuration
-
         window['Chart'].defaults.global.defaultFontColor = 'rgba(255, 255, 255, 0.8)';
         window['Chart'].defaults.global.defaultFontSize = 16;
     }
 
-    ngOnChanges(changes: any) {
+    ngOnChanges(changes: SimpleChanges) {
         this.loadChartIfReady();
     }
 
@@ -110,26 +108,29 @@ export class TapsChartComponent implements OnInit, OnChanges {
     }
 
     private loadChartIfReady() {
+        this.loaded = false;
+
         if (!this.taps || !this.pours) {
             return;
         }
-        let chartData = this.pours.reduce((prev, curr) => {
-            if (!(curr.TapId in prev)) {
-                prev[curr.TapId] = [];
-            }
 
-            for(let tapId in prev) {
-                let tapIndexForDate = prev[tapId].findIndex(data => data.x.getTime() === curr.Date.getTime());
+        let chartData = this.pours.reduce((result, curr) => {
+            for(let tapId in result) {
+                let tapIndexForDate = result[tapId].findIndex(data => data.x.getTime() === curr.Date.getTime());
                 if (tapIndexForDate < 0) {
-                    prev[tapId].push({x: curr.Date, y: 0});
+                    result[tapId].push({x: curr.Date, y: 0});
                 }
             }
 
-            let tapIndexForDate = prev[curr.TapId].findIndex(data => data.x.getTime() === curr.Date.getTime());
-            prev[curr.TapId][tapIndexForDate].y += curr.Volume;
+            let tapIndexForDate = result[curr.TapId].findIndex(data => data.x.getTime() === curr.Date.getTime());
+            result[curr.TapId][tapIndexForDate].y += curr.Volume;
 
-            return prev;
-        }, {});
+            return result;
+        }, this.taps.reduce((result, tap) => {
+            result[tap.TapId] = [];
+            return result;
+            }, {})
+        );
 
         //sort the data by date
         for(let tapId in chartData) {
@@ -149,7 +150,7 @@ export class TapsChartComponent implements OnInit, OnChanges {
 
         this.lineChartLabels = chartData[Object.keys(chartData)[0]].map(p => (p.x.getMonth() + 1) + '/' + p.x.getDate());
 
-        let newLineChartData = []
+        let newLineChartData = [];
 
         this.taps.forEach(tap => {
             newLineChartData.push({
@@ -157,9 +158,10 @@ export class TapsChartComponent implements OnInit, OnChanges {
                 label: tap.TapName
             });
         });
-
+        
         this.lineChartData = newLineChartData;
 
-        this.loaded = true;
+        // force chart labels redraw
+        setTimeout(() => this.loaded = true, 0);
     }
 }
