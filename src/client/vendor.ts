@@ -7,5 +7,6 @@ import 'bootstrap';
 import 'rxjs';
 import 'rxjs/add/operator/map';
 
-import 'chart.js';
 import 'moment';
+import 'chart.js';
+

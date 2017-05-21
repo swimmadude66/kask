@@ -52,10 +52,11 @@ export interface Database {
     adjustKegVolume(kegId: number, volume: number): Observable<any>;
     adjustTapVolume(tapId: number, volume): Observable<any>;
     getPours(fromDate: string, toDate: string): Observable<any[]>;
+    getKegSessionHistory(fromDate: string, toDate: string): Observable<BeerSession[]>;
 
     // Voting
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;
-    getSessionVotes(sessionId: number, userId?: number): Observable<any[]>;
+    getSessionVotes(sessionId: number): Observable<any[]>;
 
     // beer movement
     // -----------------

@@ -1,7 +1,4 @@
-import {Observable} from 'rxjs/Rx';
-import {StatsService} from '../../../services/stats.service';
 import {Component, OnInit, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {TapService} from '../../../services/tap.service';
 import {Tap} from '../../../models/tap.model';
 
 @Component({
@@ -12,11 +9,10 @@ import {Tap} from '../../../models/tap.model';
 export class TapsChartComponent implements OnInit, OnChanges {
     loaded: boolean = false;
 
-    // lineChart
-    lineChartData: any[] = [];
-    lineChartLabels = [];
+    chartData: any[] = [];
+    chartLabels = [];
 
-    lineChartOptions: any = {
+    chartOptions: any = {
         responsive: true,
         tooltips: {
             callbacks: {
@@ -44,9 +40,9 @@ export class TapsChartComponent implements OnInit, OnChanges {
         }
     };
 
-    lineChartColors: any[] = [
+    chartColors: any[] = [
         { // tap-color-1
-            backgroundColor: 'rgba(252,91,85,0.05)',
+            backgroundColor: 'rgba(252,91,85,0.8)',
             borderColor: 'rgba(252,91,85,1)',
             pointBackgroundColor: 'rgba(252,91,85,1)',
             pointBorderColor: '#fff',
@@ -54,7 +50,7 @@ export class TapsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(252,91,85,0.8)'
         },
         { // tap-color-2
-            backgroundColor: 'rgba(114,242,94,0.05)',
+            backgroundColor: 'rgba(114,242,94,0.8)',
             borderColor: 'rgba(114,242,94,1)',
             pointBackgroundColor: 'rgba(114,242,94,1)',
             pointBorderColor: '#fff',
@@ -62,7 +58,7 @@ export class TapsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(114,242,94,0.8)'
         },
         { // tap-color-3
-            backgroundColor: 'rgba(252,106,240,0.05)',
+            backgroundColor: 'rgba(252,106,240,0.8)',
             borderColor: 'rgba(252,106,240,1)',
             pointBackgroundColor: 'rgba(252,106,240,1)',
             pointBorderColor: '#fff',
@@ -70,7 +66,7 @@ export class TapsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(252,106,240,0.8)'
         },
         { // tap-color-4
-            backgroundColor: 'rgba(122,175,255, 0.05)',
+            backgroundColor: 'rgba(122,175,255, 0.8)',
             borderColor: 'rgba(122,175,255, 1)',
             pointBackgroundColor: 'rgba(122,175,255, 1)',
             pointBorderColor: '#fff',
@@ -78,9 +74,6 @@ export class TapsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(122,175,255, 0.8)'
         }
     ];
-
-    lineChartLegend: boolean = true;
-    lineChartType: string = 'line';
 
     @Input() pours: any[];
     @Input() taps: Tap[];
@@ -98,15 +91,6 @@ export class TapsChartComponent implements OnInit, OnChanges {
         this.loadChartIfReady();
     }
 
-    // events
-    public chartClicked(e: any): void {
-        // console.log(e);
-    }
-
-    public chartHovered(e: any): void {
-        // console.log(e);
-    }
-
     private loadChartIfReady() {
         this.loaded = false;
 
@@ -114,7 +98,16 @@ export class TapsChartComponent implements OnInit, OnChanges {
             return;
         }
 
-        let chartData = this.pours.reduce((result, curr) => {
+        let chartData = this.pours.map(p => {
+            let dt = new Date(p.Timestamp.slice(0, -1));
+            
+            // group data by day
+            return {
+                Date:   new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()),
+                Volume: Math.ceil(p.Volume / 29.57),
+                TapId: p.TapId
+            };
+        }).reduce((result, curr) => {
             for(let tapId in result) {
                 let tapIndexForDate = result[tapId].findIndex(data => data.x.getTime() === curr.Date.getTime());
                 if (tapIndexForDate < 0) {
@@ -148,18 +141,18 @@ export class TapsChartComponent implements OnInit, OnChanges {
             });
         }
 
-        this.lineChartLabels = chartData[Object.keys(chartData)[0]].map(p => (p.x.getMonth() + 1) + '/' + p.x.getDate());
+        this.chartLabels = chartData[Object.keys(chartData)[0]].map(p => (p.x.getMonth() + 1) + '/' + p.x.getDate());
 
-        let newLineChartData = [];
+        let newChartData = [];
 
         this.taps.forEach(tap => {
-            newLineChartData.push({
-                data: chartData[tap.TapId] || {},
+            newChartData.push({
+                data: chartData[tap.TapId].map(_ => _.y) || {},
                 label: tap.TapName
             });
         });
         
-        this.lineChartData = newLineChartData;
+        this.chartData = newChartData;
 
         // force chart labels redraw
         setTimeout(() => this.loaded = true, 0);

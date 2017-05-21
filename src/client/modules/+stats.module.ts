@@ -2,8 +2,7 @@ import {FormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
-import {StatsComponent} from '../components/stats';
-import {TapsChartComponent} from '../components/stats/activity/component';
+import {StatsComponent, KegsChartComponent, TapsChartComponent} from '../components/stats';
 import { ChartsModule } from 'ng2-charts';
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
@@ -21,11 +20,13 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
     ],
     declarations: [
         StatsComponent,
-        TapsChartComponent
+        TapsChartComponent,
+        KegsChartComponent
     ],
     exports: [
         StatsComponent,
-        TapsChartComponent
+        TapsChartComponent,
+        KegsChartComponent
     ]
 })
 export class LazyStatsModule { }

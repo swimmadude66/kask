@@ -3,11 +3,10 @@
     <div style="display: block;" *ngIf="loaded">
       <canvas baseChart
               [datasets]="chartData"
-              [labels]="chartLabels"
               [options]="chartOptions"
               [colors]="chartColors"
               [legend]="true"
-              [chartType]="'bar'"
+              [chartType]="'line'"
               >
       </canvas>
     </div>

@@ -53,7 +53,9 @@ export class MysqlDatabase implements Database {
             NetVote: result.NetVote,
             UserVote: result.UserVote,
             TapId: result.TapId,
-            Keg: this.mapKeg(result)
+            Keg: this.mapKeg(result),
+            TappedTime: result.TappedTime,
+            RemovalTime: result.RemovalTime
         };
         return session;
     }
@@ -647,7 +649,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [sessionId, userId, vote.toLowerCase()]);
     }
 
-    getSessionVotes(sessionId: number, userId?: number): Observable<any[]> {
+    getSessionVotes(sessionId: number): Observable<any[]> {
         let q = 'Select `UserId`, (`Vote`-2) as Vote from `beer_session_likes` Where `BeerSessionId` = ?;';
         return this.query(q, [sessionId])
         .map(
@@ -673,7 +675,7 @@ export class MysqlDatabase implements Database {
                     return Observable.of(null);
                 }
                 let contents = results[0];
-                return this.getSessionVotes(contents.SessionId, userId)
+                return this.getSessionVotes(contents.SessionId)
                 .map(
                     votes => {
                         let netVote = votes.reduce((previous, current) => {
@@ -726,9 +728,38 @@ export class MysqlDatabase implements Database {
     }
 
     getPours(fromDate: string, toDate: string): Observable<any[]> {
-        let q = 'Select `PourId`, `Volume`, `Timestamp`, `TapId` from `pours`' +
+        let q = 'Select `PourId`, `Volume`, `Timestamp`, `TapId`, `beer_sessions`.`KegId` from `pours`' +
             ' join `beer_sessions` on `beer_sessions`.`KegId`=`pours`.`KegId`' +
-            ' where `pours`.`Timestamp` > ? AND `pours`.`Timestamp` <= ?;';
+            ' where `pours`.`Timestamp` > ? AND `pours`.`Timestamp` <= ? ' +
+            ' order by `pours`.`Timestamp` asc;';
         return this.query(q, [fromDate, toDate]);
+    }
+    
+    getKegSessionHistory(fromDate: string, toDate: string): Observable<BeerSession[]> {
+        let q = 'Select * from `beer_sessions` ' +
+            'join `kegs` on `beer_sessions`.`KegId`=`kegs`.`KegId` ' +
+            'join `beers` on `kegs`.`BeerId`=`beers`.`BeerId` ' +
+            'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
+            'join `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
+            //'where `beer_sessions`.`TappedTime` < ? AND (`beer_sessions`.`RemovalTime` > ? OR `beer_sessions`.`Active` = 1) ' +
+            'where `beer_sessions`.`TappedTime` < ? AND `beer_sessions`.`TappedTime` > ? ' +
+            'order by `beer_sessions`.`TappedTime` desc;';
+
+        return this.query(q, [toDate, fromDate])
+            .map(
+                results => {
+                    if (!results || results.length < 1) {
+                        return null;
+                    }
+
+                    return results.map(contents => this.mapBeerSession(contents));
+            })
+            .map(
+                _ => _,
+                err => {
+                    console.error(err);
+                    return Observable.throw('Could not get contents of location');
+                }
+            );
     }
 }

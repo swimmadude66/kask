@@ -1,4 +1,11 @@
+@import '~bootstrap/scss/bootstrap-grid';
 @import '../../scss/_variables';
+
+.container-wide {
+    @include media-breakpoint-up(lg) {
+        width: 1540px;
+    }
+}
 
 .input-group-addon {
     color: #333;

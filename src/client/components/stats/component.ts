@@ -3,6 +3,8 @@ import {TapService} from "../../services/tap.service";
 import {Tap} from "../../models/tap.model";
 import {StatsService} from "../../services/stats.service";
 import {NgbDatepickerConfig, NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
+import {Keg} from "../../models/keg.model";
+import {TapSession} from "../../models/session.model";
 
 @Component({
     selector: 'stats',
@@ -13,8 +15,10 @@ export class StatsComponent implements OnInit, OnDestroy {
     private subscriptions = [];
 
     private taps: Tap[];
+    private kegs: Keg[];
     private pourData: any[];
-
+    private sessionData: TapSession[];
+    
     private fromDate: NgbDateStruct;
     private toDate: NgbDateStruct;
 
@@ -26,28 +30,23 @@ export class StatsComponent implements OnInit, OnDestroy {
         let now = new Date();
         _datepickerConfig.maxDate = {year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()};
 
-        let sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        let fouteenDaysAgo = new Date();
+        fouteenDaysAgo.setDate(fouteenDaysAgo.getDate() - 14);
 
         this.toDate = { year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate() };
-        this.fromDate = { year: sevenDaysAgo.getFullYear(), month: sevenDaysAgo.getMonth()+1, day: sevenDaysAgo.getDate() };
+        this.fromDate = { year: fouteenDaysAgo.getFullYear(), month: fouteenDaysAgo.getMonth()+1, day: fouteenDaysAgo.getDate() };
     }
 
     ngOnInit() {
         this._tapService.getTaps().subscribe(taps => {
             this.taps = taps;
         });
-
-        this._statsService.observePours().subscribe(pours => {
-            this.pourData = pours.filter(x => x.Volume < 1000).map(p => {
-                let dt = new Date(p.Timestamp.slice(0, -1));
-                p.Date = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-                p.Volume = Math.ceil(p.Volume / 29.57);
-                return p;
-            });
-        });
-
-        this._statsService.getPours().subscribe();
+        
+        this._statsService.observePours().subscribe(pours => this.pourData = pours.filter(x => x.Volume < 1000));
+        this._statsService.observeSessions().subscribe(sessions => this.sessionData = sessions);
+        
+        this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate)).subscribe();
+        this._statsService.getSessions(this.dateToString(this.fromDate), this.dateToString(this.toDate)).subscribe();
     }
 
     onFromDateChange(newDate: NgbDateStruct) {
