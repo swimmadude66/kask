@@ -73,9 +73,7 @@ export class TapComponent implements OnInit, OnDestroy {
                 vote = 'none';
             }
         }
-        this._tapService.vote(this.tapSession.SessionId, vote)
-            .switchMap(() => this._tapService.getTapContents(this.info.TapId))
-            .subscribe();
+        this._tapService.vote(this.info.TapId, vote).subscribe();
     }
 
     editTapScale() {

@@ -33,8 +33,8 @@ export class TapService {
         .map(res => res.Success);
     }
 
-    vote(sessionId: number, isUpVote: string): Observable<Response> {
-        return this.http.post(`/api/votes/session/${sessionId}`, {Vote: isUpVote});
+    vote(tapId: number, isUpVote: string): Observable<Response> {
+        return this.http.post(`/api/votes/tap/${tapId}`, {Vote: isUpVote});
     }
 
     deleteTap(tapid): Observable<boolean> {

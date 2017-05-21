@@ -54,6 +54,7 @@ export interface Database {
     getPours(): Observable<any[]>;
 
     // Voting
+    voteForTap(tapId: number, userId: number, vote: string): Observable<any>;
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;
     getSessionVotes(sessionId: number, userId?: number): Observable<any[]>;
 
