@@ -14,7 +14,7 @@ export class TapComponent implements OnInit, OnDestroy {
 
     tapSession: TapSession;
     loaded: boolean;
-    editing: boolean = false;
+    editing = false;
     originalScale = 100;
 
     @Input() info: Tap;
@@ -31,17 +31,19 @@ export class TapComponent implements OnInit, OnDestroy {
     ngOnInit() {
         if (this.info && this.info.TapId) {
             this.subscriptions.push(
-                this._tapService.observeTapContents(this.info.TapId).subscribe(
+                this._tapService.observeTapContents(this.info.TapId)
+                .subscribe(
                     tapSession => this.tapSession = tapSession,
                     error => console.log(error),
                     () => this.loaded = true
             ));
 
-            // poll the tap
+            // initialize the tapSession
             this.subscriptions.push(
-                Observable.timer(0, 30000)
-                    .switchMap(() => this._tapService.getTapContents(this.info.TapId))
-                    .subscribe()
+                this._tapService.getTapContents(this.info.TapId).subscribe(
+                    tapSession => this.tapSession = tapSession,
+                    error => console.log(error)
+                )
             );
         } else {
             this.editing = true;

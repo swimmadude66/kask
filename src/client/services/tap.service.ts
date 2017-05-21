@@ -1,3 +1,4 @@
+import {SocketService} from './sockets.service';
 import {Observable, ReplaySubject, Subject} from 'rxjs/Rx';
 import {Http, Response} from '@angular/http';
 import {Injectable} from '@angular/core';
@@ -10,8 +11,15 @@ export class TapService {
     private tapContents: {[key: number]: Subject<TapSession>} = {};
 
     constructor(
-        private http: Http
-    ) {}
+        private http: Http,
+        private sockets: SocketService
+    ) {
+        sockets.onRoot(
+            'TapContentsEvent', (contents) => {
+                this.tapContents[contents.TapId].next(contents);
+            }
+        );
+    }
 
     addTap(data): Observable<number> {
         return this.http.post('/api/admin/taps', data)
@@ -47,7 +55,7 @@ export class TapService {
 
     observeTapContents(tapId: number): Observable<TapSession> {
         if (!this.tapContents[tapId]) {
-            this.tapContents[tapId] = new ReplaySubject<TapSession>(1);
+            this.tapContents[tapId] = new Subject<TapSession>();
         }
         return this.tapContents[tapId];
     }

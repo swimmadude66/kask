@@ -31,10 +31,8 @@ export class KegRowComponent implements OnInit {
     tapKeg() {
         if (!!this.selectedTapId) {
             this._adminService.loadTapFromStorage(this.selectedTapId, this.info.KegId)
-                .switchMap(_ => Observable.forkJoin(
-                    this._tapService.getTapContents(this.selectedTapId),
-                    this._locationService.getLocationContents(this.location.LocationId)
-                ))
+                .switchMap(_ => this._locationService.getLocationContents(this.location.LocationId)
+                )
                 .subscribe();
         }
     }
