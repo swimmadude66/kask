@@ -4,6 +4,7 @@ import * as express from 'express';
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
     const db: MysqlDatabase = APP_CONFIG.database;
+    const sockets = APP_CONFIG.IO.sockets;
 
     router.get('/search/:beername', (req, res) => {
         let q = req.params.beername;
@@ -131,7 +132,13 @@ module.exports = (APP_CONFIG) => {
         }
         return method
         .subscribe(
-            result => res.send({Success: !!result}),
+            result => {
+                res.send({Success: !!result})
+                return db.getTapContents(tapId)
+                .subscribe(
+                    contents => sockets.emit('TapContentsEvent', contents)
+                );
+            },
             err => res.status(500).send(err)
         );
     });
@@ -140,7 +147,13 @@ module.exports = (APP_CONFIG) => {
         let tapId = +req.params.tapId;
         return db.emptyTap(tapId)
         .subscribe(
-            result => res.send({Success: result}),
+            result => {
+                res.send({Success: result});
+                return db.getTapContents(tapId)
+                .subscribe(
+                    contents => sockets.emit('TapContentsEvent', contents)
+                );
+            },
             err => res.status(500).send(err)
         );
     });
@@ -149,9 +162,17 @@ module.exports = (APP_CONFIG) => {
         if (!req.body || !req.body.Volume) {
             return res.status(400).send('Volume is required');
         }
-        db.adjustTapVolume(req.params.tapId, req.body.Volume, req.body.Timestamp)
+        let tapId = +req.params.tapId;
+        db.adjustTapVolume(tapId, req.body.Volume, req.body.Timestamp)
         .subscribe(
-            _ => res.status(204).end(),
+            _ => {
+                res.status(204).end();
+                // emit to sockets
+                return db.getTapContents(tapId)
+                .subscribe(
+                    contents => sockets.emit('TapContentsEvent', contents)
+                );
+            },
             err => res.status(500).send('could not update poured volume')
         );
     });

@@ -640,6 +640,19 @@ export class MysqlDatabase implements Database {
         );
     }
 
+    voteForTap(tapId: number, userId: number, vote: string): Observable<any> {
+        let q = 'Select `SessionId` from `beer_sessions` Where `TapId`=? and `Active`=1 LIMIT 1;';
+        return this.query(q, [tapId]).flatMap(
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not vote for tap');
+                }
+                let sessionId = results[0].SessionId;
+                return this.voteForSession(sessionId, userId, vote);
+            }
+        );
+    }
+
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any> {
         let q = 'INSERT INTO `beer_session_likes` (`BeerSessionId`, `UserId`, `Vote`)'
         + ' VALUES (?, ?, ?)'
