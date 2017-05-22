@@ -642,6 +642,19 @@ export class MysqlDatabase implements Database {
         );
     }
 
+    voteForTap(tapId: number, userId: number, vote: string): Observable<any> {
+        let q = 'Select `SessionId` from `beer_sessions` Where `TapId`=? and `Active`=1 LIMIT 1;';
+        return this.query(q, [tapId]).flatMap(
+            results => {
+                if (!results || results.length < 1) {
+                    return Observable.throw('Could not vote for tap');
+                }
+                let sessionId = results[0].SessionId;
+                return this.voteForSession(sessionId, userId, vote);
+            }
+        );
+    }
+
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any> {
         let q = 'INSERT INTO `beer_session_likes` (`BeerSessionId`, `UserId`, `Vote`)'
         + ' VALUES (?, ?, ?)'
@@ -705,16 +718,16 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    adjustKegVolume(kegId: number, volume: number): Observable<any> {
+    adjustKegVolume(kegId: number, volume: number, pourtime?: string): Observable<any> {
         let q = 'Update `kegs` set `RemovedVolume` = `RemovedVolume`+? Where `KegId`=?;';
         return this.query(q, [volume, kegId])
         .flatMap(_ => {
-            let pourQ = 'Insert into `pours` (`KegId`, `Volume`) VALUES (?, ?);';
-            return this.query(pourQ, [kegId, volume]);
+            let pourQ = 'Insert into `pours` (`KegId`, `Volume`, `Timestamp`) VALUES (?, ?, ?);';
+            return this.query(pourQ, [kegId, volume, pourtime]);
         });
     }
 
-    adjustTapVolume(tapId: number, volume): Observable<any> {
+    adjustTapVolume(tapId: number, volume: number, pourtime?: string): Observable<any> {
         let q = 'Select `KegId` from `beer_sessions` Where `TapId`=? And `Active`=1 LIMIT 1;';
         return this.query(q, [tapId])
         .flatMap(
@@ -722,7 +735,7 @@ export class MysqlDatabase implements Database {
                 if (!results || results.length < 1) {
                     return Observable.throw('Could not get Keg Id from tap');
                 }
-                return this.adjustKegVolume(results[0].KegId, volume);
+                return this.adjustKegVolume(results[0].KegId, volume, pourtime);
             }
         );
     }

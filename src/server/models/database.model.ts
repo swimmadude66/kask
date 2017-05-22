@@ -55,6 +55,7 @@ export interface Database {
     getKegSessionHistory(fromDate: string, toDate: string): Observable<BeerSession[]>;
 
     // Voting
+    voteForTap(tapId: number, userId: number, vote: string): Observable<any>;
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;
     getSessionVotes(sessionId: number): Observable<any[]>;
 

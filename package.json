@@ -51,9 +51,11 @@
     "reflect-metadata": "0.1.8",
     "rx-http-request": "1.2.0",
     "rxjs": "5.0.3",
+    "socket.io": "^2.0.1",
+    "socket.io-client": "^2.0.1",
     "tether": "1.4.0",
     "uuid": "3.0.1",
-    "zone.js": "0.8.4"
+    "zone.js": "0.8.11"
   },
   "devDependencies": {
     "@types/core-js": "0.9.35",

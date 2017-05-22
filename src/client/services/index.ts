@@ -4,6 +4,7 @@ import {BeerService} from './beer.service';
 import {AuthService} from './auth.service';
 import {AdminService} from './admin.service';
 import {StatsService} from './stats.service';
+import {SocketService} from './sockets.service';
 
 export const ALL_PROVIDERS = [
     TapService,
@@ -12,6 +13,7 @@ export const ALL_PROVIDERS = [
     AuthService,
     AdminService,
     StatsService,
+    SocketService,
 ];
 
 export {
@@ -21,4 +23,5 @@ export {
     AuthService,
     AdminService,
     StatsService,
+    SocketService,
 };

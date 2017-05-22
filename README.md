@@ -1,6 +1,11 @@
-# On Tap
+# Kask
 
 _Better than a whiteboard over the kegerator_
+
+## Related Repositories
+
+* [kaskpi](https://github.com/KabbageInc/kaskpi) - Raspberry Pi based Go data collection
+* [kaskduino](https://github.com/KabbageInc/kaskduino) - Arduino interface to flow sensors, RFID, etc
 
 ## Local Installation
 

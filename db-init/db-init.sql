@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 CREATE TABLE IF NOT EXISTS `sessions` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `SessionId` varchar(256) NOT NULL,
+  `SessionId` varchar(128) NOT NULL,
   `UserId` int(11) NOT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`SessionId`),
