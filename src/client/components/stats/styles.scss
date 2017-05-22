@@ -11,3 +11,25 @@
     color: #333;
     cursor: pointer;
 }
+
+.beer-title {
+    font-size: 18px;
+    a {
+        color: $chalk-color;
+    }
+
+}
+
+.filters {
+    margin-bottom: 1em;
+}
+
+:host >>> .nav-link {
+    color: $link-color !important;
+    background-color: transparent !important;
+
+    &.active {
+        color: #fff !important;
+        border: 1px solid $chalk-color !important;
+    }
+}

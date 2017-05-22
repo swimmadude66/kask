@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 @Component({
   selector: 'onTap',
   templateUrl: './template.html',
-  styleUrls: ['./styles.scss']
+  styleUrls: ['../styles.scss', './styles.scss']
 })
 export class AppComponent implements OnInit {
     isSigningUp: boolean;

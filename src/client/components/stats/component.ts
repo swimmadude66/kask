@@ -3,8 +3,8 @@ import {TapService} from "../../services/tap.service";
 import {Tap} from "../../models/tap.model";
 import {StatsService} from "../../services/stats.service";
 import {NgbDatepickerConfig, NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
-import {Keg} from "../../models/keg.model";
 import {TapSession} from "../../models/session.model";
+import * as Moment from 'moment';
 
 @Component({
     selector: 'stats',
@@ -15,26 +15,23 @@ export class StatsComponent implements OnInit, OnDestroy {
     private subscriptions = [];
 
     private taps: Tap[];
-    private kegs: Keg[];
     private pourData: any[];
     private sessionData: TapSession[];
     
     private fromDate: NgbDateStruct;
     private toDate: NgbDateStruct;
 
+    private showFilters: boolean = false;
+    
     constructor(
         private _tapService: TapService,
         private _statsService: StatsService,
         private _datepickerConfig: NgbDatepickerConfig
     ) {
-        let now = new Date();
-        _datepickerConfig.maxDate = {year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()};
+        _datepickerConfig.maxDate = this.momentToDate(Moment());
 
-        let fouteenDaysAgo = new Date();
-        fouteenDaysAgo.setDate(fouteenDaysAgo.getDate() - 14);
-
-        this.toDate = { year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate() };
-        this.fromDate = { year: fouteenDaysAgo.getFullYear(), month: fouteenDaysAgo.getMonth()+1, day: fouteenDaysAgo.getDate() };
+        this.toDate = Object.assign({}, _datepickerConfig.maxDate);
+        this.fromDate = this.momentToDate(Moment().subtract(2, 'w'));
     }
 
     ngOnInit() {
@@ -46,8 +43,16 @@ export class StatsComponent implements OnInit, OnDestroy {
         this._statsService.observeSessions().subscribe(sessions => this.sessionData = sessions);
         
         this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate)).subscribe();
-        this._statsService.getSessions(this.dateToString(this.fromDate), this.dateToString(this.toDate)).subscribe();
+        this._statsService.getSessions(Moment().subtract(1, 'y').format('YYYY-MM-DD'), this.dateToString(this.toDate, true)).subscribe();
     }
+
+    filterForKeg(session: TapSession) {
+        this.fromDate = this.momentToDate(Moment(session.TappedTime.slice(0, -1)));
+        this.toDate = this.momentToDate(session.RemovalTime ? Moment(session.RemovalTime.slice(0, -1)) : Moment());
+
+        this.trySubmitDateRange();
+    }
+
 
     onFromDateChange(newDate: NgbDateStruct) {
         this.fromDate = newDate;
@@ -73,19 +78,20 @@ export class StatsComponent implements OnInit, OnDestroy {
         if(!(this.fromDate && this.toDate))
             return;
 
-        this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate))
+        this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate, true))
             .subscribe();
     }
 
-    private dateToString(date: NgbDateStruct) {
-        let pad = (num: number): string => {
-            if (num > 9) {
-                return '' + num;
-            }
-            return '0' + num;
-        };
+    private momentToDate(moment: any): NgbDateStruct {
+        return {year: moment.year(), month: moment.month() + 1, day: moment.date()};
+    }
 
-        return date ? `${date.year}-${pad(date.month)}-${pad(date.day)}` : null;
+    private dateToString(date: NgbDateStruct, nextDay: boolean = false) {
+        var m = Moment({day: date.day, month: date.month - 1, year: date.year});
+        if (nextDay) {
+            m.add(1, 'd');
+        }
+        return m.format('YYYY-MM-DD');
     }
 
     ngOnDestroy() {

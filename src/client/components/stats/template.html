@@ -1,10 +1,15 @@
 <div class="container container-wide">
-  <h1>Stats</h1>
-
   <div class="row">
     <div class="col-lg-9">
 
-      <form class="form-inline">
+
+      <div class="filters" *ngIf="!showFilters">
+        <label>Showing pour data from</label>
+        <button class="btn btn-link" (click)="showFilters=true">
+          {{dateToString(fromDate)}}  &ndash;  {{dateToString(toDate)}}
+        </button>
+      </div>
+      <form class="form-inline filters" *ngIf="showFilters">
         <div class="form-group mr-sm-4">
           <label class="mr-sm-2">From Date: </label>
           <div class="input-group">
@@ -26,21 +31,36 @@
         </span>
           </div>
         </div>
+
+        <button class="btn btn-outline-secondary" (click)="showFilters=false">Hide</button>
       </form>
 
-      <h2>Activity</h2>
-      <taps-chart [taps]="taps" [pours]="pourData"></taps-chart>
-
-      <hr />
-
-      <h2>Keg Level</h2>
-      <kegs-chart [sessions]="sessionData" [taps]="taps" [pours]="pourData"></kegs-chart>
+      <ngb-tabset type="pills">
+        <ngb-tab title="Keg Level">
+          <ng-template ngbTabContent>
+            <br>
+            <h2>Keg Level</h2>
+            <kegs-chart [sessions]="sessionData" [taps]="taps" [pours]="pourData"></kegs-chart>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab title="Tap Activity">
+          <ng-template ngbTabContent>
+            <br>
+            <h2>Tap Activity</h2>
+            <taps-chart [taps]="taps" [pours]="pourData"></taps-chart>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
     </div>
 
     <div class="col-lg-3">
       <h2>Recent Kegs</h2>
       <div *ngFor="let session of sessionData">
-        {{session.Keg?.Beer?.BeerName}}
+        <div class="beer-title"><a [routerLink]="'/info/beer/' + session.Keg?.Beer?.BeerId">{{session.Keg?.Beer?.BeerName}}</a></div>
+        <div>{{session.Keg?.Size}} Barrel</div>
+        <button class="btn btn-link" (click)="filterForKeg(session)">
+          {{session.TappedTime | date:'shortDate'}}  &ndash;  {{session.RemovalTime ? (session.RemovalTime | date:'shortDate') : 'Now'}}
+        </button>
       </div>
     </div>
   </div>

@@ -98,13 +98,11 @@ export class KegsChartComponent implements OnInit, OnChanges {
             return;
         }
 
-
-
         let chartData = this.pours.map(p => {
             let dt = new Date(p.Timestamp.slice(0, -1));
             return {
-                // group data by hour
-                Date: new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours()),
+                // group data into 4-hour blocks
+                Date: new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), Math.round(dt.getHours()/4)*4),
                 Volume: Math.ceil(p.Volume / 29.57),
                 KegId: p.KegId
             };
@@ -124,9 +122,10 @@ export class KegsChartComponent implements OnInit, OnChanges {
             return result;
         }, this.sessions.reduce((result, session) => {
             result[session.Keg.KegId] = [{
-                x: new Date(session.TappedTime.slice(0,-1)) ,
+                x: new Date(session.TappedTime.slice(0,-1)),
                 y: Math.ceil(session.Keg.InitialVolume / 29.57)
             }];
+            console.log(result);
             return result;
             }, {})
         );
@@ -141,8 +140,6 @@ export class KegsChartComponent implements OnInit, OnChanges {
                 label: session.Keg.Beer.BeerName
             });
         });
-
-        console.log(newChartData);
 
         this.chartData = newChartData;
 
