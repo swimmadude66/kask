@@ -40,7 +40,7 @@
           <ng-template ngbTabContent>
             <br>
             <h2>Keg Level</h2>
-            <kegs-chart [sessions]="sessionData" [taps]="taps" [pours]="pourData"></kegs-chart>
+            <kegs-chart [sessions]="pourSessionData" [taps]="taps" [pours]="pourData"></kegs-chart>
           </ng-template>
         </ngb-tab>
         <ngb-tab title="Tap Activity">
@@ -55,7 +55,7 @@
 
     <div class="col-lg-3">
       <h2>Recent Kegs</h2>
-      <div *ngFor="let session of sessionData">
+      <div *ngFor="let session of sessionData | slice:0:20">
         <div class="beer-title"><a [routerLink]="'/info/beer/' + session.Keg?.Beer?.BeerId">{{session.Keg?.Beer?.BeerName}}</a></div>
         <div>{{session.Keg?.Size}} Barrel</div>
         <button class="btn btn-link" (click)="filterForKeg(session)">

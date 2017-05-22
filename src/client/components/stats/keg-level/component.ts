@@ -1,6 +1,7 @@
 import {Component, OnInit, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {TapSession} from "../../../models/session.model";
 import {Tap} from "../../../models/tap.model";
+import * as Moment from 'moment';
 
 @Component({
     selector: 'kegs-chart',
@@ -16,7 +17,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
 
     tapColors: any[] = [
         { // tap-color-1
-            backgroundColor: 'rgba(252,91,85,0.07)',
+            backgroundColor: 'rgba(252,91,85,0.05)',
             borderColor: 'rgba(252,91,85,1)',
             pointBackgroundColor: 'rgba(252,91,85,1)',
             pointBorderColor: '#fff',
@@ -24,7 +25,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(252,91,85,0.8)'
         },
         { // tap-color-2
-            backgroundColor: 'rgba(114,242,94,0.07)',
+            backgroundColor: 'rgba(114,242,94,0.05)',
             borderColor: 'rgba(114,242,94,1)',
             pointBackgroundColor: 'rgba(114,242,94,1)',
             pointBorderColor: '#fff',
@@ -32,7 +33,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(114,242,94,0.8)'
         },
         { // tap-color-3
-            backgroundColor: 'rgba(252,106,240,0.07)',
+            backgroundColor: 'rgba(252,106,240,0.05)',
             borderColor: 'rgba(252,106,240,1)',
             pointBackgroundColor: 'rgba(252,106,240,1)',
             pointBorderColor: '#fff',
@@ -40,7 +41,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(252,106,240,0.8)'
         },
         { // tap-color-4
-            backgroundColor: 'rgba(122,175,255, 0.07)',
+            backgroundColor: 'rgba(122,175,255, 0.05)',
             borderColor: 'rgba(122,175,255, 1)',
             pointBackgroundColor: 'rgba(122,175,255, 1)',
             pointBorderColor: '#fff',
@@ -77,7 +78,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
     @Input() pours: any[];
     @Input() sessions: TapSession[];
     @Input() taps: Tap[];
-
+    
     constructor(
     ) { }
 
@@ -94,11 +95,15 @@ export class KegsChartComponent implements OnInit, OnChanges {
     private loadChartIfReady() {
         this.loaded = false;
 
-        if (!this.sessions || !this.pours || ! this.taps) {
+        if (!this.sessions || !this.pours || !this.taps) {
             return;
         }
 
-        let chartData = this.pours.map(p => {
+        let sessionKegIds = this.sessions.map(s => s.Keg.KegId);
+
+        let chartData = this.pours
+        .filter(p => sessionKegIds.includes(p.KegId))
+        .map(p => {
             let dt = new Date(p.Timestamp.slice(0, -1));
             return {
                 // group data into 4-hour blocks
@@ -106,7 +111,6 @@ export class KegsChartComponent implements OnInit, OnChanges {
                 Volume: Math.ceil(p.Volume / 29.57),
                 KegId: p.KegId
             };
-
         }).reduce((result, curr) => {
             let kegId = curr.KegId;
             for(let kegId in result) {
@@ -125,14 +129,13 @@ export class KegsChartComponent implements OnInit, OnChanges {
                 x: new Date(session.TappedTime.slice(0,-1)),
                 y: Math.ceil(session.Keg.InitialVolume / 29.57)
             }];
-            console.log(result);
             return result;
             }, {})
         );
 
         this.chartColors = [];
         let newChartData = [];
-        
+
         this.sessions.forEach(session => {
             this.chartColors.push(this.tapColors[this.taps.findIndex(t => t.TapId === session.TapId)]);
             newChartData.push({

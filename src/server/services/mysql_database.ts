@@ -741,8 +741,7 @@ export class MysqlDatabase implements Database {
             'join `beers` on `kegs`.`BeerId`=`beers`.`BeerId` ' +
             'join `breweries` on `beers`.`BreweryId`=`breweries`.`BreweryId` ' +
             'join `styles` on `beers`.`StyleId`=`styles`.`StyleId` ' +
-            //'where `beer_sessions`.`TappedTime` < ? AND (`beer_sessions`.`RemovalTime` > ? OR `beer_sessions`.`Active` = 1) ' +
-            'where `beer_sessions`.`TappedTime` < ? AND `beer_sessions`.`TappedTime` > ? ' +
+            'where `beer_sessions`.`TappedTime` < ? AND (`beer_sessions`.`RemovalTime` > ? OR `beer_sessions`.`Active` = 1) ' +
             'order by `beer_sessions`.`TappedTime` desc;';
 
         return this.query(q, [toDate, fromDate])

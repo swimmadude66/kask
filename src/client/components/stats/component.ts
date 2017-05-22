@@ -17,7 +17,8 @@ export class StatsComponent implements OnInit, OnDestroy {
     private taps: Tap[];
     private pourData: any[];
     private sessionData: TapSession[];
-    
+    private pourSessionData: TapSession[];
+
     private fromDate: NgbDateStruct;
     private toDate: NgbDateStruct;
 
@@ -29,21 +30,22 @@ export class StatsComponent implements OnInit, OnDestroy {
         private _datepickerConfig: NgbDatepickerConfig
     ) {
         _datepickerConfig.maxDate = this.momentToDate(Moment());
+        _datepickerConfig.minDate = this.momentToDate(Moment().subtract(1, 'year'));
 
         this.toDate = Object.assign({}, _datepickerConfig.maxDate);
         this.fromDate = this.momentToDate(Moment().subtract(2, 'w'));
     }
 
     ngOnInit() {
-        this._tapService.getTaps().subscribe(taps => {
-            this.taps = taps;
-        });
+        this._tapService.getTaps().subscribe(taps => this.taps = taps);
         
-        this._statsService.observePours().subscribe(pours => this.pourData = pours.filter(x => x.Volume < 1000));
-        this._statsService.observeSessions().subscribe(sessions => this.sessionData = sessions);
-        
-        this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate)).subscribe();
-        this._statsService.getSessions(Moment().subtract(1, 'y').format('YYYY-MM-DD'), this.dateToString(this.toDate, true)).subscribe();
+        this.subscriptions.push(this._statsService.observePours().subscribe(pours => this.pourData = pours.filter(x => x.Volume < 1000)));
+        this.subscriptions.push(this._statsService.observeSessions().subscribe(sessions => this.sessionData = sessions));
+
+        //TODO: get earliest tap time of active sessions and use that to initialize fromDate
+        this._statsService.getSessions(this.dateToString(this._datepickerConfig.minDate), this.dateToString(this.toDate, true))
+            .do(_ => this.trySubmitDateRange())
+            .subscribe();
     }
 
     filterForKeg(session: TapSession) {
@@ -52,7 +54,6 @@ export class StatsComponent implements OnInit, OnDestroy {
 
         this.trySubmitDateRange();
     }
-
 
     onFromDateChange(newDate: NgbDateStruct) {
         this.fromDate = newDate;
@@ -79,7 +80,9 @@ export class StatsComponent implements OnInit, OnDestroy {
             return;
 
         this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate, true))
-            .subscribe();
+            .subscribe(_ => {
+                this.pourSessionData = this.sessionData.filter(s => Moment(s.TappedTime) > Moment(this.dateToString(this.fromDate)));
+            });
     }
 
     private momentToDate(moment: any): NgbDateStruct {
