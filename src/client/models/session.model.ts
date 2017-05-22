@@ -1,6 +1,7 @@
 import {Keg} from './index';
 
 export class TapSession {
+    Active: boolean;
     SessionId: number;
     NetVote: number;
     UserVote: number;

@@ -8,4 +8,5 @@ export class BeerSession {
     RemovalTime: string;
     Keg: Keg;
     TapId: number;
+    Active: boolean;
 }

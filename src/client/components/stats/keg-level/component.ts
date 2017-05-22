@@ -17,7 +17,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
 
     tapColors: any[] = [
         { // tap-color-1
-            backgroundColor: 'rgba(252,91,85,0.05)',
+            backgroundColor: 'rgba(252,91,85,0)',
             borderColor: 'rgba(252,91,85,1)',
             pointBackgroundColor: 'rgba(252,91,85,1)',
             pointBorderColor: '#fff',
@@ -25,7 +25,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(252,91,85,0.8)'
         },
         { // tap-color-2
-            backgroundColor: 'rgba(114,242,94,0.05)',
+            backgroundColor: 'rgba(114,242,94,0)',
             borderColor: 'rgba(114,242,94,1)',
             pointBackgroundColor: 'rgba(114,242,94,1)',
             pointBorderColor: '#fff',
@@ -33,7 +33,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(114,242,94,0.8)'
         },
         { // tap-color-3
-            backgroundColor: 'rgba(252,106,240,0.05)',
+            backgroundColor: 'rgba(252,106,240,0)',
             borderColor: 'rgba(252,106,240,1)',
             pointBackgroundColor: 'rgba(252,106,240,1)',
             pointBorderColor: '#fff',
@@ -41,7 +41,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             pointHoverBorderColor: 'rgba(252,106,240,0.8)'
         },
         { // tap-color-4
-            backgroundColor: 'rgba(122,175,255, 0.05)',
+            backgroundColor: 'rgba(122,175,255, 0)',
             borderColor: 'rgba(122,175,255, 1)',
             pointBackgroundColor: 'rgba(122,175,255, 1)',
             pointBorderColor: '#fff',

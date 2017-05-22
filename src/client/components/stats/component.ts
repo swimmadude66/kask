@@ -42,9 +42,19 @@ export class StatsComponent implements OnInit, OnDestroy {
         this.subscriptions.push(this._statsService.observePours().subscribe(pours => this.pourData = pours.filter(x => x.Volume < 1000)));
         this.subscriptions.push(this._statsService.observeSessions().subscribe(sessions => this.sessionData = sessions));
 
-        //TODO: get earliest tap time of active sessions and use that to initialize fromDate
         this._statsService.getSessions(this.dateToString(this._datepickerConfig.minDate), this.dateToString(this.toDate, true))
-            .do(_ => this.trySubmitDateRange())
+            .do(sessions => {
+                let earliestActiveSession:TapSession = sessions.filter(s => s.Active).reduce((prev, curr) => {
+                    if(!prev || Moment(curr.TappedTime).isBefore(prev.TappedTime)) {
+                        return curr;
+                    }
+                    return prev;
+                });
+
+                this.fromDate = this.momentToDate(Moment(earliestActiveSession.TappedTime.slice(0, -1)));
+
+                this.trySubmitDateRange();
+            })
             .subscribe();
     }
 
