@@ -1,5 +1,5 @@
 import {SocketService} from './sockets.service';
-import {Observable, ReplaySubject, Subject} from 'rxjs/Rx';
+import {Observable, Subject} from 'rxjs/Rx';
 import {Http, Response} from '@angular/http';
 import {Injectable} from '@angular/core';
 import {Tap} from '../models';

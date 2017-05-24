@@ -22,6 +22,7 @@ export class LocationComponent implements OnInit, OnDestroy {
     isAddingKeg: boolean;
     beerToLoad: Beer;
     kegSizeToLoad: string;
+    otherLocations: Location[];
 
     @Input() info: Location;
     @Input() taps: Tap[];
@@ -30,7 +31,7 @@ export class LocationComponent implements OnInit, OnDestroy {
         private _locationService: LocationService,
         private _adminService: AdminService,
         config: NgbTypeaheadConfig
-    ) { 
+    ) {
         config.focusFirst = false;
     }
 
@@ -43,7 +44,16 @@ export class LocationComponent implements OnInit, OnDestroy {
                 error => console.log(error),
                 () => this.loaded = true
             ));
-            this._locationService.getLocationContents(this.info.LocationId).subscribe();
+            this.subscriptions.push(
+                this._locationService.getLocationContents(this.info.LocationId).subscribe()
+            );
+             this.subscriptions.push(
+                this._locationService.getLocations()
+                .map(locs => locs.filter(l => l.LocationId !== this.info.LocationId))
+                .subscribe(
+                    locs => this.otherLocations = locs
+                )
+             );
         } else {
             this.editing = true;
             this.loaded = true;

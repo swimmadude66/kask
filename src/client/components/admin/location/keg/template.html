@@ -1,12 +1,11 @@
 <div class="form-group text-right">
-  <select class="form-control" (change)="selectedTapId = $event.target.value">
-    <option value="">(Select Tap)</option>
-    <ng-container *ngFor="let tap of taps">
-      <option [value]="tap.TapId">{{tap.TapName}}</option>
-    </ng-container>
+  <select class="form-control" (change)="selectedDestination = $event.target.value">
+    <option value="">(Select Destination)</option>
+      <option *ngFor="let tap of taps" [value]="'tap_'+tap.TapId">{{tap.TapName}}</option>
+      <option *ngFor="let loc of locations" [value]="'loc_'+loc.LocationId">{{loc.Name}}</option>
   </select>
 
-  <button type="button" class="btn btn-outline-info" [ngClass]="!selectedTapId ? 'disabled' : ''" (click)="tapKeg()">Move</button>
+  <button type="button" class="btn btn-outline-info" [ngClass]="!selectedDestination ? 'disabled' : ''" (click)="moveKeg()">Move</button>
 </div>
 
 
