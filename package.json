@@ -1,6 +1,6 @@
 {
-  "name": "ontap",
-  "version": "0.0.1",
+  "name": "kask",
+  "version": "1.0.3",
   "description": "monitoring and management system for beer supplies",
   "main": "dist/server/app.js",
   "scripts": {
