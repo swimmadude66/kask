@@ -1,3 +1,4 @@
+import {SocketService} from './sockets.service';
 import {Observable, Subject, ReplaySubject} from 'rxjs/Rx';
 import {Http} from '@angular/http';
 import {Injectable} from '@angular/core';
@@ -9,8 +10,13 @@ export class LocationService {
     private locationContents: {[key: number]: Subject<Keg[]>} = {};
 
     constructor(
-        private http: Http
-    ) {}
+        private http: Http,
+        private sockets: SocketService
+    ) {
+        sockets.onRoot('LocationContentsEvent', (contents) => {
+            this.locationContents[contents.LocationId].next(contents.Contents);
+        });
+    }
 
     addLocation(data): Observable<number> {
         return this.http.post('/api/admin/locations', data)

@@ -12,4 +12,6 @@ export class Keg {
     Size: KegSize;
     InitialVolume: number;
     RemovedVolume: number;
+    TapId?: number;
+    LocationId?: number;
 }

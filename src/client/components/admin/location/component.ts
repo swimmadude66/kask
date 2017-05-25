@@ -67,13 +67,12 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     submitNewKeg() {
         this.loaded = false;
-       this._adminService.store(this.beerToLoad.BeerId, this.kegSizeToLoad, this.info.LocationId)
-           .switchMap(_ => this._locationService.getLocationContents(this.info.LocationId))
-           .subscribe(
-               () => this.isAddingKeg = false,
-               err => console.error(err),
-               () => this.loaded = true
-           );
+        this._adminService.store(this.beerToLoad.BeerId, this.kegSizeToLoad, this.info.LocationId)
+            .subscribe(
+                () => this.isAddingKeg = false,
+                err => console.error(err),
+                () => this.loaded = true
+            );
     }
 
     search = (text: Observable<string>) => {

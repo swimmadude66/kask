@@ -6,6 +6,24 @@ module.exports = (APP_CONFIG) => {
     const db: MysqlDatabase = APP_CONFIG.database;
     const sockets = APP_CONFIG.IO.sockets;
 
+    function socketUpdateTapContents(tapIds: number[]): void {
+        tapIds.forEach((tapId) => {
+            db.getTapContents(tapId)
+            .subscribe(
+                contents => sockets.emit('TapContentsEvent', contents)
+            );
+        });
+    }
+
+    function socketUpdateLocationContents(locationIds: number[]): void {
+        locationIds.forEach(locationId => {
+            db.getLocationContents(locationId)
+            .subscribe(
+                contents => sockets.emit('LocationContentsEvent', {LocationId: locationId, Contents: contents})
+            );
+        });
+    }
+
     router.get('/search/:beername', (req, res) => {
         let q = req.params.beername;
         return APP_CONFIG.beer_service.searchForBeer(q)
@@ -96,8 +114,10 @@ module.exports = (APP_CONFIG) => {
         }
         return db.assignBeerToLocation(body.BeerId, body.LocationId, body.Size)
         .subscribe(
-            result => res.send({Success: result}),
-            err => res.status(500).send(err)
+            result => {
+                res.send({Success: result});
+                socketUpdateLocationContents([body.LocationId]);
+            }, err => res.status(500).send(err)
         );
     });
 
@@ -106,10 +126,26 @@ module.exports = (APP_CONFIG) => {
         if (!body || !body.KegId || !body.LocationId) {
             return res.status(400).send('Missing required parameters');
         }
-        return db.moveKegLocation(body.KegId, body.LocationId)
+        let kegId = body.KegId;
+        let oldLoc: string;
+        return db.findKeg(kegId)
+        .flatMap(
+            old => {
+                oldLoc = old;
+                return db.moveKegLocation(kegId, body.LocationId);
+            }
+        )
         .subscribe(
-            result => res.send({Success: result}),
-            err => res.status(500).send(err)
+            result => {
+                res.send({Success: result});
+                let locations = [body.LocationId];
+                if (oldLoc && oldLoc.indexOf('loc_') === 0) {
+                    locations.push(+oldLoc.replace('loc_', ''));
+                } else if (oldLoc && oldLoc.indexOf('tap_') === 0) {
+                    socketUpdateTapContents([+oldLoc.replace('tap_', '')]);
+                }
+                socketUpdateLocationContents(locations);
+            }, err => res.status(500).send(err)
         );
     });
 
@@ -120,8 +156,17 @@ module.exports = (APP_CONFIG) => {
             return res.status(400).send('Missing required parameters');
         }
         let method;
+        let kegId;
+        let oldLoc: string;
         if (body.KegId) {
-            method = db.tapKeg(body.KegId, tapId);
+            kegId = body.KegId;
+            method = db.findKeg(kegId)
+            .flatMap(
+                old => {
+                    oldLoc = old;
+                    return db.tapKeg(kegId, tapId);
+                }
+            );
         } else if (body.BeerId) {
             if (!body.Size) {
                 return res.status(400).send('Size is required when BeerId is provided');
@@ -133,11 +178,16 @@ module.exports = (APP_CONFIG) => {
         return method
         .subscribe(
             result => {
-                res.send({Success: !!result})
-                return db.getTapContents(tapId)
-                .subscribe(
-                    contents => sockets.emit('TapContentsEvent', contents)
-                );
+                res.send({Success: !!result});
+                let taps = [tapId];
+                if (kegId) {
+                    if (oldLoc && oldLoc.indexOf('loc_') === 0) {
+                        socketUpdateLocationContents([+oldLoc.replace('loc_', '')]);
+                    } else if (oldLoc && oldLoc.indexOf('tap_') === 0) {
+                        taps.push(+oldLoc.replace('tap_', ''));
+                    }
+                }
+                return socketUpdateTapContents(taps);
             },
             err => res.status(500).send(err)
         );
@@ -149,10 +199,7 @@ module.exports = (APP_CONFIG) => {
         .subscribe(
             result => {
                 res.send({Success: result});
-                return db.getTapContents(tapId)
-                .subscribe(
-                    contents => sockets.emit('TapContentsEvent', contents)
-                );
+                return socketUpdateTapContents([tapId]);
             },
             err => res.status(500).send(err)
         );
@@ -167,11 +214,7 @@ module.exports = (APP_CONFIG) => {
         .subscribe(
             _ => {
                 res.status(204).end();
-                // emit to sockets
-                return db.getTapContents(tapId)
-                .subscribe(
-                    contents => sockets.emit('TapContentsEvent', contents)
-                );
+                return socketUpdateTapContents([tapId]);
             },
             err => res.status(500).send('could not update poured volume')
         );

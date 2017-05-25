@@ -53,6 +53,9 @@ export interface Database {
     adjustTapVolume(tapId: number, volume): Observable<any>;
     getPours(fromDate: string, toDate: string): Observable<any[]>;
     getKegSessionHistory(fromDate: string, toDate: string): Observable<BeerSession[]>;
+    getKegLocation(kegId: number): Observable<number>;
+    getKegTap(kegId: number): Observable<number>;
+    findKeg(kegId: number): Observable<string>;
 
     // Voting
     voteForTap(tapId: number, userId: number, vote: string): Observable<any>;

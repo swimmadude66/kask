@@ -1,8 +1,6 @@
-import {Observable} from 'rxjs/Rx';
 import {Component, Input} from '@angular/core';
 import {AdminService} from '../../../../services/admin.service';
 import {Keg} from '../../../../models/keg.model';
-import {Location} from '../../../../models/location.model';
 import {Tap} from '../../../../models/tap.model';
 import {LocationService} from '../../../../services/location.service';
 import {TapService} from '../../../../services/tap.service';
@@ -15,7 +13,6 @@ import {TapService} from '../../../../services/tap.service';
 export class KegRowComponent {
 
     @Input() info: Keg;
-    @Input() location: Location;
     @Input() taps: Tap[];
     @Input() locations: Location[];
 
@@ -29,18 +26,12 @@ export class KegRowComponent {
 
     moveKeg() {
         if (!!this.selectedDestination) {
-            if (this.selectedDestination.startsWith('tap_')) {
+            if (this.selectedDestination.indexOf('tap_') === 0) {
                 this._adminService.loadTapFromStorage(+this.selectedDestination.replace('tap_', ''), this.info.KegId)
-                .switchMap(_ => this._locationService.getLocationContents(this.location.LocationId))
                 .subscribe();
-            } else if (this.selectedDestination.startsWith('loc_')) {
+            } else if (this.selectedDestination.indexOf('loc_') === 0) {
                 let dest = +this.selectedDestination.replace('loc_', '');
-                this._adminService.move(this.info.KegId, dest)
-                .switchMap(_ => Observable.forkJoin(
-                    this._locationService.getLocationContents(this.location.LocationId),
-                    this._locationService.getLocationContents(dest)
-                ))
-                .subscribe();
+                this._adminService.move(this.info.KegId, dest).subscribe();
             }
         }
     }

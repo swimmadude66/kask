@@ -81,6 +81,12 @@ export class MysqlDatabase implements Database {
             InitialVolume: initialVolume,
             RemovedVolume: result.RemovedVolume || 0,
         };
+        if ('TapId' in result) {
+            keg.TapId = result.TapId;
+        }
+        if ('LocationId' in result) {
+            keg.LocationId = result.LocationId;
+        }
         return keg;
     }
 
@@ -527,6 +533,60 @@ export class MysqlDatabase implements Database {
         );
     }
 
+    getKegLocation(kegId: number): Observable<number> {
+        let q = 'Select `keg_locations`.`LocationId`'
+        + ' from `kegs`'
+        + ' join `keg_locations` on `kegs`.`KegId`=`keg_locations`.`KegId`'
+        + ' where `kegs`.`KegId`= ?;';
+        return this.query(q, [kegId])
+        .map(results => {
+            if (results.length < 1) {
+                return -1;
+            }
+            return results[0].LocationId;
+        }, err => {
+            console.error(err);
+        });
+    }
+
+    getKegTap(kegId: number): Observable<number> {
+        let q = 'Select `beer_sessions`.`TapId`'
+        + ' from `kegs`'
+        + ' join `beer_sessions` on `kegs`.`KegId`=`beer_sessions`.`KegId`'
+        + ' where `kegs`.`KegId` = ?;';
+        return this.query(q, [kegId])
+        .map(results => {
+            if (results.length < 1) {
+                return -1;
+            }
+            return results[0].TapId;
+        }, err => {
+            console.error(err);
+        });
+    }
+
+    findKeg(kegId: number): Observable<string> {
+        return this.getKegTap(kegId)
+        .flatMap(
+            tapId => {
+                if (tapId > 0) {
+                    return Observable.of('tap_' + tapId);
+                } else {
+                    return this.getKegLocation(kegId)
+                    .map(
+                        locId => {
+                            if (locId > 0) {
+                                return 'loc_' + locId;
+                            } else {
+                                console.log('Could not find keg');
+                            }
+                        }
+                    );
+                }
+            }
+        );
+    }
+
     assignBeerToLocation(beerId: number, locationId: number, size: KegSize): Observable<boolean> {
         let q = 'Insert into `kegs` (`BeerId`, `Size`) VALUES(?, ?);';
         return this.query(q, [beerId, size])
@@ -748,7 +808,7 @@ export class MysqlDatabase implements Database {
             ' order by `pours`.`Timestamp` asc;';
         return this.query(q, [fromDate, toDate]);
     }
-    
+
     getKegSessionHistory(fromDate: string, toDate: string): Observable<BeerSession[]> {
         let q = 'Select * from `beer_sessions` ' +
             'join `kegs` on `beer_sessions`.`KegId`=`kegs`.`KegId` ' +
