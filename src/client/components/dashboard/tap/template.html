@@ -57,6 +57,7 @@
             <span class="fa fa-pencil edit" (click)="editTapImage()" *ngIf="isLoggedIn && isAdmin && !!tapSession?.Keg && !editing"></span>
             <img src="/assets/img/tap-handle.png">
             <div class="tap-image" *ngIf="getImage()">
+                <span *ngIf="editing" class="badge badge-pill badge-primary img-drag" (mousedown)="dragImageStart($event)"><i class="fa fa-arrows"></i></span>
                 <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">
                     <img src="{{getImage()}}" alt="beer image"
                          [style.width]="(tapSession?.Keg?.Beer?.LabelScalingFactor || 100) + '%'"
@@ -69,7 +70,5 @@
     </div>
 
     <input *ngIf="isLoggedIn && !!tapSession?.Keg && editing" class="img-slider" type="range" name="scale" min="10" max="1000" [(ngModel)]="tapSession.Keg.Beer.LabelScalingFactor" step="1"/>
-    <input *ngIf="isLoggedIn && !!tapSession?.Keg && editing" class="img-slider img-slider-x" type="range" name="xOffset" min="-500" max="500" [(ngModel)]="tapSession.Keg.Beer.LabelOffsetX" step="1"/>
-    <input *ngIf="isLoggedIn && !!tapSession?.Keg && editing" class="img-slider img-slider-y" type="range" name="yOffset" min="-500" max="500" [(ngModel)]="tapSession.Keg.Beer.LabelOffsetY" step="1"/>
 </section>
 

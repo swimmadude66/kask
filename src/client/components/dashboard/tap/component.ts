@@ -1,7 +1,7 @@
 import {AdminService} from '../../../services/admin.service';
 import {TapService} from '../../../services/tap.service';
 import {Tap, TapSession} from '../../../models';
-import {Component, Input, OnInit, Output, EventEmitter, OnDestroy} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter, OnDestroy, HostListener} from '@angular/core';
 import {Observable, Subscription} from 'rxjs/Rx';
 
 @Component({
@@ -18,12 +18,29 @@ export class TapComponent implements OnInit, OnDestroy {
     originalScale = 100;
     originalOffsetX = 0;
     originalOffsetY = 0;
+    isMovingImage = false;
+    lastMouseEvent: MouseEvent;
 
     @Input() info: Tap;
     @Input() tapNum: number;
     @Input() isLoggedIn: boolean;
     @Input() isAdmin: boolean;
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
+
+    @HostListener('mousemove', ['$event'])
+    onMousemove(event: MouseEvent) {
+        if(this.isMovingImage) {
+            this.tapSession.Keg.Beer.LabelOffsetX += event.clientX - this.lastMouseEvent.clientX;
+            this.tapSession.Keg.Beer.LabelOffsetY += event.clientY - this.lastMouseEvent.clientY;
+
+            this.lastMouseEvent = event;
+        }
+    }
+
+    @HostListener('mouseup')
+    onMouseup() {
+        this.isMovingImage = false;
+    }
 
     constructor(
         private _tapService: TapService,
@@ -67,6 +84,13 @@ export class TapComponent implements OnInit, OnDestroy {
             }
         }
         return '';
+    }
+
+    dragImageStart(event: MouseEvent) {
+        if (this.editing) {
+            this.isMovingImage = true;
+            this.lastMouseEvent = event;
+        }
     }
 
     vote(vote: string) {

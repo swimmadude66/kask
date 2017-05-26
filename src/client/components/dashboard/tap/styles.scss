@@ -184,19 +184,17 @@ input {
         left: 0;
         right: 0;
         width: 100%;
+    }
 
-        &.img-slider-x {
-            top: 20px;
-            width:200px;
-        }
-        &.img-slider-y {
-            top: 40px;
-            writing-mode: bt-lr; /* IE */
-            -webkit-appearance: slider-vertical; /* WebKit */
-            width: 8px;
-            height: 200px;
-            padding: 0 5px;
-        }
+    .img-drag {
+        z-index: 1;
+        position: absolute;
+        top: -10px;
+        left:-52px;
+        font-size:140px;
+        color: rgba(255,255,255,.6);
+        background-color: transparent;
+        cursor: move;
     }
 
 
