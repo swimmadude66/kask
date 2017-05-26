@@ -16,6 +16,8 @@ export class TapComponent implements OnInit, OnDestroy {
     loaded: boolean;
     editing = false;
     originalScale = 100;
+    originalOffsetX = 0;
+    originalOffsetY = 0;
 
     @Input() info: Tap;
     @Input() tapNum: number;
@@ -76,14 +78,18 @@ export class TapComponent implements OnInit, OnDestroy {
         this._tapService.vote(this.info.TapId, vote).subscribe();
     }
 
-    editTapScale() {
+    editTapImage() {
         this.originalScale = this.tapSession.Keg.Beer.LabelScalingFactor;
+        this.originalOffsetX = this.tapSession.Keg.Beer.LabelOffsetX;
+        this.originalOffsetY = this.tapSession.Keg.Beer.LabelOffsetY;
         this.editing = true;
     }
 
     cancelTapScale() {
         this.editing = false;
         this.tapSession.Keg.Beer.LabelScalingFactor = this.originalScale;
+        this.tapSession.Keg.Beer.LabelOffsetX = this.originalOffsetX;
+        this.tapSession.Keg.Beer.LabelOffsetY = this.originalOffsetY;
     }
 
     submitTapScale() {
@@ -92,6 +98,6 @@ export class TapComponent implements OnInit, OnDestroy {
         }
         this.editing = false;
         let beer = this.tapSession.Keg.Beer;
-        this._adminService.saveBeerLabelScale(beer.BeerId, beer.LabelScalingFactor).subscribe();
+        this._adminService.saveBeerLabelImage(beer.BeerId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
     }
 }

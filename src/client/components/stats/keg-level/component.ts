@@ -117,6 +117,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             let indexForDate = result[kegId].findIndex(data => data.x.getTime() === curr.Date.getTime());
             if (indexForDate < 0) {
                 let prevY = result[kegId][result[kegId].length - 1].y;
+                
                 result[kegId].push({x: curr.Date, y: prevY});
                 indexForDate = 0;
             }
