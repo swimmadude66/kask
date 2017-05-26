@@ -101,7 +101,9 @@ export class MysqlDatabase implements Database {
             ABV: result.ABV,
             IBU: result.IBU,
             LabelUrl: result.LabelUrl,
-            LabelScalingFactor: result.LabelScalingFactor
+            LabelScalingFactor: result.LabelScalingFactor,
+            LabelOffsetX: result.LabelOffsetX,
+            LabelOffsetY: result.LabelOffsetY
         };
         return beer;
     }
@@ -236,9 +238,9 @@ export class MysqlDatabase implements Database {
         );
     }
 
-    saveBeerLabelScale(beerId: number, scale: number): Observable<any> {
-        let q = 'Update `beers` set `LabelScalingFactor`=? Where `BeerId`=?;';
-        return this.query(q, [scale, beerId]);
+    saveBeerLabelImage(beerId: number, scale: number, xOffset: number, yOffset: number): Observable<any> {
+        let q = 'Update `beers` set `LabelScalingFactor`=?, `LabelOffsetX`=?, `LabelOffsetY`=? Where `BeerId`=?;';
+        return this.query(q, [scale, xOffset, yOffset, beerId]);
     }
 
     saveStyle(style: Style): Observable<number> {

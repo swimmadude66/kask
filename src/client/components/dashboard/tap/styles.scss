@@ -179,12 +179,24 @@ input {
     }
 
 
-    .img-scale {
+    .img-slider {
         position: absolute;
         left: 0;
         right: 0;
         width: 100%;
     }
+
+    .img-drag {
+        z-index: 1;
+        position: absolute;
+        top: -10px;
+        left:-52px;
+        font-size:140px;
+        color: rgba(255,255,255,.6);
+        background-color: transparent;
+        cursor: move;
+    }
+
 
     .tap-image {
         border-radius: 50%;

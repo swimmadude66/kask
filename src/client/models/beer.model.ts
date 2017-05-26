@@ -9,6 +9,8 @@ export class Beer {
     IBU: number;
     LabelUrl: string;
     LabelScalingFactor: number;
+    LabelOffsetX: number;
+    LabelOffsetY: number;
     Style: Style;
     Brewery: Brewery;
     BeerBDBID: string;

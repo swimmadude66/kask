@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS `beers` (
   `IBU` int(6) DEFAULT NULL,
   `LabelUrl` varchar(512) DEFAULT NULL,
   `LabelScalingFactor` int(11) NOT NULL DEFAULT '100',
+  `LabelOffsetX` int(11) NOT NULL DEFAULT '0',
+  `LabelOffsetY` int(11) NOT NULL DEFAULT '0',
   `BeerBDBID` varchar(32) NOT NULL,
   PRIMARY KEY (`BeerId`),
   UNIQUE KEY `BeerId_UNIQUE` (`BeerId`),

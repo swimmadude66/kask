@@ -1,7 +1,7 @@
 import {AdminService} from '../../../services/admin.service';
 import {TapService} from '../../../services/tap.service';
 import {Tap, TapSession} from '../../../models';
-import {Component, Input, OnInit, Output, EventEmitter, OnDestroy} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter, OnDestroy, HostListener} from '@angular/core';
 import {Observable, Subscription} from 'rxjs/Rx';
 
 @Component({
@@ -16,12 +16,31 @@ export class TapComponent implements OnInit, OnDestroy {
     loaded: boolean;
     editing = false;
     originalScale = 100;
+    originalOffsetX = 0;
+    originalOffsetY = 0;
+    isMovingImage = false;
+    lastMouseEvent: MouseEvent;
 
     @Input() info: Tap;
     @Input() tapNum: number;
     @Input() isLoggedIn: boolean;
     @Input() isAdmin: boolean;
     @Output() remove: EventEmitter<number> = new EventEmitter<number>();
+
+    @HostListener('mousemove', ['$event'])
+    onMousemove(event: MouseEvent) {
+        if(this.isMovingImage) {
+            this.tapSession.Keg.Beer.LabelOffsetX += event.clientX - this.lastMouseEvent.clientX;
+            this.tapSession.Keg.Beer.LabelOffsetY += event.clientY - this.lastMouseEvent.clientY;
+
+            this.lastMouseEvent = event;
+        }
+    }
+
+    @HostListener('mouseup')
+    onMouseup() {
+        this.isMovingImage = false;
+    }
 
     constructor(
         private _tapService: TapService,
@@ -67,6 +86,13 @@ export class TapComponent implements OnInit, OnDestroy {
         return '';
     }
 
+    dragImageStart(event: MouseEvent) {
+        if (this.editing) {
+            this.isMovingImage = true;
+            this.lastMouseEvent = event;
+        }
+    }
+
     vote(vote: string) {
         if (this.tapSession && this.tapSession.UserVote) {
             if (((this.tapSession.UserVote === 1) && (vote === 'up')) || ((this.tapSession.UserVote === -1) && (vote === 'down'))) {
@@ -76,14 +102,18 @@ export class TapComponent implements OnInit, OnDestroy {
         this._tapService.vote(this.info.TapId, vote).subscribe();
     }
 
-    editTapScale() {
+    editTapImage() {
         this.originalScale = this.tapSession.Keg.Beer.LabelScalingFactor;
+        this.originalOffsetX = this.tapSession.Keg.Beer.LabelOffsetX;
+        this.originalOffsetY = this.tapSession.Keg.Beer.LabelOffsetY;
         this.editing = true;
     }
 
     cancelTapScale() {
         this.editing = false;
         this.tapSession.Keg.Beer.LabelScalingFactor = this.originalScale;
+        this.tapSession.Keg.Beer.LabelOffsetX = this.originalOffsetX;
+        this.tapSession.Keg.Beer.LabelOffsetY = this.originalOffsetY;
     }
 
     submitTapScale() {
@@ -92,6 +122,6 @@ export class TapComponent implements OnInit, OnDestroy {
         }
         this.editing = false;
         let beer = this.tapSession.Keg.Beer;
-        this._adminService.saveBeerLabelScale(beer.BeerId, beer.LabelScalingFactor).subscribe();
+        this._adminService.saveBeerLabelImage(beer.BeerId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
     }
 }

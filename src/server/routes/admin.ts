@@ -225,7 +225,7 @@ module.exports = (APP_CONFIG) => {
         if (!body || !body.BeerId || !body.Scale) {
             return res.status(400).send('BeerId and Scale are required fields');
         }
-        db.saveBeerLabelScale(body.BeerId, body.Scale).subscribe(
+        db.saveBeerLabelImage(body.BeerId, body.Scale, body.XOffset, body.YOffset).subscribe(
             _ => res.status(204).end(),
             err => {
                 console.error(err);
