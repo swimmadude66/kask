@@ -91,7 +91,7 @@ export class StatsComponent implements OnInit, OnDestroy {
 
         this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate, true))
             .subscribe(_ => {
-                this.pourSessionData = this.sessionData.filter(s => Moment(s.TappedTime) > Moment(this.dateToString(this.fromDate)));
+                this.pourSessionData = this.sessionData.filter(s => Moment(s.TappedTime) >= Moment(this.dateToString(this.fromDate)) && Moment(s.TappedTime) < Moment(this.dateToString(this.toDate)));
             });
     }
 
