@@ -51,7 +51,7 @@ export class StatsComponent implements OnInit, OnDestroy {
                     return prev;
                 });
 
-                this.fromDate = this.momentToDate(Moment(earliestActiveSession.TappedTime.slice(0, -1)));
+                this.fromDate = this.momentToDate(Moment(earliestActiveSession.TappedTime));
 
                 this.trySubmitDateRange();
             })
@@ -59,8 +59,8 @@ export class StatsComponent implements OnInit, OnDestroy {
     }
 
     filterForKeg(session: TapSession) {
-        this.fromDate = this.momentToDate(Moment(session.TappedTime.slice(0, -1)));
-        this.toDate = this.momentToDate(session.RemovalTime ? Moment(session.RemovalTime.slice(0, -1)) : Moment());
+        this.fromDate = this.momentToDate(Moment(session.TappedTime));
+        this.toDate = this.momentToDate(session.RemovalTime ? Moment(session.RemovalTime) : Moment());
 
         this.trySubmitDateRange();
     }

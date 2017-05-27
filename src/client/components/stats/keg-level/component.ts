@@ -126,7 +126,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             return result;
         }, this.sessions.reduce((result, session) => {
             result[session.Keg.KegId] = [{
-                x: new Date(session.TappedTime.slice(0,-1)),
+                x: new Date(session.TappedTime),
                 y: Math.ceil(session.Keg.InitialVolume / 29.57)
             }];
             return result;
