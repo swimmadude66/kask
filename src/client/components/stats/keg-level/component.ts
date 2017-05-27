@@ -107,7 +107,7 @@ export class KegsChartComponent implements OnInit, OnChanges {
             let dt = new Date(p.Timestamp.slice(0, -1));
             return {
                 // group data into 4-hour blocks
-                Date: new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), Math.round(dt.getHours()/4)*4),
+                Date: new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), Math.ceil(dt.getHours()/2)*2),
                 Volume: Math.ceil(p.Volume / 29.57),
                 KegId: p.KegId
             };
@@ -116,10 +116,11 @@ export class KegsChartComponent implements OnInit, OnChanges {
 
             let indexForDate = result[kegId].findIndex(data => data.x.getTime() === curr.Date.getTime());
             if (indexForDate < 0) {
-                let prevY = result[kegId][result[kegId].length - 1].y;
+                let lastIndex = result[kegId].length - 1;
+                let prevY = result[kegId][lastIndex].y;
                 
                 result[kegId].push({x: curr.Date, y: prevY});
-                indexForDate = 0;
+                indexForDate = lastIndex + 1;
             }
             result[kegId][indexForDate].y -= curr.Volume;
 
