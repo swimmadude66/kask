@@ -55,6 +55,7 @@
     <div class="positioner">
         <div class="tap-image-container">
             <span class="fa fa-pencil edit" (click)="editTapImage()" *ngIf="isLoggedIn && isAdmin && !!tapSession?.Keg && !editing"></span>
+            <div class="flip-container">
             <img src="/assets/img/tap-handle.png">
             <div class="tap-image" *ngIf="getImage()">
                 <span *ngIf="editing" class="badge badge-pill badge-primary img-drag" (mousedown)="dragImageStart($event)"><i class="fa fa-arrows"></i></span>
@@ -65,6 +66,7 @@
                          [style.top]="(-9999 + (tapSession?.Keg?.Beer?.LabelOffsetY || 0)) + 'px'"
                     />
                 </a>
+            </div>
             </div>
         </div>
     </div>
