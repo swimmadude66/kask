@@ -49,13 +49,17 @@
     </form>
 </div>
 
+
+
 <section class="tap-handle hidden-md-down">
 
+<ng-template #tipContent><div class="amount-poured">{{amountPoured}} oz. poured!</div></ng-template>
 
     <div class="positioner">
         <div class="tap-image-container">
             <span class="fa fa-pencil edit" (click)="editTapImage()" *ngIf="isLoggedIn && isAdmin && !!tapSession?.Keg && !editing"></span>
-            <img src="/assets/img/tap-handle.png">
+            <div class="flip-container" [ngClass]="isPouring ? 'pouring' : ''">
+            <img src="/assets/img/tap-handle.png"  [ngbTooltip]="tipContent" triggers="manual" #pourAmount="ngbTooltip">
             <div class="tap-image" *ngIf="getImage()">
                 <span *ngIf="editing" class="badge badge-pill badge-primary img-drag" (mousedown)="dragImageStart($event)"><i class="fa fa-arrows"></i></span>
                 <a [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer?.BeerId">
@@ -65,6 +69,7 @@
                          [style.top]="(-9999 + (tapSession?.Keg?.Beer?.LabelOffsetY || 0)) + 'px'"
                     />
                 </a>
+            </div>
             </div>
         </div>
     </div>

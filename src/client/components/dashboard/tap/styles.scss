@@ -162,6 +162,26 @@ input {
         left: calc(50% - #{$tap-handle-width / 2});
 
         .tap-image-container {
+            perspective: 1600px;
+            perspective-origin: 50% 50px;
+
+            .flip-container {
+                transform-style: flat;
+                transform-origin: center 400px;
+                transition: transform 0.5s cubic-bezier(.57,-0.42,.46,1.4);
+                transform: rotateX(0deg)  rotateZ(0deg);
+
+                &.pouring {
+                    transform: rotateX(-22deg)  rotateZ(15deg);
+                }
+
+                > img {
+                    position: absolute;
+                    width: $tap-handle-width;
+                    height:$tap-handle-height;
+                }
+            }
+
             display:none;
             position: fixed;
             top: calc(100vh - #{$tap-handle-height});
@@ -170,11 +190,7 @@ input {
                 display:block
             }
 
-            > img {
-                position: absolute;
-                width: $tap-handle-width;
-                height:$tap-handle-height;
-            }
+
         }
     }
 
@@ -208,7 +224,6 @@ input {
         top:22px;
         left: 33px;
         overflow: hidden;
-
         transform: rotateY(30deg) rotateX(6deg);
 
         img {
@@ -235,4 +250,9 @@ input {
             display: inline-block;
         }
     }
+}
+
+.amount-poured {
+    font-size: 20px;
+    padding: 15px;
 }

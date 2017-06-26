@@ -3,6 +3,7 @@ import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
 import {DashboardComponent, TapComponent} from '../components/dashboard';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
     imports: [
@@ -12,7 +13,8 @@ import {DashboardComponent, TapComponent} from '../components/dashboard';
             [
                 {path: '', component: DashboardComponent},
             ]
-        )
+        ),
+        NgbModule.forRoot(),
     ],
     declarations: [
         DashboardComponent,
