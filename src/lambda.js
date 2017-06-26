@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
       "headers": {
         "content-type": "application/json",
         "cache-control": "no-cache",
-        "cookie": "ot_auth=s%3Ad1bd8fea-7ae7-45b6-81b0-a73453642f50.UVRKNaz%2FhB%2FseTzvFQdAr933OY11APQtmV2rPdOVALY"
+        "cookie": "$AUTH_COOKIE"
       }
     };
     
