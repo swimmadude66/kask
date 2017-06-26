@@ -205,6 +205,13 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
+    router.post('/beginpour/:tapId', (req, res) => {
+        let tapId = +req.params.tapId;
+        res.send();
+
+        sockets.emit('PourEvent', {tapId: tapId, isPouring: true});
+    });
+
     router.post('/completepour/:tapId', (req, res) => {
         if (!req.body || !req.body.Volume) {
             return res.status(400).send('Volume is required');
@@ -214,6 +221,7 @@ module.exports = (APP_CONFIG) => {
         .subscribe(
             _ => {
                 res.status(204).end();
+                sockets.emit('PourEvent', {tapId: tapId, isPouring: false, volume: req.body.Volume});
                 return socketUpdateTapContents([tapId]);
             },
             err => res.status(500).send('could not update poured volume')

@@ -1,8 +1,9 @@
 import {AdminService} from '../../../services/admin.service';
 import {TapService} from '../../../services/tap.service';
 import {Tap, TapSession} from '../../../models';
-import {Component, Input, OnInit, Output, EventEmitter, OnDestroy, HostListener} from '@angular/core';
+import {Component, Input, OnInit, Output, EventEmitter, OnDestroy, HostListener, ViewChild} from '@angular/core';
 import {Observable, Subscription} from 'rxjs/Rx';
+import {NgbTooltip} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'tap',
@@ -20,6 +21,8 @@ export class TapComponent implements OnInit, OnDestroy {
     originalOffsetY = 0;
     isMovingImage = false;
     lastMouseEvent: MouseEvent;
+    isPouring = false;
+    amountPoured: string;
 
     @Input() info: Tap;
     @Input() tapNum: number;
@@ -41,6 +44,8 @@ export class TapComponent implements OnInit, OnDestroy {
     onMouseup() {
         this.isMovingImage = false;
     }
+
+    @ViewChild('pourAmount') pourAmountTooltip: NgbTooltip;
 
     constructor(
         private _tapService: TapService,
@@ -64,6 +69,12 @@ export class TapComponent implements OnInit, OnDestroy {
                     error => console.log(error)
                 )
             );
+
+            this.subscriptions.push(
+                this._tapService.observeTapPours(this.info.TapId)
+                .subscribe(pour => this.handlePour(pour))
+            );
+
         } else {
             this.editing = true;
             this.loaded = true;
@@ -123,5 +134,19 @@ export class TapComponent implements OnInit, OnDestroy {
         this.editing = false;
         let beer = this.tapSession.Keg.Beer;
         this._adminService.saveBeerLabelImage(beer.BeerId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
+    }
+
+    handlePour(pour) {
+         this.isPouring = pour.isPouring;
+
+         if (!this.isPouring && pour.volume) {
+             Observable.timer(300)
+             .do(_ => {
+                this.amountPoured = (pour.volume / 29.5735).toFixed(2);
+                this.pourAmountTooltip.open();
+             })
+            .delay(2000)
+            .subscribe(_ => this.pourAmountTooltip.close());
+         }
     }
 }

@@ -171,8 +171,8 @@ input {
                 transition: transform 0.5s cubic-bezier(.57,-0.42,.46,1.4);
                 transform: rotateX(0deg)  rotateZ(0deg);
 
-                &:hover {
-                    transform: rotateX(-32deg)  rotateZ(15deg);
+                &.pouring {
+                    transform: rotateX(-22deg)  rotateZ(15deg);
                 }
 
                 > img {
@@ -250,4 +250,9 @@ input {
             display: inline-block;
         }
     }
+}
+
+.amount-poured {
+    font-size: 20px;
+    padding: 15px;
 }
