@@ -12,6 +12,8 @@ export class TapService {
 
     private tapContents: {[key: number]: Subject<TapSession>} = {};
     private tapPours: {[key: number]: Subject<Pour>} = {};
+    private tapInfo: {[key: number]: Subject<Tap>} = {};
+
 
     constructor(
         private http: Http,
@@ -28,6 +30,10 @@ export class TapService {
                 this.tapPours[pourEvent.tapId].next(pourEvent);
             }
         );
+
+        sockets.onRoot('TapInfoEvent', (info) => {
+            this.tapInfo[info.tapId].next(info);
+        });
     }
 
     addTap(data): Observable<number> {
@@ -80,5 +86,12 @@ export class TapService {
             this.tapPours[tapId] = new Subject<Pour>();
         }
         return this.tapPours[tapId];
+    }
+
+    observeTapInfo(tapId: number): Observable<Tap> {
+          if (!this.tapInfo[tapId]) {
+            this.tapInfo[tapId] = new Subject<Tap>();
+        }
+        return this.tapInfo[tapId];
     }
 }

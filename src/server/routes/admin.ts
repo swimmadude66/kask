@@ -24,6 +24,11 @@ module.exports = (APP_CONFIG) => {
         });
     }
 
+    function socketUpdateTapInfo(tapId: number): void {
+        db.getTap(tapId)
+        .subscribe(tapInfo => sockets.emit('TapInfoEvent', tapInfo));
+    }
+
     router.get('/search/:beername', (req, res) => {
         let q = req.params.beername;
         return APP_CONFIG.beer_service.searchForBeer(q)
@@ -94,7 +99,10 @@ module.exports = (APP_CONFIG) => {
         }
         db.editTap(body.TapId, body.TapName, body.Description || null, body.Status || null)
         .subscribe(
-            result => res.send(result),
+            result => {
+                res.send(result);
+                socketUpdateTapInfo(body.TapId);
+            } ,
             err => res.status(500).send(err)
         );
     });
@@ -231,10 +239,13 @@ module.exports = (APP_CONFIG) => {
     router.post('/beers/scale/', (req, res) => {
         let body = req.body;
         if (!body || !body.BeerId || !body.Scale) {
-            return res.status(400).send('BeerId and Scale are required fields');
+            return res.status(400).send('BeerId, and Scale are required fields');
         }
         db.saveBeerLabelImage(body.BeerId, body.Scale, body.XOffset, body.YOffset).subscribe(
-            _ => res.status(204).end(),
+            _ => {
+                res.status(204).end();
+                return socketUpdateTapContents(req.body.TapId);
+            },
             err => {
                 console.error(err);
                 return res.status(500).send('Could not scale label scale');

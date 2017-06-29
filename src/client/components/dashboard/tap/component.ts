@@ -110,7 +110,10 @@ export class TapComponent implements OnInit, OnDestroy {
                 vote = 'none';
             }
         }
-        this._tapService.vote(this.info.TapId, vote).subscribe();
+
+        let voteNum = vote === 'none' ? 0 : vote === 'down' ? -1 : 1;
+
+        this._tapService.vote(this.info.TapId, vote).subscribe(_ => this.tapSession.UserVote = voteNum);
     }
 
     editTapImage() {
@@ -133,7 +136,7 @@ export class TapComponent implements OnInit, OnDestroy {
         }
         this.editing = false;
         let beer = this.tapSession.Keg.Beer;
-        this._adminService.saveBeerLabelImage(beer.BeerId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
+        this._adminService.saveBeerLabelImage(beer.BeerId, this.tapSession.TapId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
     }
 
     handlePour(pour) {

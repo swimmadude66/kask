@@ -43,9 +43,10 @@ export class AdminService {
             LocationId: locationId
         });
     }
-    saveBeerLabelImage(beerId: number, scale: number, xOffset: number, yOffset: number) {
+    saveBeerLabelImage(beerId: number, tapId: number, scale: number, xOffset: number, yOffset: number) {
         return this.http.post('/api/admin/beers/scale', {
             BeerId: beerId,
+            TapId: tapId,
             Scale: scale,
             XOffset: xOffset,
             YOffset: yOffset
