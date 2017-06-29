@@ -26,12 +26,12 @@ export class TapEditComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.subscriptions.push(
-        this._tapService.observeTapContents(this.info.TapId).subscribe(
-            tapSession => this.tapSession = tapSession,
-            error => console.error(error)
-        ));
-
-        this._tapService.getTapContents(this.info.TapId).subscribe();
+            this._tapService.observeTapContents(this.info.TapId)
+            .merge(this._tapService.getTapContents(this.info.TapId))
+            .subscribe(
+                tapSession => this.tapSession = tapSession
+            )
+        );
     }
 
     submitEdit() {

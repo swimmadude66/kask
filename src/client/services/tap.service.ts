@@ -2,9 +2,9 @@ import {SocketService} from './sockets.service';
 import { Tap } from '../models';
 import { Pour } from '../models/pour.model';
 import { TapSession } from '../models/session.model';
-import {Observable, Subject} from 'rxjs/Rx';
-import {Http, Response} from '@angular/http';
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import { Observable, ReplaySubject, Subject } from 'rxjs/Rx';
 
 
 @Injectable()
@@ -72,13 +72,18 @@ export class TapService {
         if (!this.tapContents[tapId]) {
             this.tapContents[tapId] = new Subject<TapSession>();
         }
+        
         return this.tapContents[tapId];
     }
 
     getTapContents(tapId: number): Observable<TapSession> {
+        if (!this.tapContents[tapId]) {
+            this.tapContents[tapId] = new Subject<TapSession>();
+        }
+
         return this.http.get(`/api/beers/contents/tap/${tapId}`)
         .map(res => res.json())
-            .do(_ => this.tapContents[tapId].next(_));
+        .do(_ => this.tapContents[tapId].next(_));
     }
 
     observeTapPours(tapId: number): Observable<Pour> {
