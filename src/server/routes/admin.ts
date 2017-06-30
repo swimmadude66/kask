@@ -258,7 +258,7 @@ module.exports = (APP_CONFIG) => {
         db.saveBeerLabelImage(body.BeerId, body.Scale, body.XOffset, body.YOffset).subscribe(
             _ => {
                 res.status(204).end();
-                return socketUpdateTapContents(req.body.TapId);
+                return socketUpdateTapContents([req.body.TapId]);
             },
             err => {
                 console.error(err);
