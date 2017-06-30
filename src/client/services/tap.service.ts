@@ -21,7 +21,7 @@ export class TapService {
     ) {
         sockets.onRoot(
             'TapContentsEvent', (contents) => {
-                this.tapContents[contents.TapId].next(contents);
+                this.tapContents[contents.TapId].next(contents.Contents);
             }
         );
 
@@ -72,7 +72,6 @@ export class TapService {
         if (!this.tapContents[tapId]) {
             this.tapContents[tapId] = new Subject<TapSession>();
         }
-        
         return this.tapContents[tapId];
     }
 
@@ -80,7 +79,6 @@ export class TapService {
         if (!this.tapContents[tapId]) {
             this.tapContents[tapId] = new Subject<TapSession>();
         }
-
         return this.http.get(`/api/beers/contents/tap/${tapId}`)
         .map(res => res.json())
         .do(_ => this.tapContents[tapId].next(_));

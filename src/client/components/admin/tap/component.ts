@@ -14,8 +14,10 @@ export class TapEditComponent implements OnInit, OnDestroy {
     private subscriptions = [];
     tapSession: TapSession;
 
-    private isEditing: boolean;
+    isEditing: boolean;
     beerToLoad: Beer;
+
+    @Input() locations: Location[];
     @Input() info: Tap;
     @Input() tapNum: number;
 
@@ -41,22 +43,6 @@ export class TapEditComponent implements OnInit, OnDestroy {
                     this.isEditing = false;
                 }, err => console.log(err)
             );
-    }
-
-    // deleteTap() {
-    //     if (this.info && this.info.TapId) {
-    //         this._tapService.deleteTap(this.info.TapId)
-    //             .subscribe(
-    //                 success => this.remove.emit(this.info.TapId),
-    //                 err => console.log(err),
-    //                 () => this.loaded = true
-    //             );
-    //     }
-    // }
-
-    clear() {
-        this._adminService.clearTap(this.info.TapId)
-            .subscribe();
     }
 
     ngOnDestroy() {

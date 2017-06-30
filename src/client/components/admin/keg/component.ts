@@ -1,9 +1,10 @@
 import {Component, Input} from '@angular/core';
-import {AdminService} from '../../../../services/admin.service';
-import {Keg} from '../../../../models/keg.model';
-import {Tap} from '../../../../models/tap.model';
-import {LocationService} from '../../../../services/location.service';
-import {TapService} from '../../../../services/tap.service';
+import {AdminService} from '../../../services/admin.service';
+import {Keg} from '../../../models/keg.model';
+import {Tap} from '../../../models/tap.model';
+import {LocationService} from '../../../services/location.service';
+import {TapService} from '../../../services/tap.service';
+import {Location} from '../../../models/location.model';
 
 @Component({
     selector: 'keg-move',
@@ -32,6 +33,8 @@ export class KegRowComponent {
             } else if (this.selectedDestination.indexOf('loc_') === 0) {
                 let dest = +this.selectedDestination.replace('loc_', '');
                 this._adminService.move(this.info.KegId, dest).subscribe();
+            } else {
+                this._adminService.clearKeg(this.info.KegId).subscribe(_ => _);
             }
         }
     }

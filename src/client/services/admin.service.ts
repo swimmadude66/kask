@@ -33,8 +33,8 @@ export class AdminService {
         }).map(res => res.json());
     }
 
-    clearTap(tapId: number) {
-        return this.http.post(`/api/admin/clear/${tapId}`, {});
+    clearKeg(kegId: number) {
+        return this.http.post(`/api/admin/clear/${kegId}`, {});
     }
 
     move(kegId: number, locationId: number) {

@@ -30,7 +30,7 @@ module.exports = (APP_CONFIG) => {
                 // emit to sockets
                 return db.getTapContents(tapId)
                 .subscribe(
-                    contents => sockets.emit('TapContentsEvent', contents)
+                    contents => sockets.emit('TapContentsEvent', {TapId: tapId, Contents: contents})
                 );
             },
             err => {

@@ -1,5 +1,6 @@
 import {MysqlDatabase} from '../services/mysql_database';
 import * as express from 'express';
+import { Observable } from 'rxjs/Rx';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
@@ -10,7 +11,7 @@ module.exports = (APP_CONFIG) => {
         tapIds.forEach((tapId) => {
             db.getTapContents(tapId)
             .subscribe(
-                contents => sockets.emit('TapContentsEvent', contents)
+                contents => sockets.emit('TapContentsEvent', {TapId: tapId, Contents: contents})
             );
         });
     }
@@ -140,9 +141,13 @@ module.exports = (APP_CONFIG) => {
         .flatMap(
             old => {
                 oldLoc = old;
-                return db.moveKegLocation(kegId, body.LocationId);
+                if (oldLoc.indexOf('tap_') === 0) {
+                     return db.emptyTap(+oldLoc.replace('tap_', ''))
+                }
+                return Observable.of(true);
             }
         )
+        .flatMap(_ => db.moveKegLocation(kegId, body.LocationId))
         .subscribe(
             result => {
                 res.send({Success: result});
@@ -201,17 +206,26 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
-    router.post('/clear/:tapId', (req, res) => {
-        let tapId = +req.params.tapId;
-        return db.emptyTap(tapId)
-        .subscribe(
-            result => {
-                res.send({Success: result});
-                return socketUpdateTapContents([tapId]);
-            },
-            err => res.status(500).send(err)
-        );
+    router.post('/clear/:kegId', (req, res) => {
+        let kegId = +req.params.kegId;
+
+        Observable.forkJoin([
+            db.findKeg(kegId),
+            db.deactivateKeg(kegId)
+        ])
+        .subscribe(results => {
+             res.send({Success: results[1]});
+
+            if (results[0].indexOf('tap_') === 0) {
+                return socketUpdateTapContents([+results[0].replace('tap_', '')]);
+            }
+
+            if (results[0].indexOf('loc_') === 0) {
+                return socketUpdateLocationContents([+results[0].replace('loc_', '')]);
+            }
+        }, err => res.status(500).send(err));
     });
+
 
     router.post('/beginpour/:tapId', (req, res) => {
         let tapId = +req.params.tapId;
