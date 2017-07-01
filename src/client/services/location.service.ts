@@ -47,6 +47,9 @@ export class LocationService {
         return this.locationContents[locationId];
     }
     getLocationContents(locationId: number): Observable<Keg[]> {
+        if (!this.locationContents[locationId]) {
+            this.locationContents[locationId] = new ReplaySubject<Keg[]>(1);
+        }
         return this.http.get(`/api/beers/contents/location/${locationId}`)
         .map(res => res.json())
             .do(_ => this.locationContents[locationId].next(_));

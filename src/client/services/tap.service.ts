@@ -19,20 +19,18 @@ export class TapService {
         private http: Http,
         private sockets: SocketService
     ) {
-        sockets.onRoot(
-            'TapContentsEvent', (contents) => {
-                this.tapContents[contents.TapId].next(contents.Contents);
+        sockets.onRoot('TapContentsEvent', (contents) => {
+                this.getSubject(this.tapContents, contents.TapId).next(contents.Contents);
             }
         );
 
-        sockets.onRoot(
-            'PourEvent', (pourEvent) => {
-                this.tapPours[pourEvent.tapId].next(pourEvent);
+        sockets.onRoot('PourEvent', (pourEvent) => {
+                this.getSubject(this.tapPours, pourEvent.tapId).next(pourEvent);
             }
         );
 
         sockets.onRoot('TapInfoEvent', (info) => {
-            this.tapInfo[info.tapId].next(info);
+            this.getSubject(this.tapInfo, info.TapId).next(info);
         });
     }
 
@@ -60,41 +58,38 @@ export class TapService {
 
     getTaps(): Observable<Tap[]> {
         return this.http.get('/api/beers/taps')
-        .map(res => res.json());
+        .map(res => res.json())
+        .do(taps => taps.forEach(tap => this.getSubject(this.tapInfo, tap.TapId).next(tap)));
     }
 
     getTap(tapId: number): Observable<Tap[]> {
         return this.http.get(`/api/beers/tap/${tapId}`)
-        .map(res => res.json());
+        .map(res => res.json())
+        .do(tap => this.tapInfo[tap.TapId].next(tap));
     }
 
     observeTapContents(tapId: number): Observable<TapSession> {
-        if (!this.tapContents[tapId]) {
-            this.tapContents[tapId] = new Subject<TapSession>();
-        }
-        return this.tapContents[tapId];
+        return this.getSubject(this.tapContents, tapId)
     }
 
     getTapContents(tapId: number): Observable<TapSession> {
-        if (!this.tapContents[tapId]) {
-            this.tapContents[tapId] = new Subject<TapSession>();
-        }
         return this.http.get(`/api/beers/contents/tap/${tapId}`)
         .map(res => res.json())
-        .do(_ => this.tapContents[tapId].next(_));
+        .do(_ => this.getSubject(this.tapContents, tapId).next(_));
     }
 
     observeTapPours(tapId: number): Observable<Pour> {
-        if (!this.tapPours[tapId]) {
-            this.tapPours[tapId] = new Subject<Pour>();
-        }
-        return this.tapPours[tapId];
+         return this.getSubject(this.tapPours, tapId);
     }
 
     observeTapInfo(tapId: number): Observable<Tap> {
-          if (!this.tapInfo[tapId]) {
-            this.tapInfo[tapId] = new Subject<Tap>();
+        return this.getSubject(this.tapInfo, tapId);
+    }
+
+    private getSubject<T>(collection: {[key: number]: Subject<T>}, id: any): Subject<T> {
+        if (!collection[id]) {
+            collection[id] = new ReplaySubject<T>(1);
         }
-        return this.tapInfo[tapId];
+        return collection[id];
     }
 }

@@ -25,8 +25,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.subscriptions.push(
             this._tapService.getTaps()
             .do(taps => this.taps = taps)
-            .flatMap(taps =>  Observable.combineLatest(taps.map(t => this._tapService.observeTapInfo(t.TapId))))
-            .subscribe(latestTaps => this.taps = latestTaps)
+            .flatMap(taps => Observable.combineLatest(taps.map(t => this._tapService.observeTapInfo(t.TapId))))
+            .subscribe(latestTaps => {
+                this.taps = latestTaps;
+                console.log('we got a new event', latestTaps)
+            })
         );
 
         this.subscriptions.push(

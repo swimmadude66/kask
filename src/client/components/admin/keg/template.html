@@ -3,11 +3,8 @@
     <option value="">(Select)</option>
       <option *ngFor="let tap of taps" [value]="'tap_'+tap.TapId">{{tap.TapName}}</option>
       <option *ngFor="let loc of locations" [value]="'loc_'+loc.LocationId">{{loc.Name}}</option>
-      <option value="clear" class="text-danger"><i class="fa fa-fw fa-trash"></i> Clear</option>
+      <option value="clear" class="text-danger">Clear</option>
   </select>
 
   <button type="button" class="btn btn-outline-info" [ngClass]="!selectedDestination ? 'disabled' : ''" (click)="moveKeg()">{{selectedDestination === 'clear' ? 'Submit' : 'Move'}}</button>
 </div>
-
-
-
