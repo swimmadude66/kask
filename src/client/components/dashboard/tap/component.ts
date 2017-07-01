@@ -106,7 +106,7 @@ export class TapComponent implements OnInit, OnDestroy {
 
         let voteNum = vote === 'none' ? 0 : vote === 'down' ? -1 : 1;
 
-        this._tapService.vote(this.info.TapId, vote).subscribe(_ => this.tapSession.UserVote = voteNum);
+        this._tapService.vote(this.info.TapId, vote).subscribe(_ => _);
     }
 
     editTapImage() {
