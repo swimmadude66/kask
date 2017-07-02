@@ -1,6 +1,7 @@
 import {TapService} from '../../services';
 import {Tap} from '../../models';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
 import {AuthService} from '../../services/auth.service';
 
 @Component({
@@ -23,7 +24,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.subscriptions.push(
             this._tapService.getTaps()
-            .subscribe(taps => this.taps = taps)
+            .do(taps => this.taps = taps)
+            .flatMap(taps => Observable.combineLatest(taps.map(t => this._tapService.observeTapInfo(t.TapId))))
+            .subscribe(latestTaps => this.taps = latestTaps)
         );
 
         this.subscriptions.push(

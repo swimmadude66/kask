@@ -6,11 +6,12 @@
     <div class="beer-container">
       <div *ngIf="tapSession?.Keg?.Beer">
         <a class="beer" [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer.BeerId">{{tapSession?.Keg?.Beer.BeerName}}</a>
-        <button class="btn btn-sm btn-outline-danger btn-hover" (click)="clear()">Remove From Tap</button>
+        <keg-move [info]="tapSession?.Keg" [locations]="locations"></keg-move>
       </div>
       <div *ngIf="!tapSession?.Keg?.Beer">
         <span class="beer empty">Empty</span>
       </div>
+      <br/>
       <keg-progress-bar *ngIf="tapSession?.Keg" [keg]="tapSession?.Keg"></keg-progress-bar>
     </div>
 

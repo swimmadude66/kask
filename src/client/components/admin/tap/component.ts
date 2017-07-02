@@ -14,8 +14,10 @@ export class TapEditComponent implements OnInit, OnDestroy {
     private subscriptions = [];
     tapSession: TapSession;
 
-    private isEditing: boolean;
+    isEditing: boolean;
     beerToLoad: Beer;
+
+    @Input() locations: Location[];
     @Input() info: Tap;
     @Input() tapNum: number;
 
@@ -26,12 +28,12 @@ export class TapEditComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.subscriptions.push(
-        this._tapService.observeTapContents(this.info.TapId).subscribe(
-            tapSession => this.tapSession = tapSession,
-            error => console.error(error)
-        ));
-
-        this._tapService.getTapContents(this.info.TapId).subscribe();
+            this._tapService.observeTapContents(this.info.TapId)
+            .merge(this._tapService.getTapContents(this.info.TapId))
+            .subscribe(
+                tapSession => this.tapSession = tapSession
+            )
+        );
     }
 
     submitEdit() {
@@ -41,22 +43,6 @@ export class TapEditComponent implements OnInit, OnDestroy {
                     this.isEditing = false;
                 }, err => console.log(err)
             );
-    }
-
-    // deleteTap() {
-    //     if (this.info && this.info.TapId) {
-    //         this._tapService.deleteTap(this.info.TapId)
-    //             .subscribe(
-    //                 success => this.remove.emit(this.info.TapId),
-    //                 err => console.log(err),
-    //                 () => this.loaded = true
-    //             );
-    //     }
-    // }
-
-    clear() {
-        this._adminService.clearTap(this.info.TapId)
-            .subscribe();
     }
 
     ngOnDestroy() {

@@ -56,19 +56,12 @@ export class TapComponent implements OnInit, OnDestroy {
         if (this.info && this.info.TapId) {
             this.subscriptions.push(
                 this._tapService.observeTapContents(this.info.TapId)
+                .merge(this._tapService.getTapContents(this.info.TapId))
                 .subscribe(
                     tapSession => this.tapSession = tapSession,
-                    error => console.log(error),
+                    error => console.error(error),
                     () => this.loaded = true
             ));
-
-            // initialize the tapSession
-            this.subscriptions.push(
-                this._tapService.getTapContents(this.info.TapId).subscribe(
-                    tapSession => this.tapSession = tapSession,
-                    error => console.log(error)
-                )
-            );
 
             this.subscriptions.push(
                 this._tapService.observeTapPours(this.info.TapId)
@@ -110,7 +103,8 @@ export class TapComponent implements OnInit, OnDestroy {
                 vote = 'none';
             }
         }
-        this._tapService.vote(this.info.TapId, vote).subscribe();
+
+        this._tapService.vote(this.info.TapId, vote).subscribe(_ => _);
     }
 
     editTapImage() {
@@ -133,7 +127,7 @@ export class TapComponent implements OnInit, OnDestroy {
         }
         this.editing = false;
         let beer = this.tapSession.Keg.Beer;
-        this._adminService.saveBeerLabelImage(beer.BeerId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
+        this._adminService.saveBeerLabelImage(beer.BeerId, this.tapSession.TapId, beer.LabelScalingFactor, beer.LabelOffsetX, beer.LabelOffsetY).subscribe();
     }
 
     handlePour(pour) {

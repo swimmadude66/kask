@@ -602,7 +602,7 @@ export class MysqlDatabase implements Database {
     }
 
     moveKegLocation(kegId: number, newLocationId: number): Observable<boolean> {
-        let q = 'Update `keg_locations` SET `LocationId` = ? WHERE `KegId` = ?;';
+        let q = 'Update `keg_locations` SET `LocationId` = ?, Active = 1 WHERE `KegId` = ?;';
         return this.query(q, [newLocationId, kegId])
         .map(results => !!results);
     }
@@ -686,6 +686,14 @@ export class MysqlDatabase implements Database {
                 return Observable.throw('Could not untap keg!');
             }
         );
+    }
+
+    deactivateKeg(kegId: number): Observable<boolean> {
+        let q1 = 'Update `beer_sessions` SET `Active`=0 WHERE `KegId`=?';
+        let q2 = 'Update `keg_locations` SET `Active`=0 WHERE `KegId`=?';
+
+        return Observable.forkJoin([this.query(q1, [kegId]), this.query(q2, [kegId])])
+        .map(results => results[0] || results[1]);
     }
 
     getLocationContents(locationId: number): Observable<Keg[]> {

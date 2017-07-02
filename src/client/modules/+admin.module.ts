@@ -6,7 +6,7 @@ import {AdminComponent} from '../components/admin';
 import {LocationComponent} from '../components/admin/location/component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TapEditComponent} from '../components/admin/tap/component';
-import {KegRowComponent} from '../components/admin/location/keg/component';
+import {KegRowComponent} from '../components/admin/keg/component';
 
 @NgModule({
     imports: [

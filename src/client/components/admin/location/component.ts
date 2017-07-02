@@ -39,14 +39,14 @@ export class LocationComponent implements OnInit, OnDestroy {
         if (this.info && this.info.LocationId) {
             this.subscriptions.push(
                 this._locationService.observeLocationContents(this.info.LocationId)
-            .subscribe(
-                beers => this.contents = beers,
-                error => console.log(error),
-                () => this.loaded = true
-            ));
-            this.subscriptions.push(
-                this._locationService.getLocationContents(this.info.LocationId).subscribe()
+                .merge(this._locationService.getLocationContents(this.info.LocationId))
+                .subscribe(
+                    beers => this.contents = beers,
+                    error => console.log(error),
+                    () => this.loaded = true
+                )
             );
+
              this.subscriptions.push(
                 this._locationService.getLocations()
                 .map(locs => locs.filter(l => l.LocationId !== this.info.LocationId))

@@ -28,9 +28,9 @@ module.exports = (APP_CONFIG) => {
             _ => {
                 res.status(204).end();
                 // emit to sockets
-                return db.getTapContents(tapId)
+                return db.getTapContents(tapId, +userId)
                 .subscribe(
-                    contents => sockets.emit('TapContentsEvent', contents)
+                    contents => sockets.emit('TapContentsEvent', {TapId: tapId, Contents: contents})
                 );
             },
             err => {

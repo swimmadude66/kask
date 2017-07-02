@@ -48,7 +48,7 @@ export interface Database {
 
     // Contents
     getLocationContents(locationId: number): Observable<Keg[]>;
-    getTapContents(locationId: number): Observable<BeerSession>;
+    getTapContents(tapId: number, userId: number): Observable<BeerSession>;
     adjustKegVolume(kegId: number, volume: number): Observable<any>;
     adjustTapVolume(tapId: number, volume): Observable<any>;
     getPours(fromDate: string, toDate: string): Observable<any[]>;
