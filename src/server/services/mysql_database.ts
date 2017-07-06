@@ -32,7 +32,9 @@ export class MysqlDatabase implements Database {
         return Observable.create(observer => {
             this.pool.getConnection((err, conn) => {
                 if (err) {
-                    conn.release();
+                    if (conn && conn.release) {
+                        conn.release();
+                    }
                     return observer.error(err);
                 }
                 conn.query(q, params || [], (error, result) => {
