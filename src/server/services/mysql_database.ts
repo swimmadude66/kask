@@ -32,16 +32,19 @@ export class MysqlDatabase implements Database {
         return Observable.create(observer => {
             this.pool.getConnection((err, conn) => {
                 if (err) {
+                    if (conn && conn.release) {
+                        conn.release();
+                    }
                     return observer.error(err);
                 }
                 conn.query(q, params || [], (error, result) => {
+                    conn.release();
                     if (error) {
                         console.error('DATABASE ERROR', error);
                         return observer.error(error);
                     }
                     observer.next(result);
                     observer.complete();
-                    conn.release();
                 });
             });
         });
