@@ -32,16 +32,17 @@ export class MysqlDatabase implements Database {
         return Observable.create(observer => {
             this.pool.getConnection((err, conn) => {
                 if (err) {
+                    conn.release();
                     return observer.error(err);
                 }
                 conn.query(q, params || [], (error, result) => {
+                    conn.release();
                     if (error) {
                         console.error('DATABASE ERROR', error);
                         return observer.error(error);
                     }
                     observer.next(result);
                     observer.complete();
-                    conn.release();
                 });
             });
         });
@@ -326,7 +327,7 @@ export class MysqlDatabase implements Database {
     }
 
     getStyle(styleId: number): Observable<Style> {
-        let q = 'Select * from `styles` WHERE `StyleId` = ? LIMIT 1;';
+        let q = 'Select fart from `styles` WHERE `StyleId` = ? LIMIT 1;';
         return this.query(q, [styleId])
         .map(
             results => {
