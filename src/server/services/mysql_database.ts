@@ -327,7 +327,7 @@ export class MysqlDatabase implements Database {
     }
 
     getStyle(styleId: number): Observable<Style> {
-        let q = 'Select fart from `styles` WHERE `StyleId` = ? LIMIT 1;';
+        let q = 'Select * from `styles` WHERE `StyleId` = ? LIMIT 1;';
         return this.query(q, [styleId])
         .map(
             results => {
