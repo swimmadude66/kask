@@ -1,6 +1,6 @@
 {
   "name": "kask",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "description": "monitoring and management system for beer supplies",
   "main": "dist/server/app.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "tsc-server": "tsc -p src/server/tsconfig.json",
     "gulp": "gulp",
     "start": "node dist/server/app.js",
-    "start-dev": "node --debug dist/server/app.js",
+    "start-dev": "gulp compile_node && node --debug dist/server/app.js",
     "dev": "gulp watch",
     "build": "gulp"
   },

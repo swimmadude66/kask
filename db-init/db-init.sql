@@ -118,19 +118,6 @@ CREATE TABLE IF NOT EXISTS `beer_sessions` (
   CONSTRAINT `FK_Tap` FOREIGN KEY (`TapId`) REFERENCES `taps` (`TapId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Record of beer taptimes';
 
-CREATE TABLE IF NOT EXISTS `beer_session_likes` (
-  `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `BeerSessionId` int(11) NOT NULL,
-  `UserId` int(11) NOT NULL,
-  `Vote` enum('down','none','up') NOT NULL DEFAULT 'none',
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `oneVote` (`BeerSessionId`,`UserId`),
-  KEY `bsession_idx` (`BeerSessionId`),
-  KEY `uservotes_idx` (`UserId`),
-  CONSTRAINT `bsession` FOREIGN KEY (`BeerSessionId`) REFERENCES `beer_sessions` (`SessionId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `uservotes` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `keg_locations` (
   `KegLocId` int(11) NOT NULL AUTO_INCREMENT,
   `LocationId` int(11) NOT NULL,
@@ -155,7 +142,6 @@ CREATE TABLE IF NOT EXISTS `pours` (
   KEY `pourfromkeg_idx` (`KegId`),
   CONSTRAINT `pourfromkeg` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `polls` (
   `PollId` int(11) NOT NULL AUTO_INCREMENT,
   `Title` varchar(256) NOT NULL,
@@ -163,33 +149,53 @@ CREATE TABLE IF NOT EXISTS `polls` (
   `VotesPerUser` int(11) NOT NULL DEFAULT '1',
   `Active` tinyint(1) NOT NULL DEFAULT '0',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`PollId`),
-  UNIQUE KEY `PollId_UNIQUE` (`PollId`)
+  PRIMARY KEY (`PollId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `pollbeers` (
+CREATE TABLE IF NOT EXISTS `poll_beers` (
   `PollBeerId` int(11) NOT NULL AUTO_INCREMENT,
   `PollId` int(11) NOT NULL,
   `BeerId` int(11) NOT NULL,
   `Size` enum('1/2','1/3','1/4','1/5','1/6') NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`PollBeerId`),
-  UNIQUE KEY `PollBeerId_UNIQUE` (`PollBeerId`),
   KEY `FK_poll_idx` (`PollId`),
   KEY `FK_beer_idx` (`BeerId`),
+  UNIQUE KEY `pollbeer_unique` (`PollId`, `BeerId`),
   CONSTRAINT `FK_poll` FOREIGN KEY (`PollId`) REFERENCES `polls` (`PollId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_beer` FOREIGN KEY (`BeerId`) REFERENCES `beers` (`BeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `pollvotes` (
+CREATE TABLE IF NOT EXISTS `votes` (
+  `VoteId` int(11) NOT NULL AUTO_INCREMENT,
+  `UserId` int(11) NOT NULL,
+  `Vote` enum('down','none','up') NOT NULL DEFAULT 'none',
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`VoteId`),
+  KEY `FK_user_idx` (`UserId`),
+  CONSTRAINT `FK_user` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `poll_votes` (
   `PollVoteId` int(11) NOT NULL AUTO_INCREMENT,
   `PollBeerId` int(11) NOT NULL,
-  `UserId` int(11) NOT NULL,
+  `VoteId` int(11) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`PollVoteId`),
-  UNIQUE KEY `PollVoteId_UNIQUE` (`PollVoteId`),
   KEY `FK_pollbeer_idx` (`PollBeerId`),
-  KEY `FK_user_idx` (`UserId`),
-  CONSTRAINT `FK_pollbeer` FOREIGN KEY (`PollBeerId`) REFERENCES `pollbeers` (`PollBeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_user` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FK_pollvote_idx` (`VoteId`),
+  CONSTRAINT `FK_pollbeer` FOREIGN KEY (`PollBeerId`) REFERENCES `poll_beers` (`PollBeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_pollvote` FOREIGN KEY (`VoteId`) REFERENCES `votes` (`VoteId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `beer_session_votes` (
+  `BeerSessionVoteId` int(11) NOT NULL AUTO_INCREMENT,
+  `BeerSessionId` int(11) NOT NULL,
+  `VoteId` int(11) NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`BeerSessionVoteId`),
+  KEY `FK_bsession_idx` (`BeerSessionId`),
+  KEY `FK_beervote_idx` (`VoteId`),
+  CONSTRAINT `bsession` FOREIGN KEY (`BeerSessionId`) REFERENCES `beer_sessions` (`SessionId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_beervote` FOREIGN KEY (`VoteId`) REFERENCES `votes` (`VoteId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

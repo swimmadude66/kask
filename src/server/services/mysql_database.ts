@@ -1,16 +1,8 @@
 import {Observable} from 'rxjs/Rx';
-import {createPool, IPoolConfig, Pool, escape} from 'mysql';
-import {
-    Beer,
-    Brewery,
-    Style,
-    Database,
-    Tap,
-    Location,
-    KegSize,
-    Keg,
-    BeerSession
-} from '../models';
+import {createPool, escape, IPoolConfig, Pool} from 'mysql';
+import {ErrorObservable} from 'rxjs/observable/ErrorObservable';
+import {Beer, BeerSession, Brewery, Database, Keg, KegSize, Location, Style, Tap} from '../models';
+import {Poll} from '../models/poll.model';
 
 export class MysqlDatabase implements Database {
 
@@ -140,16 +132,24 @@ export class MysqlDatabase implements Database {
         return brewery;
     }
 
+    private mapPoll(result: any): Poll {
+        let poll: Poll = {
+            PollId: result.PollId,
+            Title: result.Title,
+            Description: result.Description,
+            VotesPerUser: result.VotesPerUser,
+            Active: !!result.Active
+        };
+        return poll;
+    }
+
     registerUser(username: string, salt: string, passHash: string): Observable<number> {
         let q = 'Insert into `users` (`Email`, `Salt`, `PasswordHash`) VALUES (?, ?, ?);';
         let params = [username, salt, passHash];
         return this.query(q, params)
         .map(
             result => result.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not register new user');
-            }
+            err => this.logErrorAndThrow(err, 'Could not register new user')
         );
     }
 
@@ -164,10 +164,7 @@ export class MysqlDatabase implements Database {
                     return Observable.throw('Error logging in');
                 }
                 return results[0];
-            }, err => {
-                console.error(err);
-                return Observable.throw('Could not look up user ' + username);
-            }
+            }, err => this.logErrorAndThrow(err, 'Could not look up user ' + username)
         );
     }
 
@@ -191,10 +188,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            err => {
-                console.error(err);
-                return Observable.throw('Error getting user by session');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting user by session')
         );
     }
 
@@ -212,10 +206,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, params)
         .map(
             results => results.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Error saving beer to database');
-            }
+            err => this.logErrorAndThrow(err, 'Error saving beer to database')
         );
     }
 
@@ -251,10 +242,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, style)
         .map(
             results => results.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Error saving style to database');
-            }
+            err => this.logErrorAndThrow(err, 'Error saving style to database')
         );
     }
 
@@ -286,10 +274,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, brewery)
         .map(
             results => results.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Error saving brewery to database');
-            }
+            err => this.logErrorAndThrow(err, 'Error saving brewery to database')
         );
     }
 
@@ -321,10 +306,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving styles');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving styles')
         );
     }
 
@@ -338,10 +320,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving style');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving style')
         );
     }
 
@@ -350,10 +329,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving breweries');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving breweries')
         );
     }
 
@@ -367,10 +343,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving brewery');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving brewery')
         );
     }
 
@@ -401,10 +374,7 @@ export class MysqlDatabase implements Database {
                 }
                 return this.mapBeer(results[0]);
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving beer');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving beer')
         );
     }
 
@@ -413,10 +383,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting locations');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting locations')
         );
     }
 
@@ -430,10 +397,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting location');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting location')
         );
     }
 
@@ -442,10 +406,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description])
         .map(
             result => result.insertId,
-            error => {
-                console.error(error);
-                return Observable.throw('Error adding location');
-            }
+            err => this.logErrorAndThrow(err, 'Error adding location')
         );
     }
 
@@ -454,10 +415,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description, locationId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not update location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not update location')
         );
     }
 
@@ -466,10 +424,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [locationId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not delete location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not delete location')
         );
     }
 
@@ -478,10 +433,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting taps');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting taps')
         );
     }
 
@@ -495,10 +447,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting tap');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting tap')
         );
     }
 
@@ -507,10 +456,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description, status])
         .map(
             result => result.insertId,
-            error => {
-                console.error(error);
-                return Observable.throw('Error adding tap');
-            }
+            err => this.logErrorAndThrow(err, 'Error adding tap')
         );
     }
 
@@ -519,10 +465,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description, status, tapId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not update tap');
-            }
+            err => this.logErrorAndThrow(err, 'Could not update tap')
         );
     }
 
@@ -531,10 +474,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [tapId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not delete tap');
-            }
+            err => this.logErrorAndThrow(err, 'Could not delete tap')
         );
     }
 
@@ -549,9 +489,7 @@ export class MysqlDatabase implements Database {
                 return -1;
             }
             return results[0].LocationId;
-        }, err => {
-            console.error(err);
-        });
+        }, err => console.error(err));
     }
 
     getKegTap(kegId: number): Observable<number> {
@@ -565,9 +503,7 @@ export class MysqlDatabase implements Database {
                 return -1;
             }
             return results[0].TapId;
-        }, err => {
-            console.error(err);
-        });
+        }, err => console.error(err));
     }
 
     findKeg(kegId: number): Observable<string> {
@@ -618,10 +554,7 @@ export class MysqlDatabase implements Database {
         )
         .map(
             _ => _,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not tap beer');
-            }
+            err => this.logErrorAndThrow(err, 'Could not tap beer')
         );
     }
 
@@ -684,10 +617,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [tapId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not untap keg!');
-            }
+            err => this.logErrorAndThrow(err, 'Could not untap keg!')
         );
     }
 
@@ -709,10 +639,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [locationId])
         .map(
             results => results.map(keg => this.mapKeg(keg)),
-            err => {
-                console.error(err);
-                return Observable.throw('Could not get contents of location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not get contents of location')
         );
     }
 
@@ -730,21 +657,62 @@ export class MysqlDatabase implements Database {
     }
 
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any> {
-        let q = 'INSERT INTO `beer_session_likes` (`BeerSessionId`, `UserId`, `Vote`)'
-        + ' VALUES (?, ?, ?)'
-        + ' ON Duplicate Key Update `Vote`=Values(`Vote`);';
-        return this.query(q, [sessionId, userId, vote.toLowerCase()]);
+        let getVoteExists = 'SELECT bsv.`VoteId` FROM `beer_session_votes` bsv'
+            + ' JOIN `votes` v ON bsv.`VoteId` = v.`VoteId`'
+            + ' WHERE bsv.`BeerSessionId` = ? AND v.`UserId` = ?;';
+
+        let voteInsert = 'INSERT INTO `votes` (`Vote`, `UserId`)'
+        + ' VALUES (?, ?);';
+
+        let sessionVoteInsert = 'INSERT INTO `beer_session_votes` (`BeerSessionId`, `VoteId`)'
+        + ' VALUES (?, ?);';
+
+        let voteUpdate = 'UPDATE `votes` SET `vote` = ? WHERE `VoteId` = ?;';
+
+        let existingVoteId: number;
+
+        return this.query(getVoteExists, [sessionId, userId])
+            .do(result => existingVoteId = result[0] ? result[0].VoteId : null)
+            .map(result => result.length ? voteUpdate : voteInsert)
+            .flatMap(query => this.query(query, [vote.toLowerCase(), existingVoteId || userId]))
+            .flatMap(result => result.insertId
+                ? this.query(sessionVoteInsert, [sessionId, result.insertId])
+                : Observable.of(result));
+    }
+
+    voteForPollBeer(pollBeerId: number, userId: number, vote: string): Observable<any> {
+        let getVoteExists = 'SELECT pv.`VoteId` FROM `poll_votes` pv'
+            + ' JOIN `votes` v ON pv.`VoteId` = v.`VoteId`'
+            + ' WHERE pv.`PollBeerId` = ? AND v.`UserId` = ?;';
+
+        let voteInsert = 'INSERT INTO `votes` (`Vote`, `UserId`)'
+        + ' VALUES (?, ?);';
+
+        let sessionVoteInsert = 'INSERT INTO `poll_votes` (`PollBeerId`, `VoteId`)'
+        + ' VALUES (?, ?);';
+
+        let voteUpdate = 'UPDATE `votes` SET `Vote` = ? WHERE `VoteId` = ?;';
+
+        let existingVoteId: number;
+
+        return this.query(getVoteExists, [pollBeerId, userId])
+            .do(result => existingVoteId = result[0] ? result[0].VoteId : null)
+            .map(result => result.length ? voteUpdate : voteInsert)
+            .flatMap(query => {return this.query(query, [vote.toLowerCase(), existingVoteId || userId])})
+            .flatMap(result => result.insertId
+                ? this.query(sessionVoteInsert, [pollBeerId, result.insertId])
+                : Observable.of(result));
     }
 
     getSessionVotes(sessionId: number): Observable<any[]> {
-        let q = 'Select `UserId`, (`Vote`-2) as Vote from `beer_session_likes` Where `BeerSessionId` = ?;';
+        let q = 'SELECT v.`UserId`, (`Vote`-2) FROM `beer_session_votes` bsv'
+            + ' JOIN `votes` v ON bsv.`VoteId` = v.`VoteId`'
+            + ' WHERE bsv.`BeerSessionId` = ?;';
+
         return this.query(q, [sessionId])
         .map(
             results => results,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not retrieve votes for beer session');
-            }
+            err => this.logErrorAndThrow(err, 'Could not retrieve votes for beer session')
         );
     }
 
@@ -785,10 +753,7 @@ export class MysqlDatabase implements Database {
             })
         .map(
             _ => _,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not get contents of location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not get contents of location')
         );
     }
 
@@ -842,10 +807,113 @@ export class MysqlDatabase implements Database {
             })
             .map(
                 _ => _,
-                err => {
-                    console.error(err);
-                    return Observable.throw('Could not get contents of location');
-                }
+                err => this.logErrorAndThrow(err, 'Could not get contents of location')
             );
+    }
+
+    getPolls(includeInactive = false): Observable<Poll[]> {
+        let q = 'SELECT * from `polls`';
+
+        if (includeInactive === false) {
+            q += ' WHERE `active` = 1';
+        }
+
+        return this.query(q, [])
+            .map(results => results || [])
+            .map(results => results.map(poll => this.mapPoll(poll)));
+    }
+
+    getPoll(pollId: number): Observable<Poll> {
+        let q = 'SELECT * from `polls` p'
+            + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
+            + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
+            + ' WHERE `pollid` = ?;';
+
+        return this.query(q, [pollId])
+            .map(result => result.reduce((poll, voteRow) => {
+                if (!poll) {
+                    poll = this.mapPoll(voteRow);
+                    poll.PollVotes = [];
+                }
+                if (voteRow.Timestamp) {
+                    poll.PollVotes.push(voteRow);
+                }
+                return poll;
+            }, null));
+    }
+
+    addPoll(title: string, description: string, votesPerUser: number): Observable<number> {
+        let q = 'INSERT INTO `polls` (`title`, `description`, `votesperuser`)'
+        + ' VALUES (?, ?, ?);';
+
+        return this.query(q, [title, description, votesPerUser])
+            .map(result => result.insertId,
+                err => this.logErrorAndThrow(err, 'an error occurred adding poll'));
+    }
+
+    addBeerToPoll(beerId: number, pollId: number, size: KegSize): Observable<number> {
+        let q = 'INSERT INTO `poll_beers` (`pollid`, `beerid`, `size`)'
+        + ' VALUES (?, ?, ?)'
+        + ' ON DUPLICATE KEY UPDATE `size`=VALUES(`size`);';
+
+        return this.query(q, [beerId, pollId, size])
+            .map(result => result.insertId,
+                err => this.logErrorAndThrow(err, 'an error occurred adding beer to poll'));
+    }
+
+    removeBeerFromPoll(pollId: number, pollBeerId: number): Observable<any> {
+        let q = 'DELETE FROM `poll_beers` WHERE `pollid` = ? AND `pollbeerid` = ?;';
+
+        return this.query(q, [pollId, pollBeerId])
+            .map(result => result,
+                err => this.logErrorAndThrow(err, 'an error occurred removing beer from poll'));
+    }
+
+    updatePoll(pollId: number, title: string, description: string, votesPerUser: number, active: boolean): Observable<any> {
+        if (!title && !description && !votesPerUser && !active) {
+            return Observable.of(null);
+        }
+
+        let q = 'UPDATE `polls` SET';
+        let args = [];
+
+        if (title) {
+            q += ' `title` = ?,';
+            args.push(title);
+        }
+
+        if (description) {
+            q += ' `description` = ?,';
+            args.push(description);
+        }
+
+        if (votesPerUser) {
+            q += ' `votesPerUser` = ?,';
+            args.push(votesPerUser);
+        }
+
+        if (active) {
+            q += ' `active` = ?,';
+            args.push(active);
+        }
+
+        q = q.slice(0, -1);
+
+        q += ' WHERE `pollid` = ?;';
+        args.push(pollId);
+
+        return this.query(q, args)
+            .map(result => result,
+                err => this.logErrorAndThrow(err, 'an error occurred updating poll'));
+    }
+
+    userCanVoteForPoll(userId: number, pollId: number): Observable<boolean> {
+        return this.getPoll(pollId)
+            .map(poll => poll.Active && poll.PollVotes.filter(v => v.UserId === userId).length <= poll.VotesPerUser)
+    }
+
+    private logErrorAndThrow(err: string, messageToThrow?: string): ErrorObservable<string> {
+        console.error(err);
+        return Observable.throw(messageToThrow || err);
     }
 }
