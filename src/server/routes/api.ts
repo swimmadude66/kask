@@ -35,6 +35,8 @@ module.exports = (APP_CONFIG) => {
 
     router.use('/stats', require('./stats')(APP_CONFIG));
 
+    router.use('/polls', require('./polls')(APP_CONFIG));
+
     router.use((req, res, next) => {
         if (!res.locals.user) {
             return res.status(401).send('User must be logged in to access these routes');
@@ -52,8 +54,6 @@ module.exports = (APP_CONFIG) => {
             return next();
         }
     });
-
-    router.use('/polls', require('./polls')(APP_CONFIG));
 
     router.use('/admin', require('./admin')(APP_CONFIG));
 

@@ -733,7 +733,6 @@ export class MysqlDatabase implements Database {
                 return this.getSessionVotes(contents.SessionId)
                 .map(
                     votes => {
-                        console.log(votes);
                         let netVote = votes.reduce((previous, current) => {
                             if (current && current.Vote) {
                                 return previous + current.Vote;
