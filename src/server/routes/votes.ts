@@ -45,7 +45,7 @@ module.exports = (APP_CONFIG) => {
         if (!req.body || !req.body.Vote) {
             return res.status(400).send('Vote is a required field');
         }
-         let userId = 1; //res.locals.user.UserId;
+         let userId = res.locals.user.UserId;
         db.voteForSession(req.params.sessionId, userId, req.body.Vote)
         .subscribe(
             _ => res.status(204).end(),
@@ -60,7 +60,7 @@ module.exports = (APP_CONFIG) => {
         if (!req.body || !req.body.Vote || !req.body.PollBeerId) {
             return res.status(400).send('Vote and PollBeerId are required fields');
         }
-        let userId = 1; //res.locals.user.UserId;
+        let userId = res.locals.user.UserId;
 
         db.userCanVoteForPoll(req.params.pollId, userId)
         .flatMap(canVote => canVote
