@@ -705,7 +705,7 @@ export class MysqlDatabase implements Database {
     }
 
     getSessionVotes(sessionId: number): Observable<any[]> {
-        let q = 'SELECT v.`UserId`, (`Vote`-2) FROM `beer_session_votes` bsv'
+        let q = 'SELECT v.`UserId`, (`Vote`-2) as Vote FROM `beer_session_votes` bsv'
             + ' JOIN `votes` v ON bsv.`VoteId` = v.`VoteId`'
             + ' WHERE bsv.`BeerSessionId` = ?;';
 
@@ -733,6 +733,7 @@ export class MysqlDatabase implements Database {
                 return this.getSessionVotes(contents.SessionId)
                 .map(
                     votes => {
+                        console.log(votes);
                         let netVote = votes.reduce((previous, current) => {
                             if (current && current.Vote) {
                                 return previous + current.Vote;
