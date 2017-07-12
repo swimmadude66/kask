@@ -1,3 +1,4 @@
+import { PollBeer } from './pollbeer.model';
 import { PollVote } from './pollvote.model';
 
 export class Poll {
@@ -6,5 +7,6 @@ export class Poll {
     Description: string;
     VotesPerUser: number;
     Active: boolean;
-    PollVotes?: PollVote[]//TODO: vote is model for pollvotes table, only getPoll populates it, and we use this to determin if user can voet
+    PollBeers?: PollBeer[];
+    PollVotes?: PollVote[]
 }

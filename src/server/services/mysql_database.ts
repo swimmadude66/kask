@@ -3,6 +3,8 @@ import {createPool, escape, IPoolConfig, Pool} from 'mysql';
 import {ErrorObservable} from 'rxjs/observable/ErrorObservable';
 import {Beer, BeerSession, Brewery, Database, Keg, KegSize, Location, Style, Tap} from '../models';
 import {Poll} from '../models/poll.model';
+import { PollVote } from "../models/pollvote.model";
+import { PollBeer } from "../models/pollbeer.model";
 
 export class MysqlDatabase implements Database {
 
@@ -85,50 +87,67 @@ export class MysqlDatabase implements Database {
         return keg;
     }
 
-    private mapBeer(result: any): Beer {
+    private mapBeer(result: any, verbose = true): Beer {
         let beer: Beer = {
             BeerId: result.BeerId,
-            BeerBDBID: result.BeerBDBID,
-            Brewery: this.mapBrewery(result),
-            Style: this.mapStyle(result),
             BeerName: result.BeerName,
-            BeerDescription: result.BeerDescription,
-            ABV: result.ABV,
-            IBU: result.IBU,
-            LabelUrl: result.LabelUrl,
-            LabelScalingFactor: result.LabelScalingFactor,
-            LabelOffsetX: result.LabelOffsetX,
-            LabelOffsetY: result.LabelOffsetY
+            Brewery: this.mapBrewery(result, verbose),
+            Style: this.mapStyle(result, verbose),
         };
+
+        if (verbose) {
+            Object.assign(beer, {
+                BeerBDBID: result.BeerBDBID,
+                BeerDescription: result.BeerDescription,
+                ABV: result.ABV,
+                IBU: result.IBU,
+                LabelUrl: result.LabelUrl,
+                LabelScalingFactor: result.LabelScalingFactor,
+                LabelOffsetX: result.LabelOffsetX,
+                LabelOffsetY: result.LabelOffsetY
+            });
+        }
+
         return beer;
     }
 
-    private mapStyle(result: any): Style {
+    private mapStyle(result: any, verbose = true): Style {
         let style: Style = {
             StyleId: result.StyleId,
-            StyleBDBID: result.StyleBDBID,
-            StyleName: result.StyleName,
-            StyleDescription: result.StyleDescription,
-            ABVMin: result.ABVMin,
-            ABVMax: result.ABVMax,
-            IBUMin: result.IBUMin,
-            IBUMax: result.IBUMax,
-            SRMMin: result.SRMMin,
-            SRMMax: result.SRMMax
-        };
+            StyleName: result.StyleName
+        }
+
+        if (verbose) {
+            Object.assign(style,  {
+                StyleBDBID: result.StyleBDBID,
+                StyleDescription: result.StyleDescription,
+                ABVMin: result.ABVMin,
+                ABVMax: result.ABVMax,
+                IBUMin: result.IBUMin,
+                IBUMax: result.IBUMax,
+                SRMMin: result.SRMMin,
+                SRMMax: result.SRMMax
+            });
+        }
+
         return style;
     }
 
-    private mapBrewery(result: any): Brewery {
+    private mapBrewery(result: any, verbose = true): Brewery {
         let brewery: Brewery = {
             BreweryId: result.BreweryId,
-            BreweryBDBID: result.BreweryBDBID,
-            BreweryName: result.BreweryName,
-            BreweryDescription: result.BreweryDescription,
-            Established: result.Established,
-            Image: result.Image,
-            Website: result.Website
+            BreweryName: result.BreweryName
         };
+
+        if (verbose) {
+            Object.assign(brewery, {
+                BreweryBDBID: result.BreweryBDBID,
+                BreweryDescription: result.BreweryDescription,
+                Established: result.Established,
+                Image: result.Image,
+                Website: result.Website
+            });
+        }
         return brewery;
     }
 
@@ -141,6 +160,27 @@ export class MysqlDatabase implements Database {
             Active: !!result.Active
         };
         return poll;
+    }
+
+    private mapPollVote(result: any): PollVote {
+        let pollVote: PollVote = {
+            PollVoteId: result.PollVoteId,
+            PollBeerId: result.PollBeerId,
+            UserId: result.UserId,
+            Vote: result.Vote
+        };
+
+        return pollVote;
+    }
+
+    private mapPollBeer(result: any): PollBeer {
+        let pollBeer: PollBeer = {
+            PollBeerId: result.PollBeerId,
+            Size: result.Size,
+            Beer: this.mapBeer(result, false)
+        };
+
+        return pollBeer;
     }
 
     registerUser(username: string, salt: string, passHash: string): Observable<number> {
@@ -812,31 +852,59 @@ export class MysqlDatabase implements Database {
     }
 
     getPolls(includeInactive = false): Observable<Poll[]> {
-        let q = 'SELECT * from `polls`';
+        let q = 'SELECT * from `polls` p'
+            + ' JOIN poll_beers pb ON p.pollid = pb.pollid'
+            + ' JOIN beers b on pb.BeerId = b.BeerId'
+            + ' JOIN breweries br on b.BreweryId = br.BreweryId'
+            + ' JOIN styles s on b.StyleId = s.StyleId';
 
-        if (includeInactive === false) {
-            q += ' WHERE `active` = 1';
+        if (!includeInactive) {
+            q += ' WHERE `Active` = 1';
         }
 
         return this.query(q, [])
             .map(results => results || [])
-            .map(results => results.map(poll => this.mapPoll(poll)));
+            .map(results => results.reduce((polls, pollBeerRow) => {
+                let poll = polls.find(p => p.PollId === pollBeerRow.PollId);
+                if (!poll) {
+                    poll = this.mapPoll(pollBeerRow);
+                    poll.PollBeers = [];
+                    polls.push(poll);
+                }
+
+                poll.PollBeers.push(this.mapPollBeer(pollBeerRow));
+
+                return polls;
+            }, []));
     }
 
     getPoll(pollId: number): Observable<Poll> {
         let q = 'SELECT * from `polls` p'
+            + ' JOIN poll_beers pb ON p.pollid = pb.pollid'
+            + ' JOIN beers b on pb.BeerId = b.BeerId'
+            + ' JOIN breweries br on b.BreweryId = br.BreweryId'
+            + ' JOIN styles s on b.StyleId = s.StyleId'
             + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
-            + ' WHERE `pollid` = ?;';
+            + ' WHERE p.`pollid` = ?;';
 
         return this.query(q, [pollId])
             .map(result => result.reduce((poll, voteRow) => {
                 if (!poll) {
                     poll = this.mapPoll(voteRow);
                     poll.PollVotes = [];
+                    poll.PollBeers = [];
                 }
-                if (voteRow.Timestamp) {
-                    poll.PollVotes.push(voteRow);
+
+                let pollBeer = poll.PollBeers.find(b => b.BeerId === voteRow.BeerId);
+
+                if (!pollBeer) {
+                    pollBeer = this.mapPollBeer(voteRow);
+                    poll.PollBeers.push(pollBeer);
+                }
+
+                if (voteRow.Timestamp) { // it's possible to have pollbeers with no votes, so check that the vote portion of the join exists
+                    poll.PollVotes.push(this.mapPollVote(voteRow));
                 }
                 return poll;
             }, null));

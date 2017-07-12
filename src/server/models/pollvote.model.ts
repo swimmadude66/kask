@@ -5,6 +5,7 @@ export enum Vote {
 }
 
 export class PollVote {
+    PollVoteId: number;
     UserId: number;
     Vote: Vote;
     PollBeerId: number;
