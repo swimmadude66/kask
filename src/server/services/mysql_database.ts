@@ -738,7 +738,7 @@ export class MysqlDatabase implements Database {
         return this.query(getVoteExists, [pollBeerId, userId])
             .do(result => existingVoteId = result[0] ? result[0].VoteId : null)
             .map(result => result.length ? voteUpdate : voteInsert)
-            .flatMap(query => {return this.query(query, [vote.toLowerCase(), existingVoteId || userId])})
+            .flatMap(query => this.query(query, [vote.toLowerCase(), existingVoteId || userId]))
             .flatMap(result => result.insertId
                 ? this.query(sessionVoteInsert, [pollBeerId, result.insertId])
                 : Observable.of(result));
@@ -851,12 +851,14 @@ export class MysqlDatabase implements Database {
             );
     }
 
-    getPolls(includeInactive = false): Observable<Poll[]> {
+    getPolls(userId, includeInactive = false): Observable<Poll[]> {
         let q = 'SELECT * from `polls` p'
             + ' JOIN poll_beers pb ON p.pollid = pb.pollid'
             + ' JOIN beers b on pb.BeerId = b.BeerId'
             + ' JOIN breweries br on b.BreweryId = br.BreweryId'
-            + ' JOIN styles s on b.StyleId = s.StyleId';
+            + ' JOIN styles s on b.StyleId = s.StyleId'
+            + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
+            + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`';
 
         if (!includeInactive) {
             q += ' WHERE `Active` = 1';
@@ -869,10 +871,11 @@ export class MysqlDatabase implements Database {
                 if (!poll) {
                     poll = this.mapPoll(pollBeerRow);
                     poll.PollBeers = [];
+                    poll.PollVotes = [];
                     polls.push(poll);
                 }
 
-                poll.PollBeers.push(this.mapPollBeer(pollBeerRow));
+                this.mapPollBeerRow(poll, pollBeerRow, vote => vote.UserId === userId);
 
                 return polls;
             }, []));
@@ -896,18 +899,22 @@ export class MysqlDatabase implements Database {
                     poll.PollBeers = [];
                 }
 
-                let pollBeer = poll.PollBeers.find(b => b.BeerId === voteRow.BeerId);
-
-                if (!pollBeer) {
-                    pollBeer = this.mapPollBeer(voteRow);
-                    poll.PollBeers.push(pollBeer);
-                }
-
-                if (voteRow.Timestamp) { // it's possible to have pollbeers with no votes, so check that the vote portion of the join exists
-                    poll.PollVotes.push(this.mapPollVote(voteRow));
-                }
-                return poll;
+               return this.mapPollBeerRow(poll, voteRow, vote => true);
             }, null));
+    }
+
+    private mapPollBeerRow(poll: any, voteRow: any, shouldAddVote: any) {
+        let pollBeer = poll.PollBeers.find(b => b.PollBeerId === voteRow.PollBeerId);
+
+        if (!pollBeer) {
+            pollBeer = this.mapPollBeer(voteRow);
+            poll.PollBeers.push(pollBeer);
+        }
+
+        if (voteRow.Timestamp && shouldAddVote(voteRow)) {
+            poll.PollVotes.push(this.mapPollVote(voteRow));
+        }
+        return poll;
     }
 
     addPoll(title: string, description: string, votesPerUser: number): Observable<number> {

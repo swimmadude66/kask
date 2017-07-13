@@ -2,7 +2,7 @@ import {FormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
-import {VotesComponent} from '../components/votes';
+import {PollsComponent} from '../components/polls';
 
 @NgModule({
     imports: [
@@ -10,15 +10,15 @@ import {VotesComponent} from '../components/votes';
         FormsModule,
         RouterModule.forChild(
             [
-                {path: '', component: VotesComponent},
+                {path: '', component: PollsComponent},
             ]
         )
     ],
     declarations: [
-        VotesComponent,
+        PollsComponent,
     ],
     exports: [
-        VotesComponent,
+        PollsComponent,
     ]
 })
-export class LazyVotesModule { }
+export class LazyPollsModule { }

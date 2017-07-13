@@ -1,0 +1,13 @@
+@import '../../scss/_variables';
+.container {
+    min-height: 600px;
+
+    .votes-remaining {
+        float:right;
+        font-size:22px;
+        margin: 0 0 10px 20px;
+        .badge.badge-info {
+            background-color: rgba(122,181,232,0.85);
+        }
+    }
+}

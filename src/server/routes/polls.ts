@@ -5,7 +5,12 @@ module.exports = (APP_CONFIG) => {
     const db = APP_CONFIG.database;
 
     router.get('/', (req, res) => {
-        db.getPolls().subscribe(
+        let userId = 0;
+        if (res.locals && res.locals.user) {
+            userId = res.locals.user.UserId;
+        }
+
+        db.getPolls(userId).subscribe(
             polls => res.send({Polls: polls}),
             err => res.status(500).send('Could not retrieve polls')
         );

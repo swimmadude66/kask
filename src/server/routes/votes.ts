@@ -62,7 +62,7 @@ module.exports = (APP_CONFIG) => {
         }
         let userId = res.locals.user.UserId;
 
-        db.userCanVoteForPoll(req.params.pollId, userId)
+        db.userCanVoteForPoll(userId, req.params.pollId)
         .flatMap(canVote => canVote
             ? db.voteForPollBeer(req.body.PollBeerId, userId, req.body.Vote)
             : Observable.throw(''))

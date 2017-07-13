@@ -5,6 +5,7 @@ import {AuthService} from './auth.service';
 import {AdminService} from './admin.service';
 import {StatsService} from './stats.service';
 import {SocketService} from './sockets.service';
+import { PollService } from './polls.service';
 
 export const ALL_PROVIDERS = [
     TapService,
@@ -14,6 +15,7 @@ export const ALL_PROVIDERS = [
     AdminService,
     StatsService,
     SocketService,
+    PollService
 ];
 
 export {
@@ -24,4 +26,5 @@ export {
     AdminService,
     StatsService,
     SocketService,
+    PollService
 };

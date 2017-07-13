@@ -60,7 +60,7 @@ export interface Database {
 
     // Poll Managemet
     addPoll(title: string, description: string, votesPerUser: number): Observable<number>;
-    getPolls(includeInactive?: boolean): Observable<Poll[]>;
+    getPolls(userId: number, includeInactive?: boolean): Observable<Poll[]>;
     getPoll(pollId: number): Observable<Poll>;
     addBeerToPoll(beerId: number, pollId: number, size: KegSize): Observable<number>;
     removeBeerFromPoll(pollId: number, pollBeerId: number): Observable<any>;
