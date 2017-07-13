@@ -1,10 +1,11 @@
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PollService } from '../../services/polls.service';
-import {Component, OnDestroy, OnInit} from '@angular/core';
 import { Poll } from '../../models/poll.model';
 import { Vote } from '../../models/pollvote.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
-    selector: 'dashboard',
+    selector: 'polls',
     templateUrl: './template.html',
     styleUrls: ['../styles.scss', './styles.scss']
 })
@@ -13,51 +14,28 @@ export class PollsComponent implements OnInit, OnDestroy {
 
     polls: Poll[];
 
+    isAdmin: boolean = false;
+    isAddingPoll: boolean = false;
+
     constructor(
-        private pollService: PollService
+        private pollService: PollService,
+        private authService: AuthService
     ) { }
 
+    addPoll(poll) {
+        this.isAddingPoll = false;
+        this.pollService.createPoll(poll.title, poll.description, poll.votesPerUser).subscribe(_ => _);
+    }
+
     ngOnInit() {
-        this.pollService.getPolls()
-            .subscribe(activePolls => this.polls = activePolls);
+        this.authService.isAdmin()
+        .do(isAdmin => this.isAdmin = isAdmin)
+        .flatMap(isAdmin =>  this.pollService.getPolls(isAdmin))
+        .subscribe(activePolls => this.polls = activePolls);
     }
 
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
-    }
-
-    vote(poll: Poll, pollBeerId: number) {
-        let vote: Vote = Vote.Up;
-        let isUpVote = !this.votedForBeer(poll, pollBeerId);
-
-        if (!isUpVote) {
-            vote = Vote.None;
-        }
-
-        this.pollService.vote(poll.PollId, pollBeerId, vote).subscribe(_ => {
-            if (!isUpVote) {
-                poll.PollVotes = poll.PollVotes.filter(v => v.PollBeerId !== pollBeerId);
-            } else {
-                poll.PollVotes.push({
-                    PollVoteId: -1,
-                    UserId: -1,
-                    PollBeerId: pollBeerId,
-                    Vote: vote
-                });
-            }
-        });
-    }
-
-    votedForBeer(poll: Poll, pollBeerId: number) {
-        return poll.PollVotes.some(p => p.PollBeerId === pollBeerId && p.Vote === Vote.Up);
-    }
-
-    canVote(poll: Poll) {
-        return poll.PollVotes.length < poll.VotesPerUser;
-    }
-
-    votesRemaining(poll: Poll) {
-        return poll.VotesPerUser - poll.PollVotes.filter(v => v.Vote === Vote.Up).length;
     }
 }

@@ -6,18 +6,22 @@ import {RouterModule} from '@angular/router';
 import {ParallaxScrollDirective} from '../directives';
 import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/component';
 import {KegProgressComponent} from '../components/shared/keg_progress_bar/component';
+import {KegAddComponent} from '../components/shared/keg_add/component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
     imports: [
         HttpModule,
         FormsModule,
         CommonModule,
-        RouterModule
+        RouterModule,
+        NgbModule.forRoot(),
     ],
     declarations: [
         ParallaxScrollDirective,
         ChalkboardBottomComponent,
-        KegProgressComponent
+        KegProgressComponent,
+        KegAddComponent
     ],
     exports: [
         HttpModule,
@@ -26,7 +30,8 @@ import {KegProgressComponent} from '../components/shared/keg_progress_bar/compon
         RouterModule,
         ParallaxScrollDirective,
         ChalkboardBottomComponent,
-        KegProgressComponent
+        KegProgressComponent,
+        KegAddComponent
     ]
 })
 export class SharedModule { }

@@ -292,13 +292,10 @@ module.exports = (APP_CONFIG) => {
             );
     });
 
-    router.delete('/polls/:pollId/beer', (req, res) => {
+    router.delete('/polls/:pollId/beer/:pollBeerId', (req, res) => {
         let body = req.body;
-        if (!body || !body.PollBeerId) {
-            return res.status(400).send('PollBeerId is required');
-        }
 
-        db.removeBeerFromPoll(req.params.pollId, body.PollBeerId)
+        db.removeBeerFromPoll(req.params.pollId, req.params.pollBeerId)
             .subscribe(
                 _ => res.send(),
                 err => res.status(500).send(err)

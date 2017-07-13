@@ -10,7 +10,7 @@ module.exports = (APP_CONFIG) => {
             userId = res.locals.user.UserId;
         }
 
-        db.getPolls(userId).subscribe(
+        db.getPolls(userId, req.query.includeInactive).subscribe(
             polls => res.send({Polls: polls}),
             err => res.status(500).send('Could not retrieve polls')
         );

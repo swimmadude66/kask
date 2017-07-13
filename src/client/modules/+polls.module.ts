@@ -2,7 +2,7 @@ import {FormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {SharedModule} from './shared.module';
-import {PollsComponent} from '../components/polls';
+import { PollsComponent, AddPollComponent, PollComponent } from '../components/polls';
 
 @NgModule({
     imports: [
@@ -16,9 +16,13 @@ import {PollsComponent} from '../components/polls';
     ],
     declarations: [
         PollsComponent,
+        AddPollComponent,
+        PollComponent
     ],
     exports: [
         PollsComponent,
+        AddPollComponent,
+        PollComponent
     ]
 })
 export class LazyPollsModule { }

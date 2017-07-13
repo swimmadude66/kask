@@ -1,10 +1,8 @@
-import {NgbTypeaheadConfig} from '@ng-bootstrap/ng-bootstrap';
 import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {Keg} from '../../../models/keg.model';
 import {Location} from '../../../models/location.model';
 import {LocationService} from '../../../services/location.service';
 import {Beer} from '../../../models/beer.model';
-import {Observable} from 'rxjs/Rx';
 import {AdminService} from '../../../services/admin.service';
 import {Tap} from '../../../models/tap.model';
 
@@ -29,10 +27,8 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     constructor(
         private _locationService: LocationService,
-        private _adminService: AdminService,
-        config: NgbTypeaheadConfig
+        private _adminService: AdminService
     ) {
-        config.focusFirst = false;
     }
 
     ngOnInit() {
@@ -65,36 +61,14 @@ export class LocationComponent implements OnInit, OnDestroy {
         this.subscriptions = [];
     }
 
-    submitNewKeg() {
+    submitNewKeg(newKeg: any) {
         this.loaded = false;
-        this._adminService.store(this.beerToLoad.BeerId, this.kegSizeToLoad, this.info.LocationId)
+        this._adminService.store(newKeg.Beer.BeerId, newKeg.Size, this.info.LocationId)
             .subscribe(
                 () => this.isAddingKeg = false,
                 err => console.error(err),
                 () => this.loaded = true
             );
-    }
-
-    search = (text: Observable<string>) => {
-        return text
-            .debounceTime(500)
-            .distinctUntilChanged()
-            .filter(term => term.length > 4)
-            .switchMap(term => this._adminService.search(term))
-            .map(result => result.beers);
-    };
-
-    getBeerName(beer: Beer) {
-        return beer.BeerName;
-    }
-
-    getBeerDisplay(beer: Beer) {
-        return `${beer.Brewery.BreweryName}: ${beer.BeerName}`;
-    }
-
-    beerSelected(selection: any) {
-        let beer: Beer = selection.item;
-        this.beerToLoad = beer;
     }
 
     addLocation() {

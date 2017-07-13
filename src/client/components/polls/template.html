@@ -2,36 +2,10 @@
   <div *ngIf="!polls.length">
     There are currently no active polls.
   </div>
-  <div *ngFor="let poll of polls">
-    <h2>{{poll.Title}}</h2>
-    <div class="votes-remaining">Votes Remaining <span class="badge" [ngClass]="votesRemaining(poll) > 0 ? 'badge-info' : 'badge-danger'">{{votesRemaining(poll)}}</span></div>
-    <p>{{poll.Description}}</p>
-    <div>
-      <table class="table table-striped table-hover">
-          <thead class="thead">
-          <tr>
-            <th>Beer Name</th>
-            <th>Brewery</th>
-            <th>Style</th>
-            <th>Size</th>
-            <th></th>
-          </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let pollBeer of poll.PollBeers">
-              <td><a [routerLink]="'/info/beer/' + pollBeer.Beer.BeerId">{{pollBeer.Beer.BeerName}}</a></td>
-              <td><a [routerLink]="'/info/brewery/' + pollBeer.Beer.Brewery.BreweryId">{{pollBeer.Beer.Brewery.BreweryName}}</a></td>
-              <td><a [routerLink]="'/info/style/' + pollBeer.Beer.Style.StyleId">{{pollBeer.Beer.Style.StyleName}}</a></td>
-              <td>{{pollBeer.Size}} Barrel</td>
-              <td>
-                <button type="button" class="btn btn-outline-secondary" [class.active]="votedForBeer(poll, pollBeer.PollBeerId)" (click)="vote(poll, pollBeer.PollBeerId)" [disabled]="!canVote(poll)">
-                 <i class="fa fa-fw fa-thumbs-up"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-    </div>
-  </div>
+
+  <poll *ngFor="let poll of polls" [poll]="poll" [isAdmin]="isAdmin"></poll>
+
+  <button class="btn btn-outline-info" *ngIf="isAdmin" (click)="isAddingPoll=true">New Poll</button>
+  <add-poll *ngIf="isAddingPoll" (submitted)="addPoll($event)" (cancelled)="isAddingPoll=false"></add-poll>
 </section>
 <chalkboard-bottom></chalkboard-bottom>

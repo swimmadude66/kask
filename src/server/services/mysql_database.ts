@@ -852,11 +852,13 @@ export class MysqlDatabase implements Database {
     }
 
     getPolls(userId, includeInactive = false): Observable<Poll[]> {
-        let q = 'SELECT * from `polls` p'
-            + ' JOIN poll_beers pb ON p.pollid = pb.pollid'
-            + ' JOIN beers b on pb.BeerId = b.BeerId'
-            + ' JOIN breweries br on b.BreweryId = br.BreweryId'
-            + ' JOIN styles s on b.StyleId = s.StyleId'
+        let q = 'SELECT p.PollId, p.Title, p.Description, p.VotesPerUser, p.Active, pb.PollBeerId, pb.BeerId, pb.Size, b.BeerName,'
+            + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
+            + ' pv.PollVoteId, pv.VoteId, v.UserId, v.Vote from `polls` p'
+            + ' LEFT JOIN poll_beers pb ON p.pollid = pb.pollid'
+            + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
+            + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
+            + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
             + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`';
 
@@ -864,9 +866,12 @@ export class MysqlDatabase implements Database {
             q += ' WHERE `Active` = 1';
         }
 
+        q += ' ORDER BY p.PollId, pb.PollBeerId';
+
         return this.query(q, [])
             .map(results => results || [])
             .map(results => results.reduce((polls, pollBeerRow) => {
+                console.log(polls, pollBeerRow);
                 let poll = polls.find(p => p.PollId === pollBeerRow.PollId);
                 if (!poll) {
                     poll = this.mapPoll(pollBeerRow);
@@ -882,14 +887,17 @@ export class MysqlDatabase implements Database {
     }
 
     getPoll(pollId: number): Observable<Poll> {
-        let q = 'SELECT * from `polls` p'
-            + ' JOIN poll_beers pb ON p.pollid = pb.pollid'
-            + ' JOIN beers b on pb.BeerId = b.BeerId'
-            + ' JOIN breweries br on b.BreweryId = br.BreweryId'
-            + ' JOIN styles s on b.StyleId = s.StyleId'
+        let q = 'SELECT p.PollId, p.Title, p.Description, p.VotesPerUser, p.Active, pb.PollBeerId, pb.BeerId, pb.Size, b.BeerName,'
+            + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
+            + ' pv.PollVoteId, pv.VoteId, v.UserId, v.Vote from `polls` p'
+            + ' LEFT JOIN poll_beers pb ON p.pollid = pb.pollid'
+            + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
+            + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
+            + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
             + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
-            + ' WHERE p.`pollid` = ?;';
+            + ' WHERE p.`pollid` = ?'
+            + ' ORDER BY pb.PollBeerId;';
 
         return this.query(q, [pollId])
             .map(result => result.reduce((poll, voteRow) => {
@@ -904,6 +912,10 @@ export class MysqlDatabase implements Database {
     }
 
     private mapPollBeerRow(poll: any, voteRow: any, shouldAddVote: any) {
+        if (!voteRow.PollBeerId) {
+            return poll;
+        }
+
         let pollBeer = poll.PollBeers.find(b => b.PollBeerId === voteRow.PollBeerId);
 
         if (!pollBeer) {
@@ -911,7 +923,7 @@ export class MysqlDatabase implements Database {
             poll.PollBeers.push(pollBeer);
         }
 
-        if (voteRow.Timestamp && shouldAddVote(voteRow)) {
+        if (voteRow.Vote && shouldAddVote(voteRow)) {
             poll.PollVotes.push(this.mapPollVote(voteRow));
         }
         return poll;
