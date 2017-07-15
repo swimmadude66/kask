@@ -56,21 +56,21 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
-    router.post('/poll/:pollId/beer', (req, res) => {
-        if (!req.body || !req.body.Vote || !req.body.PollBeerId) {
-            return res.status(400).send('Vote and PollBeerId are required fields');
+    router.post('/order/:orderId/beer', (req, res) => {
+        if (!req.body || !req.body.Vote || !req.body.OrderBeerId) {
+            return res.status(400).send('Vote and orderBeerId are required fields');
         }
         let userId = res.locals.user.UserId;
 
-        db.userCanVoteForPoll(userId, req.params.pollId)
+        db.userCanVoteForOrder(userId, req.params.orderId)
         .flatMap(canVote => canVote
-            ? db.voteForPollBeer(req.body.PollBeerId, userId, req.body.Vote)
-            : Observable.throw(''))
+            ? db.voteForOrderBeer(req.body.OrderBeerId, userId, req.body.Vote)
+            : Observable.throw('User is not eligible to vote for order'))
         .subscribe(
             _ => res.status(204).end(),
             err => {
                 console.error(err);
-                return res.status(500).send('Could not vote for poll beer');
+                return res.status(500).send('Could not vote for order beer');
             }
         );
     });

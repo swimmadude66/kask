@@ -1,0 +1,11 @@
+<section class="container" *ngIf="orders">
+  <div *ngIf="!orders.length" class="none-active">
+    There are currently no active orders.
+  </div>
+
+  <order *ngFor="let order of orders" [order]="order" [isAdmin]="isAdmin" [isLoggedIn]="isLoggedIn"></order>
+
+  <button class="btn btn-outline-info" *ngIf="isAdmin && !isAddingOrder" (click)="isAddingOrder=true">New Order</button>
+  <add-order *ngIf="isAddingOrder" (submitted)="addOrder($event)" (cancelled)="isAddingOrder=false"></add-order>
+</section>
+<chalkboard-bottom></chalkboard-bottom>

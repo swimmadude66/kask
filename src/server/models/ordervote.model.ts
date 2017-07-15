@@ -4,9 +4,9 @@ export enum Vote {
     Down = <any>'down'
 }
 
-export class PollVote {
-    PollVoteId: number;
+export class OrderVote {
+    OrderVoteId: number;
     UserId: number;
     Vote: Vote;
-    PollBeerId: number;
+    OrderBeerId: number;
 }

@@ -1,10 +1,10 @@
 import {Observable} from 'rxjs/Rx';
 import {createPool, escape, IPoolConfig, Pool} from 'mysql';
 import {ErrorObservable} from 'rxjs/observable/ErrorObservable';
-import {Beer, BeerSession, Brewery, Database, Keg, KegSize, Location, Style, Tap} from '../models';
-import {Poll} from '../models/poll.model';
-import { PollVote } from "../models/pollvote.model";
-import { PollBeer } from "../models/pollbeer.model";
+import { Beer, BeerSession, Brewery, Database, Keg, KegSize, Location, Style, Tap } from '../models';
+import { Order, OrderStatus } from '../models/order.model';
+import { OrderBeer } from '../models/orderbeer.model';
+import { OrderVote, Vote } from '../models/ordervote.model';
 
 export class MysqlDatabase implements Database {
 
@@ -151,36 +151,38 @@ export class MysqlDatabase implements Database {
         return brewery;
     }
 
-    private mapPoll(result: any): Poll {
-        let poll: Poll = {
-            PollId: result.PollId,
+    private mapOrder(result: any): Order {
+        let order: Order = {
+            OrderId: result.OrderId,
             Title: result.Title,
             Description: result.Description,
             VotesPerUser: result.VotesPerUser,
-            Active: !!result.Active
+            PlacedDate: result.PlacedDate,
+            ReceivedDate: result.ReceivedDate,
+            Status: result.Status
         };
-        return poll;
+        return order;
     }
 
-    private mapPollVote(result: any): PollVote {
-        let pollVote: PollVote = {
-            PollVoteId: result.PollVoteId,
-            PollBeerId: result.PollBeerId,
+    private mapOrderVote(result: any): OrderVote {
+        let orderVote: OrderVote = {
+            OrderVoteId: result.OrderVoteId,
+            OrderBeerId: result.OrderBeerId,
             UserId: result.UserId,
             Vote: result.Vote
         };
 
-        return pollVote;
+        return orderVote;
     }
 
-    private mapPollBeer(result: any): PollBeer {
-        let pollBeer: PollBeer = {
-            PollBeerId: result.PollBeerId,
+    private mapOrderBeer(result: any): OrderBeer {
+        let orderBeer: OrderBeer = {
+            OrderBeerId: result.OrderBeerId,
             Size: result.Size,
             Beer: this.mapBeer(result, false)
         };
 
-        return pollBeer;
+        return orderBeer;
     }
 
     registerUser(username: string, salt: string, passHash: string): Observable<number> {
@@ -720,27 +722,27 @@ export class MysqlDatabase implements Database {
                 : Observable.of(result));
     }
 
-    voteForPollBeer(pollBeerId: number, userId: number, vote: string): Observable<any> {
-        let getVoteExists = 'SELECT pv.`VoteId` FROM `poll_votes` pv'
+    voteForOrderBeer(orderBeerId: number, userId: number, vote: string): Observable<any> {
+        let getVoteExists = 'SELECT pv.`VoteId` FROM `order_votes` pv'
             + ' JOIN `votes` v ON pv.`VoteId` = v.`VoteId`'
-            + ' WHERE pv.`PollBeerId` = ? AND v.`UserId` = ?;';
+            + ' WHERE pv.`OrderBeerId` = ? AND v.`UserId` = ?;';
 
         let voteInsert = 'INSERT INTO `votes` (`Vote`, `UserId`)'
         + ' VALUES (?, ?);';
 
-        let sessionVoteInsert = 'INSERT INTO `poll_votes` (`PollBeerId`, `VoteId`)'
+        let sessionVoteInsert = 'INSERT INTO `order_votes` (`OrderBeerId`, `VoteId`)'
         + ' VALUES (?, ?);';
 
         let voteUpdate = 'UPDATE `votes` SET `Vote` = ? WHERE `VoteId` = ?;';
 
         let existingVoteId: number;
 
-        return this.query(getVoteExists, [pollBeerId, userId])
+        return this.query(getVoteExists, [orderBeerId, userId])
             .do(result => existingVoteId = result[0] ? result[0].VoteId : null)
             .map(result => result.length ? voteUpdate : voteInsert)
             .flatMap(query => this.query(query, [vote.toLowerCase(), existingVoteId || userId]))
             .flatMap(result => result.insertId
-                ? this.query(sessionVoteInsert, [pollBeerId, result.insertId])
+                ? this.query(sessionVoteInsert, [orderBeerId, result.insertId])
                 : Observable.of(result));
     }
 
@@ -851,152 +853,138 @@ export class MysqlDatabase implements Database {
             );
     }
 
-    getPolls(userId, includeInactive = false): Observable<Poll[]> {
-        let q = 'SELECT p.PollId, p.Title, p.Description, p.VotesPerUser, p.Active, pb.PollBeerId, pb.BeerId, pb.Size, b.BeerName,'
+    getOrders(userId, isAdmin): Observable<Order[]> {
+        let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate, p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
             + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
-            + ' pv.PollVoteId, pv.VoteId, v.UserId, v.Vote from `polls` p'
-            + ' LEFT JOIN poll_beers pb ON p.pollid = pb.pollid'
+            + ' pv.OrderVoteId, pv.VoteId, v.UserId, v.Vote from `orders` p'
+            + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
             + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
             + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
             + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
-            + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
-            + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`';
-
-        if (!includeInactive) {
-            q += ' WHERE `Active` = 1';
-        }
-
-        q += ' ORDER BY p.PollId, pb.PollBeerId';
+            + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
+            + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
+            + ' WHERE `Status` != \'cancelled\''
+            + (isAdmin ? '' : ' AND `Status` != \'incomplete\'')
+            + ' ORDER BY p.Timestamp desc, pb.OrderBeerId LIMIT 2';
 
         return this.query(q, [])
             .map(results => results || [])
-            .map(results => results.reduce((polls, pollBeerRow) => {
-                console.log(polls, pollBeerRow);
-                let poll = polls.find(p => p.PollId === pollBeerRow.PollId);
-                if (!poll) {
-                    poll = this.mapPoll(pollBeerRow);
-                    poll.PollBeers = [];
-                    poll.PollVotes = [];
-                    polls.push(poll);
+            .map(results => results.reduce((orders, orderBeerRow) => {
+                let order = orders.find(p => p.OrderId === orderBeerRow.OrderId);
+                if (!order) {
+                    order = this.mapOrder(orderBeerRow);
+                    order.OrderBeers = [];
+                    order.OrderVotes = [];
+                    orders.push(order);
                 }
 
-                this.mapPollBeerRow(poll, pollBeerRow, vote => vote.UserId === userId);
+                this.mapOrderBeerRow(order, orderBeerRow, vote => vote.UserId === userId);
 
-                return polls;
+                return orders;
             }, []));
     }
 
-    getPoll(pollId: number): Observable<Poll> {
-        let q = 'SELECT p.PollId, p.Title, p.Description, p.VotesPerUser, p.Active, pb.PollBeerId, pb.BeerId, pb.Size, b.BeerName,'
+    getOrder(orderId: number): Observable<Order> {
+        let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate, p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
             + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
-            + ' pv.PollVoteId, pv.VoteId, v.UserId, v.Vote from `polls` p'
-            + ' LEFT JOIN poll_beers pb ON p.pollid = pb.pollid'
+            + ' pv.OrderVoteId, pv.VoteId, v.UserId, v.Vote from `orders` p'
+            + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
             + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
             + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
             + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
-            + ' LEFT JOIN `poll_votes` pv on p.`PollId` = (SELECT `PollId` FROM `poll_beers` WHERE `PollBeerId` = pv.`PollBeerId`)'
+            + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
-            + ' WHERE p.`pollid` = ?'
-            + ' ORDER BY pb.PollBeerId;';
+            + ' WHERE p.`orderid` = ?'
+            + ' ORDER BY pb.OrderBeerId;';
 
-        return this.query(q, [pollId])
-            .map(result => result.reduce((poll, voteRow) => {
-                if (!poll) {
-                    poll = this.mapPoll(voteRow);
-                    poll.PollVotes = [];
-                    poll.PollBeers = [];
+        return this.query(q, [orderId])
+            .map(result => result.reduce((order, voteRow) => {
+                if (!order) {
+                    order = this.mapOrder(voteRow);
+                    order.OrderVotes = [];
+                    order.OrderBeers = [];
                 }
 
-               return this.mapPollBeerRow(poll, voteRow, vote => true);
+               return this.mapOrderBeerRow(order, voteRow, vote => true);
             }, null));
     }
 
-    private mapPollBeerRow(poll: any, voteRow: any, shouldAddVote: any) {
-        if (!voteRow.PollBeerId) {
-            return poll;
+    private mapOrderBeerRow(order: any, voteRow: any, shouldAddVote: any) {
+        if (!voteRow.OrderBeerId) {
+            return order;
         }
 
-        let pollBeer = poll.PollBeers.find(b => b.PollBeerId === voteRow.PollBeerId);
+        let orderBeer = order.OrderBeers.find(b => b.OrderBeerId === voteRow.OrderBeerId);
 
-        if (!pollBeer) {
-            pollBeer = this.mapPollBeer(voteRow);
-            poll.PollBeers.push(pollBeer);
+        if (!orderBeer) {
+            orderBeer = this.mapOrderBeer(voteRow);
+            order.OrderBeers.push(orderBeer);
         }
 
         if (voteRow.Vote && shouldAddVote(voteRow)) {
-            poll.PollVotes.push(this.mapPollVote(voteRow));
+            order.OrderVotes.push(this.mapOrderVote(voteRow));
         }
-        return poll;
+        return order;
     }
 
-    addPoll(title: string, description: string, votesPerUser: number): Observable<number> {
-        let q = 'INSERT INTO `polls` (`title`, `description`, `votesperuser`)'
+    addOrder(title: string, description: string, votesPerUser: number): Observable<number> {
+        let q = 'INSERT INTO `orders` (`title`, `description`, `votesperuser`)'
         + ' VALUES (?, ?, ?);';
 
         return this.query(q, [title, description, votesPerUser])
             .map(result => result.insertId,
-                err => this.logErrorAndThrow(err, 'an error occurred adding poll'));
+                err => this.logErrorAndThrow(err, 'an error occurred adding order'));
     }
 
-    addBeerToPoll(beerId: number, pollId: number, size: KegSize): Observable<number> {
-        let q = 'INSERT INTO `poll_beers` (`pollid`, `beerid`, `size`)'
+    addBeerToOrder(beerId: number, orderId: number, size: KegSize): Observable<number> {
+        let q = 'INSERT INTO `order_beers` (`orderid`, `beerid`, `size`)'
         + ' VALUES (?, ?, ?)'
         + ' ON DUPLICATE KEY UPDATE `size`=VALUES(`size`);';
 
-        return this.query(q, [beerId, pollId, size])
+        return this.query(q, [beerId, orderId, size])
             .map(result => result.insertId,
-                err => this.logErrorAndThrow(err, 'an error occurred adding beer to poll'));
+                err => this.logErrorAndThrow(err, 'an error occurred adding beer to order'));
     }
 
-    removeBeerFromPoll(pollId: number, pollBeerId: number): Observable<any> {
-        let q = 'DELETE FROM `poll_beers` WHERE `pollid` = ? AND `pollbeerid` = ?;';
+    removeBeerFromOrder(orderId: number, orderBeerId: number): Observable<any> {
+        let q1 = 'DELETE FROM `order_votes` WHERE `orderbeerid` = ?;';
+        let q2 = 'DELETE FROM `order_beers` WHERE `orderid` = ? AND `orderbeerid` = ?;';
 
-        return this.query(q, [pollId, pollBeerId])
+        return this.query(q1, [orderBeerId])
+            .flatMap(_ => this.query(q2, [orderId, orderBeerId]))
             .map(result => result,
-                err => this.logErrorAndThrow(err, 'an error occurred removing beer from poll'));
+                err => this.logErrorAndThrow(err, 'an error occurred removing beer from order'));
     }
 
-    updatePoll(pollId: number, title: string, description: string, votesPerUser: number, active: boolean): Observable<any> {
-        if (!title && !description && !votesPerUser && !active) {
+    updateOrder(orderId: number, partialOrder: any): Observable<any> {
+        let keys = Object.keys(partialOrder);
+
+        if (!keys.length) {
             return Observable.of(null);
         }
 
-        let q = 'UPDATE `polls` SET';
+        let q = 'UPDATE `orders` SET';
         let args = [];
 
-        if (title) {
-            q += ' `title` = ?,';
-            args.push(title);
-        }
-
-        if (description) {
-            q += ' `description` = ?,';
-            args.push(description);
-        }
-
-        if (votesPerUser) {
-            q += ' `votesPerUser` = ?,';
-            args.push(votesPerUser);
-        }
-
-        if (active) {
-            q += ' `active` = ?,';
-            args.push(active);
-        }
+        keys.forEach(key => {
+             q += ` ${key} = ?,`;
+            args.push(partialOrder[key]);
+        });
 
         q = q.slice(0, -1);
 
-        q += ' WHERE `pollid` = ?;';
-        args.push(pollId);
+        q += ' WHERE `orderid` = ?;';
+        args.push(orderId);
 
         return this.query(q, args)
             .map(result => result,
-                err => this.logErrorAndThrow(err, 'an error occurred updating poll'));
+                err => this.logErrorAndThrow(err, 'an error occurred updating order'));
     }
 
-    userCanVoteForPoll(userId: number, pollId: number): Observable<boolean> {
-        return this.getPoll(pollId)
-            .map(poll => poll.Active && poll.PollVotes.filter(v => v.UserId === userId).length <= poll.VotesPerUser)
+    userCanVoteForOrder(userId: number, orderId: number): Observable<boolean> {
+        return this.getOrder(orderId)
+            .map(order => order.Status === OrderStatus.Pending
+                && order.OrderVotes.filter(v => v.UserId === userId && v.Vote !== Vote.None).length <= order.VotesPerUser);
     }
 
     private logErrorAndThrow(err: string, messageToThrow?: string): ErrorObservable<string> {

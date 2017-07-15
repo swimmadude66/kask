@@ -35,7 +35,7 @@ module.exports = (APP_CONFIG) => {
 
     router.use('/stats', require('./stats')(APP_CONFIG));
 
-    router.use('/polls', require('./polls')(APP_CONFIG));
+    router.use('/orders', require('./orders')(APP_CONFIG));
 
     router.use((req, res, next) => {
         if (!res.locals.user) {

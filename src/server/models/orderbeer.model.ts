@@ -1,8 +1,8 @@
 import { Beer } from './';
 import { KegSize } from './';
 
-export class PollBeer {
-    PollBeerId: number;
+export class OrderBeer {
+    OrderBeerId: number;
     Beer: Beer;
     Size?: KegSize;
 }

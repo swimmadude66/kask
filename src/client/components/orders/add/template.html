@@ -2,7 +2,7 @@
     <div class="row">
       <div class="col-md-6">
         <div class="form-group">
-          <label>Poll Title</label>
+          <label>Order Title</label>
           <input type="text" name="title" class="form-control" [(ngModel)]="title" />
         </div>
         <div class="form-group">
@@ -13,10 +13,10 @@
           <label>Votes Per User</label>
           <input type="number" min="1" name="votesPerUser" class="form-control" [(ngModel)]="votesPerUser" />
         </div>
-        <button type="submit" name="submit" id="poll-submit" class="btn btn-outline-success" [ngClass]="(!title || !votesPerUser) ? 'disabled': ''">
+        <button type="submit" name="submit" id="order-submit" class="btn btn-outline-success" [ngClass]="(!title || !votesPerUser) ? 'disabled': ''">
           Submit
         </button>
-        <button type="button" name="cancel" id="poll-cancel" class="btn btn-outline-danger pull-right" (click)="cancel()">
+        <button type="button" name="cancel" id="order-cancel" class="btn btn-outline-danger pull-right" (click)="cancel()">
           Cancel
         </button>
       </div>

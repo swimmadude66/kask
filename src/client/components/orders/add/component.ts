@@ -1,11 +1,11 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output, Input } from '@angular/core';
 
 @Component({
-    selector: 'add-poll',
+    selector: 'add-order',
     templateUrl: './template.html',
     styleUrls: ['../../styles.scss', './styles.scss']
 })
-export class AddPollComponent implements OnInit, OnDestroy {
+export class AddOrderComponent implements OnInit, OnDestroy {
     private subscriptions = [];
 
     @Output() cancelled = new EventEmitter();

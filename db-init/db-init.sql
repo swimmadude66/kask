@@ -142,27 +142,30 @@ CREATE TABLE IF NOT EXISTS `pours` (
   KEY `pourfromkeg_idx` (`KegId`),
   CONSTRAINT `pourfromkeg` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-CREATE TABLE IF NOT EXISTS `polls` (
-  `PollId` int(11) NOT NULL AUTO_INCREMENT,
+
+CREATE TABLE IF NOT EXISTS `orders` (
+  `OrderId` int(11) NOT NULL AUTO_INCREMENT,
   `Title` varchar(256) NOT NULL,
   `Description` varchar(1024) NULL,
   `VotesPerUser` int(11) NOT NULL DEFAULT '1',
-  `Active` tinyint(1) NOT NULL DEFAULT '0',
+  `Status` enum('incomplete', 'pending', 'finalized', 'cancelled', 'placed', 'received') NOT NULL DEFAULT 'incomplete',
+  `PlacedDate` timestamp NULL,
+  `ReceivedDate` timestamp NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`PollId`)
+  PRIMARY KEY (`OrderId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `poll_beers` (
-  `PollBeerId` int(11) NOT NULL AUTO_INCREMENT,
-  `PollId` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `order_beers` (
+  `OrderBeerId` int(11) NOT NULL AUTO_INCREMENT,
+  `OrderId` int(11) NOT NULL,
   `BeerId` int(11) NOT NULL,
   `Size` enum('1/2','1/3','1/4','1/5','1/6') NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`PollBeerId`),
-  KEY `FK_poll_idx` (`PollId`),
+  PRIMARY KEY (`OrderBeerId`),
+  KEY `FK_order_idx` (`OrderId`),
   KEY `FK_beer_idx` (`BeerId`),
-  UNIQUE KEY `pollbeer_unique` (`PollId`, `BeerId`),
-  CONSTRAINT `FK_poll` FOREIGN KEY (`PollId`) REFERENCES `polls` (`PollId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  UNIQUE KEY `orderbeer_unique` (`OrderId`, `BeerId`),
+  CONSTRAINT `FK_order` FOREIGN KEY (`OrderId`) REFERENCES `orders` (`OrderId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_beer` FOREIGN KEY (`BeerId`) REFERENCES `beers` (`BeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -176,16 +179,16 @@ CREATE TABLE IF NOT EXISTS `votes` (
   CONSTRAINT `FK_user` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `poll_votes` (
-  `PollVoteId` int(11) NOT NULL AUTO_INCREMENT,
-  `PollBeerId` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `order_votes` (
+  `OrderVoteId` int(11) NOT NULL AUTO_INCREMENT,
+  `OrderBeerId` int(11) NOT NULL,
   `VoteId` int(11) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`PollVoteId`),
-  KEY `FK_pollbeer_idx` (`PollBeerId`),
-  KEY `FK_pollvote_idx` (`VoteId`),
-  CONSTRAINT `FK_pollbeer` FOREIGN KEY (`PollBeerId`) REFERENCES `poll_beers` (`PollBeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_pollvote` FOREIGN KEY (`VoteId`) REFERENCES `votes` (`VoteId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`OrderVoteId`),
+  KEY `FK_orderbeer_idx` (`OrderBeerId`),
+  KEY `FK_ordervote_idx` (`VoteId`),
+  CONSTRAINT `FK_orderbeer` FOREIGN KEY (`OrderBeerId`) REFERENCES `order_beers` (`OrderBeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_ordervote` FOREIGN KEY (`VoteId`) REFERENCES `votes` (`VoteId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `beer_session_votes` (

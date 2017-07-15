@@ -1,6 +1,7 @@
 import {MysqlDatabase} from '../services/mysql_database';
 import * as express from 'express';
 import { Observable } from 'rxjs/Rx';
+import { Order } from '../models/order.model';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
@@ -21,6 +22,15 @@ module.exports = (APP_CONFIG) => {
             db.getLocationContents(locationId)
             .subscribe(
                 contents => sockets.emit('LocationContentsEvent', {LocationId: locationId, Contents: contents})
+            );
+        });
+    }
+
+    function socketUpdateOrders(orderIds: number[]): void {
+        orderIds.forEach(orderId => {
+            db.getOrder(orderId)
+            .subscribe(
+                order => sockets.emit('OrderEvent', {OrderId: orderId, Order: order})
             );
         });
     }
@@ -267,45 +277,54 @@ module.exports = (APP_CONFIG) => {
         );
     });
 
-    router.post('/polls', (req, res) => {
+    router.post('/orders', (req, res) => {
         let body = req.body;
         if (!body || !body.Title) {
-            return res.status(400).send('Polls require a title');
+            return res.status(400).send('Orders require a title');
         }
-        db.addPoll(body.Title, body.Description, body.VotesPerUser)
+        db.addOrder(body.Title, body.Description, body.VotesPerUser)
+        .do(orderId => socketUpdateOrders([orderId]))
         .subscribe(
-            pollId => res.send({PollId: pollId}),
+            orderId => res.send({OrderId: orderId}),
             err => res.status(500).send(err)
         );
     });
 
-    router.put('/polls/:pollId/beer', (req, res) => {
+    router.put('/orders/:orderId/beer', (req, res) => {
         let body = req.body;
         if (!body || !body.BeerId) {
             return res.status(400).send('BeerId is required');
         }
 
-        db.addBeerToPoll(req.params.pollId, body.BeerId, body.Size || '')
+        db.addBeerToOrder(req.params.orderId, body.BeerId, body.Size || '')
+            .do(_ => socketUpdateOrders([req.params.orderId]))
             .subscribe(
-                pollBeerId => res.send({PollBeerId: pollBeerId}),
+                OrderBeerId => res.send({OrderBeerId: OrderBeerId}),
                 err => res.status(500).send(err)
             );
     });
 
-    router.delete('/polls/:pollId/beer/:pollBeerId', (req, res) => {
-        let body = req.body;
-
-        db.removeBeerFromPoll(req.params.pollId, req.params.pollBeerId)
+    router.delete('/orders/:orderId/beer/:orderBeerId', (req, res) => {
+        db.removeBeerFromOrder(req.params.orderId, req.params.orderBeerId)
+            .do(_ => socketUpdateOrders([req.params.orderId]))
             .subscribe(
                 _ => res.send(),
                 err => res.status(500).send(err)
             );
     });
 
-    router.patch('/polls/:pollId', (req, res) => {
+    router.patch('/orders/:orderId', (req, res) => {
         let body = req.body;
 
-        db.updatePoll(req.params.pollId, body.Title, body.Description, body.VotesPerUser, body.Active)
+        if (body.Status && body.Status === 'placed') {
+            body.PlacedDate = new Date().toISOString().replace('T', ' ').replace('Z', '');
+        }
+        if (body.Status && body.Status === 'received') {
+            body.ReceivedDate = new Date().toISOString().replace('T', ' ').replace('Z', '');
+        }
+
+        db.updateOrder(req.params.orderId, body)
+            .do(_ => socketUpdateOrders([req.params.orderId]))
             .subscribe(
                 _ => res.send(),
                 err => res.status(500).send(err)
