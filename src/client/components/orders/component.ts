@@ -16,12 +16,9 @@ import { NgbDateHelper } from "../../helpers/ngb_date";
 })
 export class OrdersComponent implements OnInit, OnDestroy {
     private subscriptions = [];
-    private ordersSubscription: Subscription;
 
     orders: Order[];
     locations: Location[];
-
-
     fromDate: NgbDateStruct;
     toDate: NgbDateStruct;
     isAdmin: boolean = false;
@@ -55,7 +52,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
     addOrder(order) {
         this.isAddingOrder = false;
 
-        this.ordersSubscription = this.orderService.createOrder(order.title, order.description, order.votesPerUser)
+        this.orderService.createOrder(order.title, order.description, order.votesPerUser)
             .flatMap(_ => this.orderService.getOrders(NgbDateHelper.dateToString(this.fromDate), NgbDateHelper.dateToString(this.toDate)))
             .subscribe(orders => this.orders = orders);
     }
