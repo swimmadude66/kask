@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import {Keg} from '../../../models/keg.model';
 import {Location} from '../../../models/location.model';
 import {LocationService} from '../../../services/location.service';
@@ -24,6 +24,7 @@ export class LocationComponent implements OnInit, OnDestroy {
 
     @Input() info: Location;
     @Input() taps: Tap[];
+    @Output() moveSubmitted = new EventEmitter();
 
     constructor(
         private _locationService: LocationService,
@@ -101,5 +102,9 @@ export class LocationComponent implements OnInit, OnDestroy {
         } else {
             this.addLocation();
         }
+    }
+
+    handleMove(selectedDestination) {
+        this.moveSubmitted.emit(selectedDestination);
     }
 }

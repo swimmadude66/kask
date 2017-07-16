@@ -1,8 +1,11 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { Order, OrderStatus } from '../../../models/order.model';
+import { OrderBeer } from '../../../models/orderbeer.model';
 import { Vote } from '../../../models/ordervote.model';
+import { AdminService } from '../../../services/admin.service';
 import { AuthService } from '../../../services/auth.service';
 import { OrderService } from '../../../services/orders.service';
+import {Location} from '../../../models/location.model';
 
 @Component({
     selector: 'order',
@@ -15,9 +18,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     @Input() order: Order;
     @Input() isAdmin: boolean;
     @Input() isLoggedIn: boolean;
+    @Input() locations: Location[];
 
     isAddingKeg: boolean = false;
     isEditing: boolean = false;
+    isOrderMoved: boolean = false;
 
     selectedStatus: OrderStatus;
     orderStatuses = [{
@@ -42,7 +47,8 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     constructor(
         private orderService: OrderService,
-        private authService: AuthService
+        private authService: AuthService,
+        private adminService: AdminService
     ) { }
 
     ngOnInit() {
@@ -54,34 +60,37 @@ export class OrderComponent implements OnInit, OnDestroy {
         this.subscriptions = [];
     }
 
-    vote(orderBeerId: number) {
+    vote(orderBeer: OrderBeer) {
         let vote: Vote = Vote.Up;
-        let isUpVote = !this.votedForBeer(orderBeerId);
+        let id = orderBeer.OrderBeerId;
+
+        let isUpVote = !this.votedForBeer(id);
 
         if (!isUpVote) {
             vote = Vote.None;
         }
 
-        this.orderService.vote(this.order.OrderId, orderBeerId, vote).subscribe(_ => {
+        this.orderService.vote(this.order.OrderId, id, vote).subscribe(_ => {
+            orderBeer.NetVote += isUpVote ? 1 : -1;
             if (!isUpVote) {
-                this.order.OrderVotes = this.order.OrderVotes.filter(v => v.OrderBeerId !== orderBeerId);
+                this.order.UserVotes = this.order.UserVotes.filter(v => v.OrderBeerId !== id);
             } else {
-                this.order.OrderVotes.push({
+                this.order.UserVotes.push({
                     OrderVoteId: -1,
                     UserId: -1,
-                    OrderBeerId: orderBeerId,
-                    Vote: vote
+                    OrderBeerId: id,
+                    Vote:  isUpVote ? 1 : -1
                 });
             }
         });
     }
 
     votedForBeer(orderBeerId: number) {
-        return this.order.OrderVotes.some(p => p.OrderBeerId === orderBeerId && p.Vote === Vote.Up);
+        return this.order.UserVotes.some(p => p.OrderBeerId === orderBeerId && p.Vote === 1);
     }
 
     canVote() {
-        return this.order.OrderVotes.length < this.order.VotesPerUser;
+        return this.order.UserVotes.length < this.order.VotesPerUser;
     }
 
     isIncomplete() {
@@ -93,12 +102,11 @@ export class OrderComponent implements OnInit, OnDestroy {
     }
 
     votesRemaining() {
-        return this.order.VotesPerUser - this.order.OrderVotes.filter(v => v.Vote === Vote.Up).length;
+        return this.order.VotesPerUser - this.order.UserVotes.filter(v => v.Vote === 1).length;
     }
 
     addKegToOrder(kegToAdd: any) {
         this.isAddingKeg = false;
-        //TODO: observable push here so the new order is added to view
         this.orderService.addBeerToOrder(this.order.OrderId, kegToAdd.Beer.BeerId, kegToAdd.Size).subscribe(_ => _);
     }
 
@@ -121,5 +129,14 @@ export class OrderComponent implements OnInit, OnDestroy {
 
     formatDate(date: string) {
         return date.replace('T', ' ').replace('.000Z', '');
+    }
+
+    moveToLocation(result) {
+        if (result.dest.indexOf('loc_') === 0) {
+            let dest = +result.dest.replace('loc_', '');
+            this.order.OrderBeers.forEach(orderBeer => {
+                this.adminService.store(orderBeer.Beer.BeerId, orderBeer.Size.toString(), dest).subscribe(_ => this.isOrderMoved = true);
+            });
+        }
     }
 }

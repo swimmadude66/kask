@@ -7,6 +7,6 @@ export enum Vote {
 export class OrderVote {
     OrderVoteId: number;
     UserId: number;
-    Vote: Vote;
+    Vote: number;
     OrderBeerId: number;
 }

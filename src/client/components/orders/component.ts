@@ -1,10 +1,10 @@
-import { OrderStatus } from '../../../server/models/order.model';
 import { Order } from '../../models/order.model';
 import { AuthService } from '../../services/auth.service';
+import { LocationService } from '../../services/location.service';
 import { OrderService } from '../../services/orders.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs/Rx';
-
+import {Location} from '../../models/location.model';
 @Component({
     selector: 'orders',
     templateUrl: './template.html',
@@ -15,6 +15,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
     private ordersSubscription: Subscription;
 
     orders: Order[];
+    locations: Location[];
 
     isAdmin: boolean = false;
     isLoggedIn: boolean = false;
@@ -22,7 +23,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
     constructor(
         private orderService: OrderService,
-        private authService: AuthService
+        private authService: AuthService,
+        private locationService: LocationService
     ) { }
 
     addOrder(order) {
@@ -32,19 +34,21 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
         this.ordersSubscription = this.orderService.createOrder(order.title, order.description, order.votesPerUser)
             .flatMap(_ => this.orderService.getOrders())
-            .do(activeOrders => this.orders = this.filterOrders(activeOrders))
-            .flatMap(orders => Observable.combineLatest(orders.map(o => this.orderService.observe(o.OrderId))))
-            .subscribe(latestOrders => this.orders = this.filterOrders(latestOrders));
+            .do(activeOrders => this.orders = activeOrders.filter(o => !!o))
+            .flatMap(orders => Observable.combineLatest(orders.map(o => this.orderService.observe(o.OrderId, o))))
+            .subscribe(latestOrders => this.orders = latestOrders.filter(o => !!o));
     }
 
     ngOnInit() {
         this.authService.isLoggedIn().subscribe(isLoggedIn => this.isLoggedIn = isLoggedIn);
         this.authService.isAdmin().subscribe(isAdmin => this.isAdmin = isAdmin);
 
+        this.locationService.getLocations().subscribe(locations => this.locations = locations);
+
         this.ordersSubscription = this.orderService.getOrders()
-            .do(activeOrders => this.orders = this.filterOrders(activeOrders))
-            .flatMap(orders => Observable.combineLatest(orders.map(o => this.orderService.observe(o.OrderId))))
-            .subscribe(latestOrders => this.orders = this.filterOrders(latestOrders));
+            .do(activeOrders => this.orders = activeOrders.filter(o => !!o))
+            .flatMap(orders => Observable.combineLatest(orders.map(o => this.orderService.observe(o.OrderId, o))))
+            .subscribe(latestOrders => this.orders = latestOrders.filter(o => !!o));
 
         this.subscriptions.push(this.ordersSubscription);
     }
@@ -53,6 +57,4 @@ export class OrdersComponent implements OnInit, OnDestroy {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
     }
-
-    private filterOrders = (orders: Order[]) => orders.filter(o => !!o);
 }

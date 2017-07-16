@@ -19,5 +19,5 @@ export class Order {
     PlacedDate?: Date;
     ReceivedDate?: Date;
     OrderBeers?: OrderBeer[];
-    OrderVotes?: OrderVote[];
+    UserVotes?: OrderVote[];
 }

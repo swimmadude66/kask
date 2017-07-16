@@ -5,7 +5,6 @@ import {SharedModule} from './shared.module';
 import {AdminComponent} from '../components/admin';
 import {LocationComponent} from '../components/admin/location/component';
 import {TapEditComponent} from '../components/admin/tap/component';
-import {KegRowComponent} from '../components/admin/keg/component';
 
 @NgModule({
     imports: [
@@ -20,14 +19,12 @@ import {KegRowComponent} from '../components/admin/keg/component';
     declarations: [
         AdminComponent,
         LocationComponent,
-        TapEditComponent,
-        KegRowComponent
+        TapEditComponent
     ],
     exports: [
         AdminComponent,
         LocationComponent,
-        TapEditComponent,
-        KegRowComponent
+        TapEditComponent
     ]
 })
 export class LazyAdminModule { }

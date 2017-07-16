@@ -8,6 +8,7 @@ import {ChalkboardBottomComponent} from '../components/app/chalkboard_bottom/com
 import {KegProgressComponent} from '../components/shared/keg_progress_bar/component';
 import {KegAddComponent} from '../components/shared/keg_add/component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { KegMoveComponent } from '../components/shared/keg_move/component';
 
 @NgModule({
     imports: [
@@ -21,7 +22,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         ParallaxScrollDirective,
         ChalkboardBottomComponent,
         KegProgressComponent,
-        KegAddComponent
+        KegAddComponent,
+        KegMoveComponent
     ],
     exports: [
         HttpModule,
@@ -31,7 +33,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         ParallaxScrollDirective,
         ChalkboardBottomComponent,
         KegProgressComponent,
-        KegAddComponent
+        KegAddComponent,
+        KegMoveComponent
     ]
 })
 export class SharedModule { }

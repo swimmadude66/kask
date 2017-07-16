@@ -24,8 +24,10 @@ export class OrderService {
         });
     }
 
-    observe(orderId: number): Subscribable<Order> {
-        return this.getSubject(this.orders, orderId);
+    observe(orderId: number, init: Order): Subscribable<Order> {
+        let sub = this.getSubject(this.orders, orderId);
+        sub.next(init);
+        return sub;
     }
 
     getOrders(): Observable<Order[]> {

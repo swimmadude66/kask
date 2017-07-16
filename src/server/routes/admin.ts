@@ -26,9 +26,9 @@ module.exports = (APP_CONFIG) => {
         });
     }
 
-    function socketUpdateOrders(orderIds: number[]): void {
+    function socketUpdateOrders(userId, orderIds: number[]): void {
         orderIds.forEach(orderId => {
-            db.getOrder(orderId)
+            db.getOrder(userId, orderId)
             .subscribe(
                 order => sockets.emit('OrderEvent', {OrderId: orderId, Order: order})
             );
@@ -283,9 +283,11 @@ module.exports = (APP_CONFIG) => {
             return res.status(400).send('Orders require a title');
         }
         db.addOrder(body.Title, body.Description, body.VotesPerUser)
-        .do(orderId => socketUpdateOrders([orderId]))
         .subscribe(
-            orderId => res.send({OrderId: orderId}),
+            orderId => {
+                res.send({OrderId: orderId});
+                return socketUpdateOrders(res.locals.user.UserId, [orderId]);
+        },
             err => res.status(500).send(err)
         );
     });
@@ -297,18 +299,22 @@ module.exports = (APP_CONFIG) => {
         }
 
         db.addBeerToOrder(req.params.orderId, body.BeerId, body.Size || '')
-            .do(_ => socketUpdateOrders([req.params.orderId]))
             .subscribe(
-                OrderBeerId => res.send({OrderBeerId: OrderBeerId}),
+                OrderBeerId => {
+                    res.send({OrderBeerId: OrderBeerId});
+                    return socketUpdateOrders(res.locals.user.UserId, [req.params.orderId]);
+                },
                 err => res.status(500).send(err)
             );
     });
 
     router.delete('/orders/:orderId/beer/:orderBeerId', (req, res) => {
         db.removeBeerFromOrder(req.params.orderId, req.params.orderBeerId)
-            .do(_ => socketUpdateOrders([req.params.orderId]))
             .subscribe(
-                _ => res.send(),
+                _ => {
+                    res.send();
+                    return socketUpdateOrders(res.locals.user.UserId, [req.params.orderId]);
+                },
                 err => res.status(500).send(err)
             );
     });
@@ -324,9 +330,11 @@ module.exports = (APP_CONFIG) => {
         }
 
         db.updateOrder(req.params.orderId, body)
-            .do(_ => socketUpdateOrders([req.params.orderId]))
             .subscribe(
-                _ => res.send(),
+                _ => {
+                    res.send();
+                    return socketUpdateOrders(res.locals.user.UserId, [req.params.orderId]);
+                },
                 err => res.status(500).send(err)
             );
     });

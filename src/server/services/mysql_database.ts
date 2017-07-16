@@ -179,7 +179,8 @@ export class MysqlDatabase implements Database {
         let orderBeer: OrderBeer = {
             OrderBeerId: result.OrderBeerId,
             Size: result.Size,
-            Beer: this.mapBeer(result, false)
+            Beer: this.mapBeer(result, false),
+            NetVote: 0
         };
 
         return orderBeer;
@@ -856,7 +857,7 @@ export class MysqlDatabase implements Database {
     getOrders(userId, isAdmin): Observable<Order[]> {
         let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate, p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
             + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
-            + ' pv.OrderVoteId, pv.VoteId, v.UserId, v.Vote from `orders` p'
+            + ' pv.OrderVoteId, pv.VoteId, v.UserId, (`Vote`-2) as Vote from `orders` p'
             + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
             + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
             + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
@@ -874,20 +875,20 @@ export class MysqlDatabase implements Database {
                 if (!order) {
                     order = this.mapOrder(orderBeerRow);
                     order.OrderBeers = [];
-                    order.OrderVotes = [];
+                    order.UserVotes = [];
                     orders.push(order);
                 }
 
-                this.mapOrderBeerRow(order, orderBeerRow, vote => vote.UserId === userId);
+                this.mapOrderBeerRow(order, orderBeerRow, userId);
 
                 return orders;
             }, []));
     }
 
-    getOrder(orderId: number): Observable<Order> {
+    getOrder(userId, orderId: number): Observable<Order> {
         let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate, p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
             + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
-            + ' pv.OrderVoteId, pv.VoteId, v.UserId, v.Vote from `orders` p'
+            + ' pv.OrderVoteId, pv.VoteId, v.UserId, (`Vote`-2) as Vote from `orders` p'
             + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
             + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
             + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
@@ -901,15 +902,15 @@ export class MysqlDatabase implements Database {
             .map(result => result.reduce((order, voteRow) => {
                 if (!order) {
                     order = this.mapOrder(voteRow);
-                    order.OrderVotes = [];
                     order.OrderBeers = [];
+                    order.UserVotes = [];
                 }
 
-               return this.mapOrderBeerRow(order, voteRow, vote => true);
+               return this.mapOrderBeerRow(order, voteRow, userId);
             }, null));
     }
 
-    private mapOrderBeerRow(order: any, voteRow: any, shouldAddVote: any) {
+    private mapOrderBeerRow(order: any, voteRow: any, userId: number) {
         if (!voteRow.OrderBeerId) {
             return order;
         }
@@ -921,8 +922,11 @@ export class MysqlDatabase implements Database {
             order.OrderBeers.push(orderBeer);
         }
 
-        if (voteRow.Vote && shouldAddVote(voteRow)) {
-            order.OrderVotes.push(this.mapOrderVote(voteRow));
+        if (voteRow.Vote) {
+            orderBeer.NetVote += voteRow.Vote;
+            if (voteRow.UserId === userId) {
+                order.UserVotes.push(this.mapOrderVote(voteRow));
+            }
         }
         return order;
     }
@@ -982,9 +986,9 @@ export class MysqlDatabase implements Database {
     }
 
     userCanVoteForOrder(userId: number, orderId: number): Observable<boolean> {
-        return this.getOrder(orderId)
+        return this.getOrder(userId, orderId)
             .map(order => order.Status === OrderStatus.Pending
-                && order.OrderVotes.filter(v => v.UserId === userId && v.Vote !== Vote.None).length <= order.VotesPerUser);
+                && order.UserVotes.filter(v => v.Vote !== Vote.None).length <= order.VotesPerUser);
     }
 
     private logErrorAndThrow(err: string, messageToThrow?: string): ErrorObservable<string> {

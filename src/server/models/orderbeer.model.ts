@@ -5,4 +5,5 @@ export class OrderBeer {
     OrderBeerId: number;
     Beer: Beer;
     Size?: KegSize;
+    NetVote: number;
 }

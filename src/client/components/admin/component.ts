@@ -47,4 +47,17 @@ export class AdminComponent implements OnInit, OnDestroy {
         this.subscriptions = [];
     }
 
+    handleMove(result) {
+        if (!!result.dest) {
+            if (result.dest.indexOf('tap_') === 0) {
+                this._adminService.loadTapFromStorage(+result.dest.replace('tap_', ''), result.kegId)
+                .subscribe();
+            } else if (result.dest.indexOf('loc_') === 0) {
+                let dest = +result.dest.replace('loc_', '');
+                this._adminService.move(result.kegId, dest).subscribe();
+            } else {
+                this._adminService.clearKeg(result.kegId).subscribe(_ => _);
+            }
+        }
+    }
 }
