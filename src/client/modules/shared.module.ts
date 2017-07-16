@@ -9,6 +9,8 @@ import {KegProgressComponent} from '../components/shared/keg_progress_bar/compon
 import {KegAddComponent} from '../components/shared/keg_add/component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { KegMoveComponent } from '../components/shared/keg_move/component';
+import { DateRangeComponent } from '../components/shared/date_range/component';
+import { NgbDateHelper } from '../helpers/ngb_date';
 
 @NgModule({
     imports: [
@@ -23,7 +25,8 @@ import { KegMoveComponent } from '../components/shared/keg_move/component';
         ChalkboardBottomComponent,
         KegProgressComponent,
         KegAddComponent,
-        KegMoveComponent
+        KegMoveComponent,
+        DateRangeComponent
     ],
     exports: [
         HttpModule,
@@ -34,7 +37,8 @@ import { KegMoveComponent } from '../components/shared/keg_move/component';
         ChalkboardBottomComponent,
         KegProgressComponent,
         KegAddComponent,
-        KegMoveComponent
+        KegMoveComponent,
+        DateRangeComponent
     ]
 })
 export class SharedModule { }

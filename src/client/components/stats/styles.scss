@@ -7,10 +7,7 @@
     }
 }
 
-.input-group-addon {
-    color: #333;
-    cursor: pointer;
-}
+
 
 .beer-title {
     font-size: 18px;
@@ -18,10 +15,6 @@
         color: $chalk-color;
     }
 
-}
-
-.filters {
-    margin-bottom: 1em;
 }
 
 :host >>> .nav-link {

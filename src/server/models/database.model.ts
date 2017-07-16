@@ -60,7 +60,7 @@ export interface Database {
 
     // Order Managemet
     addOrder(title: string, description: string, votesPerUser: number): Observable<number>;
-    getOrders(userId: number, isAdmin: boolean): Observable<Order[]>;
+    getOrders(isAdmin: boolean, fromDate: string, toDate: string): Observable<Order[]>;
     getOrder(userId: number, orderId: number): Observable<Order>;
     addBeerToOrder(beerId: number, orderId: number, size: KegSize): Observable<number>;
     removeBeerFromOrder(orderId: number, orderBeerId: number): Observable<any>;

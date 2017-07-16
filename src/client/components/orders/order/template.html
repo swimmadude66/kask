@@ -1,3 +1,4 @@
+<ng-container *ngIf="order">
 <add-order 
   *ngIf="isEditing" 
   (submitted)="submitEdit($event)" 
@@ -70,3 +71,4 @@
       </tbody>
     </table>
 </div>
+</ng-container>

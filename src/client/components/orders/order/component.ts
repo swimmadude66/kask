@@ -15,7 +15,7 @@ import {Location} from '../../../models/location.model';
 export class OrderComponent implements OnInit, OnDestroy {
     private subscriptions = [];
 
-    @Input() order: Order;
+    @Input() orderInfo: Order;
     @Input() isAdmin: boolean;
     @Input() isLoggedIn: boolean;
     @Input() locations: Location[];
@@ -23,7 +23,7 @@ export class OrderComponent implements OnInit, OnDestroy {
     isAddingKeg: boolean = false;
     isEditing: boolean = false;
     isOrderMoved: boolean = false;
-
+    order: Order;
     selectedStatus: OrderStatus;
     orderStatuses = [{
         name: 'Not Ready',
@@ -52,7 +52,13 @@ export class OrderComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.selectedStatus = this.order.Status;
+        this.selectedStatus = this.orderInfo.Status;
+
+        this.subscriptions.push(
+            this.orderService.observe(this.orderInfo.OrderId)
+                .merge(this.orderService.getOrder(this.orderInfo.OrderId))
+                .subscribe(order => this.order = order)
+        );
     }
 
     ngOnDestroy() {

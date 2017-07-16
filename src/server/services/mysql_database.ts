@@ -854,39 +854,32 @@ export class MysqlDatabase implements Database {
             );
     }
 
-    getOrders(userId, isAdmin): Observable<Order[]> {
-        let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate, p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
-            + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
-            + ' pv.OrderVoteId, pv.VoteId, v.UserId, (`Vote`-2) as Vote from `orders` p'
-            + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
-            + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
-            + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
-            + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
-            + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
-            + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
+    getOrders(isAdmin: boolean, fromDate: string, toDate: string): Observable<Order[]> {
+        let args = [];
+
+        let q = 'SELECT * from `orders`'
             + ' WHERE `Status` != \'cancelled\''
-            + (isAdmin ? '' : ' AND `Status` != \'incomplete\'')
-            + ' ORDER BY p.Timestamp desc, pb.OrderBeerId LIMIT 2';
+            + (isAdmin ? '' : ' AND `Status` != \'incomplete\'');
 
-        return this.query(q, [])
+        if (fromDate) {
+            q += ' AND (`Timestamp` > ? OR `PlacedDate` > ?)';
+            args = args.concat([fromDate, fromDate]);
+        }
+        if (toDate) {
+            q += ' AND `Timestamp` <= ?';
+            args.push(toDate);
+        }
+
+        q += ' ORDER BY Timestamp desc';
+
+        return this.query(q, args)
             .map(results => results || [])
-            .map(results => results.reduce((orders, orderBeerRow) => {
-                let order = orders.find(p => p.OrderId === orderBeerRow.OrderId);
-                if (!order) {
-                    order = this.mapOrder(orderBeerRow);
-                    order.OrderBeers = [];
-                    order.UserVotes = [];
-                    orders.push(order);
-                }
-
-                this.mapOrderBeerRow(order, orderBeerRow, userId);
-
-                return orders;
-            }, []));
+            .map(results => results.map(order => this.mapOrder(order)));
     }
 
-    getOrder(userId, orderId: number): Observable<Order> {
-        let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate, p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
+    getOrder(userId: number, orderId: number): Observable<Order> {
+        let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate,'
+            + ' p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
             + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
             + ' pv.OrderVoteId, pv.VoteId, v.UserId, (`Vote`-2) as Vote from `orders` p'
             + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
@@ -901,34 +894,31 @@ export class MysqlDatabase implements Database {
         return this.query(q, [orderId])
             .map(result => result.reduce((order, voteRow) => {
                 if (!order) {
+                    // init order on first iteration
                     order = this.mapOrder(voteRow);
                     order.OrderBeers = [];
                     order.UserVotes = [];
                 }
+                if (!voteRow.OrderBeerId) {
+                    return order;
+                }
 
-               return this.mapOrderBeerRow(order, voteRow, userId);
+                let orderBeer = order.OrderBeers.find(b => b.OrderBeerId === voteRow.OrderBeerId);
+
+                if (!orderBeer) {
+                    // init orderBeer if first encounter (there can be many votes per order beer)
+                    orderBeer = this.mapOrderBeer(voteRow);
+                    order.OrderBeers.push(orderBeer);
+                }
+
+                if (voteRow.Vote) {
+                    orderBeer.NetVote += voteRow.Vote;
+                    if (voteRow.UserId === userId) {
+                        order.UserVotes.push(this.mapOrderVote(voteRow));
+                    }
+                }
+               return order;
             }, null));
-    }
-
-    private mapOrderBeerRow(order: any, voteRow: any, userId: number) {
-        if (!voteRow.OrderBeerId) {
-            return order;
-        }
-
-        let orderBeer = order.OrderBeers.find(b => b.OrderBeerId === voteRow.OrderBeerId);
-
-        if (!orderBeer) {
-            orderBeer = this.mapOrderBeer(voteRow);
-            order.OrderBeers.push(orderBeer);
-        }
-
-        if (voteRow.Vote) {
-            orderBeer.NetVote += voteRow.Vote;
-            if (voteRow.UserId === userId) {
-                order.UserVotes.push(this.mapOrderVote(voteRow));
-            }
-        }
-        return order;
     }
 
     addOrder(title: string, description: string, votesPerUser: number): Observable<number> {

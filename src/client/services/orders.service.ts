@@ -24,14 +24,12 @@ export class OrderService {
         });
     }
 
-    observe(orderId: number, init: Order): Subscribable<Order> {
-        let sub = this.getSubject(this.orders, orderId);
-        sub.next(init);
-        return sub;
+    observe(orderId: number): Observable<Order> {
+        return this.getSubject(this.orders, orderId);
     }
 
-    getOrders(): Observable<Order[]> {
-        return this.http.get(`/api/orders`)
+    getOrders(fromDate: string, toDate: string): Observable<Order[]> {
+        return this.http.get(`/api/orders?fromDate=${fromDate}&toDate=${toDate}`)
         .map(res => res.json())
         .map(result => result.Orders);
     }

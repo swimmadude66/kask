@@ -5,14 +5,12 @@ module.exports = (APP_CONFIG) => {
     const db = APP_CONFIG.database;
 
     router.get('/', (req, res) => {
-        let userId = 0;
         let isAdmin = false;
         if (res.locals && res.locals.user) {
-            userId = res.locals.user.UserId;
             isAdmin = res.locals.user.IsAdmin;
         }
 
-        db.getOrders(userId, isAdmin).subscribe(
+        db.getOrders(isAdmin, req.query && req.query.fromDate, req.query && req.query.toDate).subscribe(
             orders => res.send({Orders: orders}),
             err => res.status(500).send('Could not retrieve orders')
         );
