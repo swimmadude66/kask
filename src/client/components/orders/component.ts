@@ -40,7 +40,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
         this.locationService.getLocations().subscribe(locations => this.locations = locations);
 
-        this.orderService.getOrders(NgbDateHelper.dateToString(this.fromDate), NgbDateHelper.dateToString(this.toDate))
+        this.orderService.getOrders(NgbDateHelper.dateToString(this.fromDate), NgbDateHelper.dateToString(this.toDate, true))
             .subscribe(orders => this.orders = orders);
     }
 
@@ -53,7 +53,8 @@ export class OrdersComponent implements OnInit, OnDestroy {
         this.isAddingOrder = false;
 
         this.orderService.createOrder(order.title, order.description, order.votesPerUser)
-            .flatMap(_ => this.orderService.getOrders(NgbDateHelper.dateToString(this.fromDate), NgbDateHelper.dateToString(this.toDate)))
+            .flatMap(_ => this.orderService.getOrders(NgbDateHelper.dateToString(this.fromDate),
+                NgbDateHelper.dateToString(this.toDate, true)))
             .subscribe(orders => this.orders = orders);
     }
 

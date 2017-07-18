@@ -36,7 +36,7 @@ export class DateRangeComponent implements OnInit {
     onToDateChange(newDate: NgbDateStruct) {
         this.toDate = newDate;
 
-        if (this.toDate && this.fromDate 
+        if (this.toDate && this.fromDate
             && new Date(NgbDateHelper.dateToString(this.toDate)) < new Date(NgbDateHelper.dateToString(this.fromDate))) {
             this.onFromDateChange(newDate);
         }
