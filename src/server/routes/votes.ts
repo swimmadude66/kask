@@ -1,5 +1,6 @@
 import {Database} from '../models/database.model';
 import * as express from 'express';
+import { Observable } from 'rxjs/Rx';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
@@ -44,13 +45,32 @@ module.exports = (APP_CONFIG) => {
         if (!req.body || !req.body.Vote) {
             return res.status(400).send('Vote is a required field');
         }
-        let userId = res.locals.user.UserId;
+         let userId = res.locals.user.UserId;
         db.voteForSession(req.params.sessionId, userId, req.body.Vote)
         .subscribe(
             _ => res.status(204).end(),
             err => {
                 console.error(err);
                 return res.status(500).send('Could not vote for session');
+            }
+        );
+    });
+
+    router.post('/order/:orderId/beer', (req, res) => {
+        if (!req.body || !req.body.Vote || !req.body.OrderBeerId) {
+            return res.status(400).send('Vote and orderBeerId are required fields');
+        }
+        let userId = res.locals.user.UserId;
+
+        db.userCanVoteForOrder(userId, req.params.orderId)
+        .flatMap(canVote => canVote
+            ? db.voteForOrderBeer(req.body.OrderBeerId, userId, req.body.Vote)
+            : Observable.throw('User is not eligible to vote for order'))
+        .subscribe(
+            _ => res.status(204).end(),
+            err => {
+                console.error(err);
+                return res.status(500).send('Could not vote for order beer');
             }
         );
     });

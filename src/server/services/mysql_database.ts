@@ -1,16 +1,10 @@
 import {Observable} from 'rxjs/Rx';
-import {createPool, IPoolConfig, Pool, escape} from 'mysql';
-import {
-    Beer,
-    Brewery,
-    Style,
-    Database,
-    Tap,
-    Location,
-    KegSize,
-    Keg,
-    BeerSession
-} from '../models';
+import {createPool, escape, IPoolConfig, Pool} from 'mysql';
+import {ErrorObservable} from 'rxjs/observable/ErrorObservable';
+import { Beer, BeerSession, Brewery, Database, Keg, KegSize, Location, Style, Tap } from '../models';
+import { Order, OrderStatus } from '../models/order.model';
+import { OrderBeer } from '../models/orderbeer.model';
+import { OrderVote, Vote } from '../models/ordervote.model';
 
 export class MysqlDatabase implements Database {
 
@@ -93,51 +87,103 @@ export class MysqlDatabase implements Database {
         return keg;
     }
 
-    private mapBeer(result: any): Beer {
+    private mapBeer(result: any, verbose = true): Beer {
         let beer: Beer = {
             BeerId: result.BeerId,
-            BeerBDBID: result.BeerBDBID,
-            Brewery: this.mapBrewery(result),
-            Style: this.mapStyle(result),
             BeerName: result.BeerName,
-            BeerDescription: result.BeerDescription,
-            ABV: result.ABV,
-            IBU: result.IBU,
-            LabelUrl: result.LabelUrl,
-            LabelScalingFactor: result.LabelScalingFactor,
-            LabelOffsetX: result.LabelOffsetX,
-            LabelOffsetY: result.LabelOffsetY
+            Brewery: this.mapBrewery(result, verbose),
+            Style: this.mapStyle(result, verbose),
         };
+
+        if (verbose) {
+            Object.assign(beer, {
+                BeerBDBID: result.BeerBDBID,
+                BeerDescription: result.BeerDescription,
+                ABV: result.ABV,
+                IBU: result.IBU,
+                LabelUrl: result.LabelUrl,
+                LabelScalingFactor: result.LabelScalingFactor,
+                LabelOffsetX: result.LabelOffsetX,
+                LabelOffsetY: result.LabelOffsetY
+            });
+        }
+
         return beer;
     }
 
-    private mapStyle(result: any): Style {
+    private mapStyle(result: any, verbose = true): Style {
         let style: Style = {
             StyleId: result.StyleId,
-            StyleBDBID: result.StyleBDBID,
-            StyleName: result.StyleName,
-            StyleDescription: result.StyleDescription,
-            ABVMin: result.ABVMin,
-            ABVMax: result.ABVMax,
-            IBUMin: result.IBUMin,
-            IBUMax: result.IBUMax,
-            SRMMin: result.SRMMin,
-            SRMMax: result.SRMMax
-        };
+            StyleName: result.StyleName
+        }
+
+        if (verbose) {
+            Object.assign(style,  {
+                StyleBDBID: result.StyleBDBID,
+                StyleDescription: result.StyleDescription,
+                ABVMin: result.ABVMin,
+                ABVMax: result.ABVMax,
+                IBUMin: result.IBUMin,
+                IBUMax: result.IBUMax,
+                SRMMin: result.SRMMin,
+                SRMMax: result.SRMMax
+            });
+        }
+
         return style;
     }
 
-    private mapBrewery(result: any): Brewery {
+    private mapBrewery(result: any, verbose = true): Brewery {
         let brewery: Brewery = {
             BreweryId: result.BreweryId,
-            BreweryBDBID: result.BreweryBDBID,
-            BreweryName: result.BreweryName,
-            BreweryDescription: result.BreweryDescription,
-            Established: result.Established,
-            Image: result.Image,
-            Website: result.Website
+            BreweryName: result.BreweryName
         };
+
+        if (verbose) {
+            Object.assign(brewery, {
+                BreweryBDBID: result.BreweryBDBID,
+                BreweryDescription: result.BreweryDescription,
+                Established: result.Established,
+                Image: result.Image,
+                Website: result.Website
+            });
+        }
         return brewery;
+    }
+
+    private mapOrder(result: any): Order {
+        let order: Order = {
+            OrderId: result.OrderId,
+            Title: result.Title,
+            Description: result.Description,
+            VotesPerUser: result.VotesPerUser,
+            PlacedDate: result.PlacedDate,
+            ReceivedDate: result.ReceivedDate,
+            Status: result.Status
+        };
+        return order;
+    }
+
+    private mapOrderVote(result: any): OrderVote {
+        let orderVote: OrderVote = {
+            OrderVoteId: result.OrderVoteId,
+            OrderBeerId: result.OrderBeerId,
+            UserId: result.UserId,
+            Vote: result.Vote
+        };
+
+        return orderVote;
+    }
+
+    private mapOrderBeer(result: any): OrderBeer {
+        let orderBeer: OrderBeer = {
+            OrderBeerId: result.OrderBeerId,
+            Size: result.Size,
+            Beer: this.mapBeer(result, false),
+            NetVote: 0
+        };
+
+        return orderBeer;
     }
 
     registerUser(username: string, salt: string, passHash: string): Observable<number> {
@@ -146,10 +192,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, params)
         .map(
             result => result.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not register new user');
-            }
+            err => this.logErrorAndThrow(err, 'Could not register new user')
         );
     }
 
@@ -164,10 +207,7 @@ export class MysqlDatabase implements Database {
                     return Observable.throw('Error logging in');
                 }
                 return results[0];
-            }, err => {
-                console.error(err);
-                return Observable.throw('Could not look up user ' + username);
-            }
+            }, err => this.logErrorAndThrow(err, 'Could not look up user ' + username)
         );
     }
 
@@ -191,10 +231,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            err => {
-                console.error(err);
-                return Observable.throw('Error getting user by session');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting user by session')
         );
     }
 
@@ -212,10 +249,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, params)
         .map(
             results => results.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Error saving beer to database');
-            }
+            err => this.logErrorAndThrow(err, 'Error saving beer to database')
         );
     }
 
@@ -251,10 +285,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, style)
         .map(
             results => results.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Error saving style to database');
-            }
+            err => this.logErrorAndThrow(err, 'Error saving style to database')
         );
     }
 
@@ -286,10 +317,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, brewery)
         .map(
             results => results.insertId,
-            err => {
-                console.error(err);
-                return Observable.throw('Error saving brewery to database');
-            }
+            err => this.logErrorAndThrow(err, 'Error saving brewery to database')
         );
     }
 
@@ -321,10 +349,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving styles');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving styles')
         );
     }
 
@@ -338,10 +363,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving style');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving style')
         );
     }
 
@@ -350,10 +372,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving breweries');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving breweries')
         );
     }
 
@@ -367,10 +386,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving brewery');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving brewery')
         );
     }
 
@@ -401,10 +417,7 @@ export class MysqlDatabase implements Database {
                 }
                 return this.mapBeer(results[0]);
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error retrieving beer');
-            }
+            err => this.logErrorAndThrow(err, 'Error retrieving beer')
         );
     }
 
@@ -413,10 +426,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting locations');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting locations')
         );
     }
 
@@ -430,10 +440,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting location');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting location')
         );
     }
 
@@ -442,10 +449,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description])
         .map(
             result => result.insertId,
-            error => {
-                console.error(error);
-                return Observable.throw('Error adding location');
-            }
+            err => this.logErrorAndThrow(err, 'Error adding location')
         );
     }
 
@@ -454,10 +458,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description, locationId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not update location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not update location')
         );
     }
 
@@ -466,10 +467,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [locationId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not delete location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not delete location')
         );
     }
 
@@ -478,10 +476,7 @@ export class MysqlDatabase implements Database {
         return this.query(q)
         .map(
             results => results,
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting taps');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting taps')
         );
     }
 
@@ -495,10 +490,7 @@ export class MysqlDatabase implements Database {
                 }
                 return results[0];
             },
-            error => {
-                console.error(error);
-                return Observable.throw('Error getting tap');
-            }
+            err => this.logErrorAndThrow(err, 'Error getting tap')
         );
     }
 
@@ -507,10 +499,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description, status])
         .map(
             result => result.insertId,
-            error => {
-                console.error(error);
-                return Observable.throw('Error adding tap');
-            }
+            err => this.logErrorAndThrow(err, 'Error adding tap')
         );
     }
 
@@ -519,10 +508,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [name, description, status, tapId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not update tap');
-            }
+            err => this.logErrorAndThrow(err, 'Could not update tap')
         );
     }
 
@@ -531,10 +517,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [tapId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not delete tap');
-            }
+            err => this.logErrorAndThrow(err, 'Could not delete tap')
         );
     }
 
@@ -549,9 +532,7 @@ export class MysqlDatabase implements Database {
                 return -1;
             }
             return results[0].LocationId;
-        }, err => {
-            console.error(err);
-        });
+        }, err => console.error(err));
     }
 
     getKegTap(kegId: number): Observable<number> {
@@ -565,9 +546,7 @@ export class MysqlDatabase implements Database {
                 return -1;
             }
             return results[0].TapId;
-        }, err => {
-            console.error(err);
-        });
+        }, err => console.error(err));
     }
 
     findKeg(kegId: number): Observable<string> {
@@ -618,10 +597,7 @@ export class MysqlDatabase implements Database {
         )
         .map(
             _ => _,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not tap beer');
-            }
+            err => this.logErrorAndThrow(err, 'Could not tap beer')
         );
     }
 
@@ -684,10 +660,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [tapId])
         .map(
             result => !!result,
-            error => {
-                console.error(error);
-                return Observable.throw('Could not untap keg!');
-            }
+            err => this.logErrorAndThrow(err, 'Could not untap keg!')
         );
     }
 
@@ -709,10 +682,7 @@ export class MysqlDatabase implements Database {
         return this.query(q, [locationId])
         .map(
             results => results.map(keg => this.mapKeg(keg)),
-            err => {
-                console.error(err);
-                return Observable.throw('Could not get contents of location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not get contents of location')
         );
     }
 
@@ -730,21 +700,62 @@ export class MysqlDatabase implements Database {
     }
 
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any> {
-        let q = 'INSERT INTO `beer_session_likes` (`BeerSessionId`, `UserId`, `Vote`)'
-        + ' VALUES (?, ?, ?)'
-        + ' ON Duplicate Key Update `Vote`=Values(`Vote`);';
-        return this.query(q, [sessionId, userId, vote.toLowerCase()]);
+        let getVoteExists = 'SELECT bsv.`VoteId` FROM `beer_session_votes` bsv'
+            + ' JOIN `votes` v ON bsv.`VoteId` = v.`VoteId`'
+            + ' WHERE bsv.`BeerSessionId` = ? AND v.`UserId` = ?;';
+
+        let voteInsert = 'INSERT INTO `votes` (`Vote`, `UserId`)'
+        + ' VALUES (?, ?);';
+
+        let sessionVoteInsert = 'INSERT INTO `beer_session_votes` (`BeerSessionId`, `VoteId`)'
+        + ' VALUES (?, ?);';
+
+        let voteUpdate = 'UPDATE `votes` SET `vote` = ? WHERE `VoteId` = ?;';
+
+        let existingVoteId: number;
+
+        return this.query(getVoteExists, [sessionId, userId])
+            .do(result => existingVoteId = result[0] ? result[0].VoteId : null)
+            .map(result => result.length ? voteUpdate : voteInsert)
+            .flatMap(query => this.query(query, [vote.toLowerCase(), existingVoteId || userId]))
+            .flatMap(result => result.insertId
+                ? this.query(sessionVoteInsert, [sessionId, result.insertId])
+                : Observable.of(result));
+    }
+
+    voteForOrderBeer(orderBeerId: number, userId: number, vote: string): Observable<any> {
+        let getVoteExists = 'SELECT pv.`VoteId` FROM `order_votes` pv'
+            + ' JOIN `votes` v ON pv.`VoteId` = v.`VoteId`'
+            + ' WHERE pv.`OrderBeerId` = ? AND v.`UserId` = ?;';
+
+        let voteInsert = 'INSERT INTO `votes` (`Vote`, `UserId`)'
+        + ' VALUES (?, ?);';
+
+        let sessionVoteInsert = 'INSERT INTO `order_votes` (`OrderBeerId`, `VoteId`)'
+        + ' VALUES (?, ?);';
+
+        let voteUpdate = 'UPDATE `votes` SET `Vote` = ? WHERE `VoteId` = ?;';
+
+        let existingVoteId: number;
+
+        return this.query(getVoteExists, [orderBeerId, userId])
+            .do(result => existingVoteId = result[0] ? result[0].VoteId : null)
+            .map(result => result.length ? voteUpdate : voteInsert)
+            .flatMap(query => this.query(query, [vote.toLowerCase(), existingVoteId || userId]))
+            .flatMap(result => result.insertId
+                ? this.query(sessionVoteInsert, [orderBeerId, result.insertId])
+                : Observable.of(result));
     }
 
     getSessionVotes(sessionId: number): Observable<any[]> {
-        let q = 'Select `UserId`, (`Vote`-2) as Vote from `beer_session_likes` Where `BeerSessionId` = ?;';
+        let q = 'SELECT v.`UserId`, (`Vote`-2) as Vote FROM `beer_session_votes` bsv'
+            + ' JOIN `votes` v ON bsv.`VoteId` = v.`VoteId`'
+            + ' WHERE bsv.`BeerSessionId` = ?;';
+
         return this.query(q, [sessionId])
         .map(
             results => results,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not retrieve votes for beer session');
-            }
+            err => this.logErrorAndThrow(err, 'Could not retrieve votes for beer session')
         );
     }
 
@@ -785,10 +796,7 @@ export class MysqlDatabase implements Database {
             })
         .map(
             _ => _,
-            err => {
-                console.error(err);
-                return Observable.throw('Could not get contents of location');
-            }
+            err => this.logErrorAndThrow(err, 'Could not get contents of location')
         );
     }
 
@@ -842,10 +850,139 @@ export class MysqlDatabase implements Database {
             })
             .map(
                 _ => _,
-                err => {
-                    console.error(err);
-                    return Observable.throw('Could not get contents of location');
-                }
+                err => this.logErrorAndThrow(err, 'Could not get contents of location')
             );
+    }
+
+    getOrders(isAdmin: boolean, fromDate: string, toDate: string): Observable<Order[]> {
+        let args = [];
+
+        let q = 'SELECT * from `orders`'
+            + ' WHERE `Status` != \'cancelled\''
+            + (isAdmin ? '' : ' AND `Status` != \'incomplete\'');
+
+        if (fromDate) {
+            q += ' AND (`Timestamp` > ? OR `PlacedDate` > ?)';
+            args = args.concat([fromDate, fromDate]);
+        }
+        if (toDate) {
+            q += ' AND `Timestamp` <= ?';
+            args.push(toDate);
+        }
+
+        q += ' ORDER BY Timestamp desc';
+
+        return this.query(q, args)
+            .map(results => results || [])
+            .map(results => results.map(order => this.mapOrder(order)));
+    }
+
+    getOrder(userId: number, orderId: number): Observable<Order> {
+        let q = 'SELECT p.OrderId, p.Title, p.Description, p.VotesPerUser, p.Status, p.PlacedDate,'
+            + ' p.ReceivedDate, pb.OrderBeerId, pb.BeerId, pb.Size, b.BeerName,'
+            + ' b.BeerDescription, b.StyleId, b.BreweryId, br.BreweryName, br.BreweryDescription, s.StyleName, s.StyleDescription,'
+            + ' pv.OrderVoteId, pv.VoteId, v.UserId, (`Vote`-2) as Vote from `orders` p'
+            + ' LEFT JOIN order_beers pb ON p.orderid = pb.orderid'
+            + ' LEFT JOIN beers b on pb.BeerId = b.BeerId'
+            + ' LEFT JOIN breweries br on b.BreweryId = br.BreweryId'
+            + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
+            + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
+            + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
+            + ' WHERE p.`orderid` = ?'
+            + ' ORDER BY pb.OrderBeerId;';
+
+        return this.query(q, [orderId])
+            .map(result => result.reduce((order, voteRow) => {
+                if (!order) {
+                    // init order on first iteration
+                    order = this.mapOrder(voteRow);
+                    order.OrderBeers = [];
+                    order.UserVotes = [];
+                }
+                if (!voteRow.OrderBeerId) {
+                    return order;
+                }
+
+                let orderBeer = order.OrderBeers.find(b => b.OrderBeerId === voteRow.OrderBeerId);
+
+                if (!orderBeer) {
+                    // init orderBeer if first encounter (there can be many votes per order beer)
+                    orderBeer = this.mapOrderBeer(voteRow);
+                    order.OrderBeers.push(orderBeer);
+                }
+
+                if (voteRow.Vote) {
+                    orderBeer.NetVote += voteRow.Vote;
+                    if (voteRow.UserId === userId) {
+                        order.UserVotes.push(this.mapOrderVote(voteRow));
+                    }
+                }
+               return order;
+            }, null));
+    }
+
+    addOrder(title: string, description: string, votesPerUser: number): Observable<number> {
+        let q = 'INSERT INTO `orders` (`title`, `description`, `votesperuser`)'
+        + ' VALUES (?, ?, ?);';
+
+        return this.query(q, [title, description, votesPerUser])
+            .map(result => result.insertId,
+                err => this.logErrorAndThrow(err, 'an error occurred adding order'));
+    }
+
+    addBeerToOrder(beerId: number, orderId: number, size: KegSize): Observable<number> {
+        let q = 'INSERT INTO `order_beers` (`orderid`, `beerid`, `size`)'
+        + ' VALUES (?, ?, ?)'
+        + ' ON DUPLICATE KEY UPDATE `size`=VALUES(`size`);';
+
+        return this.query(q, [beerId, orderId, size])
+            .map(result => result.insertId,
+                err => this.logErrorAndThrow(err, 'an error occurred adding beer to order'));
+    }
+
+    removeBeerFromOrder(orderId: number, orderBeerId: number): Observable<any> {
+        let q1 = 'DELETE FROM `order_votes` WHERE `orderbeerid` = ?;';
+        let q2 = 'DELETE FROM `order_beers` WHERE `orderid` = ? AND `orderbeerid` = ?;';
+
+        return this.query(q1, [orderBeerId])
+            .flatMap(_ => this.query(q2, [orderId, orderBeerId]))
+            .map(result => result,
+                err => this.logErrorAndThrow(err, 'an error occurred removing beer from order'));
+    }
+
+    updateOrder(orderId: number, partialOrder: any): Observable<any> {
+        let keys = Object.keys(partialOrder);
+
+        if (!keys.length) {
+            return Observable.of(null);
+        }
+
+        let q = 'UPDATE `orders` SET';
+        let args = [];
+
+        keys.forEach(key => {
+             q += ` ${key} = ?,`;
+            args.push(partialOrder[key]);
+        });
+
+        q = q.slice(0, -1);
+
+        q += ' WHERE `orderid` = ?;';
+        args.push(orderId);
+
+        return this.query(q, args)
+            .map(result => result,
+                err => this.logErrorAndThrow(err, 'an error occurred updating order'));
+    }
+
+    userCanVoteForOrder(userId: number, orderId: number): Observable<boolean> {
+        return this.getOrder(userId, orderId)
+            .map(order => order.Status === OrderStatus.Pending
+                && order.UserVotes.filter(v => v.Vote !== Vote.None).length <= order.VotesPerUser);
+    }
+
+    private logErrorAndThrow(err: string, messageToThrow?: string): ErrorObservable<string> {
+        console.error(err);
+        return Observable.throw(messageToThrow || err);
     }
 }

@@ -20,7 +20,7 @@ import {SharedModule} from './shared.module';
             { path: '', loadChildren: './+dashboard.module.ts#LazyDashboardModule' },
             { path: 'admin', canActivate: [AdminGuard], loadChildren: './+admin.module.ts#LazyAdminModule' },
             { path: 'stats', loadChildren: './+stats.module.ts#LazyStatsModule' },
-            // { path: 'votes', canActivate: [LoggedInGuard], loadChildren: './+votes.module.ts#LazyVotesModule' },
+            { path: 'orders', loadChildren: './+orders.module.ts#LazyOrdersModule' },
             { path: 'info', loadChildren: './+info.module.ts#LazyInfoModule' },
             // { path: 'user', canActivate: [LoggedInGuard], loadChildren: './+user.module.ts#LazyUserModule'}
         ]

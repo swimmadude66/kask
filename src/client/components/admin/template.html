@@ -2,14 +2,14 @@
   <div class="row">
     <div class="col-md-6" *ngFor="let tap of taps; let i = index">
       <div class="tap-edit">
-        <tap-edit [info]="tap" [tapNum]="i" [locations]="locations"></tap-edit>
+        <tap-edit [info]="tap" [tapNum]="i" [locations]="locations" (moveSubmitted)="handleMove($event)"></tap-edit>
       </div>
     </div>
   </div>
   <div class="row">
     <div class="col-12">
       <section class="storage-section" *ngFor="let location of locations">
-          <location [info]="location" [taps]="taps"></location>
+          <location [info]="location" [taps]="taps" (moveSubmitted)="handleMove($event)"></location>
       </section>
     </div>
   </div>

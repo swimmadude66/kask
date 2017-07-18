@@ -1,0 +1,17 @@
+@import '../../../scss/_variables';
+
+
+.filters {
+    color: $chalk-color;
+
+    margin-bottom: 1em;
+
+    .input-group-addon {
+        color: #333;
+        cursor: pointer;
+    }
+
+    .btn.btn-link {
+        color: $link-color;
+    }
+}

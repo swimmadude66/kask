@@ -39,7 +39,7 @@
             </ng-container>
           </td>
           <td>
-            <keg-move [info]="keg" [taps]="taps" [locations]="otherLocations"></keg-move>
+            <keg-move [info]="keg" [taps]="taps" [locations]="otherLocations" [showClear]="true" (moveSubmitted)="handleMove($event)"></keg-move>
           </td>
         </tr>
       </ng-container>
@@ -67,41 +67,7 @@
     </div>
   </div>
 
-  <form *ngIf="isAddingKeg" (ngSubmit)="submitNewKeg()">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group">
-          <label>Beer</label>
-          <input
-                  placeholder="Search"
-                  type="text"
-                  name="newbeer"
-                  class="form-control"
-                  [(ngModel)]="beerToLoad"
-                  [ngbTypeahead]="search"
-                  [resultFormatter]="getBeerDisplay"
-                  [inputFormatter]="getBeerName"
-                  (selectItem)="beerSelected($event)"
-                  showHint="true" />
-        </div>
-        <div class="form-group">
-          <label>Keg Size</label>
-          <select class="form-control" (change)="kegSizeToLoad = $event.target.value">
-            <option value="">(Select Keg Size)</option>
-            <option value="1/2">1/2 Barrel</option>
-            <option value="1/4">1/4 Barrel</option>
-            <option value="1/6">1/6 Barrel</option>
-          </select>
-        </div>
-        <button type="submit" name="submit" id="keg-submit" class="btn btn-outline-success" [ngClass]="!kegSizeToLoad ? 'disabled': ''">
-          Submit
-        </button>
-        <button type="button" name="cancel" id="keg-cancel" class="btn btn-outline-danger pull-right" (click)="isAddingKeg=false">
-          Cancel
-        </button>
-      </div>
-    </div>
-  </form>
+  <keg-add *ngIf="isAddingKeg" (cancelled)="isAddingKeg=false" (kegSubmitted)="submitNewKeg($event)"></keg-add>
 
   <button class="btn btn-outline-info" type="button" (click)="isAddingKeg=true" *ngIf="!isAddingKeg && !editing">New Keg</button>
 </div>

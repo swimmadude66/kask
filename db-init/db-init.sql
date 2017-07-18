@@ -118,19 +118,6 @@ CREATE TABLE IF NOT EXISTS `beer_sessions` (
   CONSTRAINT `FK_Tap` FOREIGN KEY (`TapId`) REFERENCES `taps` (`TapId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Record of beer taptimes';
 
-CREATE TABLE IF NOT EXISTS `beer_session_likes` (
-  `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `BeerSessionId` int(11) NOT NULL,
-  `UserId` int(11) NOT NULL,
-  `Vote` enum('down','none','up') NOT NULL DEFAULT 'none',
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `oneVote` (`BeerSessionId`,`UserId`),
-  KEY `bsession_idx` (`BeerSessionId`),
-  KEY `uservotes_idx` (`UserId`),
-  CONSTRAINT `bsession` FOREIGN KEY (`BeerSessionId`) REFERENCES `beer_sessions` (`SessionId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `uservotes` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `keg_locations` (
   `KegLocId` int(11) NOT NULL AUTO_INCREMENT,
   `LocationId` int(11) NOT NULL,
@@ -156,4 +143,62 @@ CREATE TABLE IF NOT EXISTS `pours` (
   CONSTRAINT `pourfromkeg` FOREIGN KEY (`KegId`) REFERENCES `kegs` (`KegId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `orders` (
+  `OrderId` int(11) NOT NULL AUTO_INCREMENT,
+  `Title` varchar(256) NOT NULL,
+  `Description` varchar(1024) NULL,
+  `VotesPerUser` int(11) NOT NULL DEFAULT '1',
+  `Status` enum('incomplete', 'pending', 'finalized', 'cancelled', 'placed', 'received') NOT NULL DEFAULT 'incomplete',
+  `PlacedDate` timestamp NULL,
+  `ReceivedDate` timestamp NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`OrderId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `order_beers` (
+  `OrderBeerId` int(11) NOT NULL AUTO_INCREMENT,
+  `OrderId` int(11) NOT NULL,
+  `BeerId` int(11) NOT NULL,
+  `Size` enum('1/2','1/3','1/4','1/5','1/6') NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`OrderBeerId`),
+  KEY `FK_order_idx` (`OrderId`),
+  KEY `FK_beer_idx` (`BeerId`),
+  UNIQUE KEY `orderbeer_unique` (`OrderId`, `BeerId`),
+  CONSTRAINT `FK_order` FOREIGN KEY (`OrderId`) REFERENCES `orders` (`OrderId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_beer` FOREIGN KEY (`BeerId`) REFERENCES `beers` (`BeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `votes` (
+  `VoteId` int(11) NOT NULL AUTO_INCREMENT,
+  `UserId` int(11) NOT NULL,
+  `Vote` enum('down','none','up') NOT NULL DEFAULT 'none',
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`VoteId`),
+  KEY `FK_user_idx` (`UserId`),
+  CONSTRAINT `FK_user` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `order_votes` (
+  `OrderVoteId` int(11) NOT NULL AUTO_INCREMENT,
+  `OrderBeerId` int(11) NOT NULL,
+  `VoteId` int(11) NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`OrderVoteId`),
+  KEY `FK_orderbeer_idx` (`OrderBeerId`),
+  KEY `FK_ordervote_idx` (`VoteId`),
+  CONSTRAINT `FK_orderbeer` FOREIGN KEY (`OrderBeerId`) REFERENCES `order_beers` (`OrderBeerId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_ordervote` FOREIGN KEY (`VoteId`) REFERENCES `votes` (`VoteId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `beer_session_votes` (
+  `BeerSessionVoteId` int(11) NOT NULL AUTO_INCREMENT,
+  `BeerSessionId` int(11) NOT NULL,
+  `VoteId` int(11) NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`BeerSessionVoteId`),
+  KEY `FK_bsession_idx` (`BeerSessionId`),
+  KEY `FK_beervote_idx` (`VoteId`),
+  CONSTRAINT `bsession` FOREIGN KEY (`BeerSessionId`) REFERENCES `beer_sessions` (`SessionId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_beervote` FOREIGN KEY (`VoteId`) REFERENCES `votes` (`VoteId`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -6,7 +6,7 @@
     <div class="beer-container">
       <div *ngIf="tapSession?.Keg?.Beer">
         <a class="beer" [routerLink]="'/info/beer/' + tapSession?.Keg?.Beer.BeerId">{{tapSession?.Keg?.Beer.BeerName}}</a>
-        <keg-move [info]="tapSession?.Keg" [locations]="locations"></keg-move>
+        <keg-move [info]="tapSession?.Keg" [locations]="locations" [showClear]="true" (moveSubmitted)="handleMove($event)"></keg-move>
       </div>
       <div *ngIf="!tapSession?.Keg?.Beer">
         <span class="beer empty">Empty</span>
