@@ -1,6 +1,7 @@
 import {MysqlDatabase} from '../services/mysql_database';
 import * as express from 'express';
 import { Observable } from 'rxjs/Rx';
+import { Order } from '../models/order.model';
 
 module.exports = (APP_CONFIG) => {
     const router = express.Router();
@@ -21,6 +22,15 @@ module.exports = (APP_CONFIG) => {
             db.getLocationContents(locationId)
             .subscribe(
                 contents => sockets.emit('LocationContentsEvent', {LocationId: locationId, Contents: contents})
+            );
+        });
+    }
+
+    function socketUpdateOrders(userId, orderIds: number[]): void {
+        orderIds.forEach(orderId => {
+            db.getOrder(userId, orderId)
+            .subscribe(
+                order => sockets.emit('OrderEvent', {OrderId: orderId, Order: order})
             );
         });
     }
@@ -265,6 +275,68 @@ module.exports = (APP_CONFIG) => {
                 return res.status(500).send('Could not scale label scale');
             }
         );
+    });
+
+    router.post('/orders', (req, res) => {
+        let body = req.body;
+        if (!body || !body.Title) {
+            return res.status(400).send('Orders require a title');
+        }
+        db.addOrder(body.Title, body.Description, body.VotesPerUser)
+        .subscribe(
+            orderId => {
+                res.send({OrderId: orderId});
+                return socketUpdateOrders(res.locals.user.UserId, [orderId]);
+        },
+            err => res.status(500).send(err)
+        );
+    });
+
+    router.put('/orders/:orderId/beer', (req, res) => {
+        let body = req.body;
+        if (!body || !body.BeerId) {
+            return res.status(400).send('BeerId is required');
+        }
+
+        db.addBeerToOrder(req.params.orderId, body.BeerId, body.Size || '')
+            .subscribe(
+                OrderBeerId => {
+                    res.send({OrderBeerId: OrderBeerId});
+                    return socketUpdateOrders(res.locals.user.UserId, [req.params.orderId]);
+                },
+                err => res.status(500).send(err)
+            );
+    });
+
+    router.delete('/orders/:orderId/beer/:orderBeerId', (req, res) => {
+        db.removeBeerFromOrder(req.params.orderId, req.params.orderBeerId)
+            .subscribe(
+                _ => {
+                    res.send();
+                    return socketUpdateOrders(res.locals.user.UserId, [req.params.orderId]);
+                },
+                err => res.status(500).send(err)
+            );
+    });
+
+    router.patch('/orders/:orderId', (req, res) => {
+        let body = req.body;
+
+        if (body.Status && body.Status === 'placed') {
+            body.PlacedDate = new Date().toISOString().replace('T', ' ').replace('Z', '');
+        }
+        if (body.Status && body.Status === 'received') {
+            body.ReceivedDate = new Date().toISOString().replace('T', ' ').replace('Z', '');
+        }
+
+        db.updateOrder(req.params.orderId, body)
+            .subscribe(
+                _ => {
+                    res.send();
+                    return socketUpdateOrders(res.locals.user.UserId, [req.params.orderId]);
+                },
+                err => res.status(500).send(err)
+            );
     });
 
     return router;

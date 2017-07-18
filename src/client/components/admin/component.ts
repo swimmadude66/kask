@@ -31,20 +31,22 @@ export class AdminComponent implements OnInit, OnDestroy {
 
     }
 
-    // addTap() {
-    //     this._tapService.addTap(this.info)
-    //         .subscribe(
-    //             id => {
-    //                 this.info.TapId = id;
-    //                 this.editing = false;
-    //             }, err => console.log(err),
-    //             () => this.loaded = true
-    //         );
-    // }
-
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
     }
 
+    handleMove(result) {
+        if (!!result.dest) {
+            if (result.dest.indexOf('tap_') === 0) {
+                this._adminService.loadTapFromStorage(+result.dest.replace('tap_', ''), result.kegId)
+                .subscribe();
+            } else if (result.dest.indexOf('loc_') === 0) {
+                let dest = +result.dest.replace('loc_', '');
+                this._adminService.move(result.kegId, dest).subscribe();
+            } else {
+                this._adminService.clearKeg(result.kegId).subscribe(_ => _);
+            }
+        }
+    }
 }

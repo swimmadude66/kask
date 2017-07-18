@@ -1,0 +1,74 @@
+<ng-container *ngIf="order">
+<add-order 
+  *ngIf="isEditing" 
+  (submitted)="submitEdit($event)" 
+  (cancelled)="isEditing=false" 
+  [title]="order.Title" 
+  [description]="order.Description" 
+  [votesPerUser]="order.VotesPerUser"
+></add-order>
+
+<div *ngIf="!isEditing">
+  <button *ngIf="isAdmin" class="btn btn-hover btn-outline-secondary pull-right" (click)="isEditing=true">Edit</button>
+  <span class="badge badge-warning" *ngIf="order.PlacedDate && !order.ReceivedDate">Order Placed! {{formatDate(order.PlacedDate)}}</span>
+  <span class="badge badge-success" *ngIf="order.ReceivedDate">Order Received! {{formatDate(order.ReceivedDate)}}</span>
+  <h2>{{order.Title}}</h2>
+  <div class="votes-remaining" *ngIf="isPending()">Votes Remaining <span class="badge" [ngClass]="votesRemaining() > 0 ? 'badge-info' : 'badge-danger'">{{votesRemaining()}}</span></div>
+  <p>{{order.Description}}</p>
+</div>
+
+<div>
+  <table class="table table-striped table-hover">
+      <thead class="thead">
+      <tr>
+        <th>Beer Name</th>
+        <th class="hidden-xs-down">Brewery</th>
+        <th class="hidden-xs-down">Style</th>
+        <th>Size</th>
+        <th>Votes</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let orderBeer of order.OrderBeers">
+          <td>
+            <a [routerLink]="'/info/beer/' + orderBeer.Beer.BeerId">{{orderBeer.Beer.BeerName}}</a></td>
+          <td class="hidden-xs-down">  
+              <a [routerLink]="'/info/brewery/' + orderBeer.Beer.Brewery.BreweryId">{{orderBeer.Beer.Brewery.BreweryName}}</a></td>
+          <td class="hidden-xs-down"><a [routerLink]="'/info/style/' + orderBeer.Beer.Style.StyleId">{{orderBeer.Beer.Style.StyleName}}</a></td>
+          <td>{{orderBeer.Size}} Barrel</td>
+          <td><span class="rating">
+                <span class="badge badge-success">{{(orderBeer.NetVote > 0 ? '+' : '') + orderBeer.NetVote}}</span>
+            </span></td>
+          <td>
+            <button *ngIf="isLoggedIn && isPending()" type="button" class="btn btn-outline-secondary" [class.active]="votedForBeer(orderBeer.OrderBeerId)" (click)="vote(orderBeer)" [disabled]="!canVote() && !votedForBeer(orderBeer.OrderBeerId)">
+              <i class="fa fa-fw fa-thumbs-up"></i>
+            </button>
+            <button *ngIf="isIncomplete() && isAdmin" type="button" class="btn btn-outline-danger" (click)="removeKegFromOrder(orderBeer.OrderBeerId)">Remove</button>
+          </td>
+        </tr>
+        <tr *ngIf="isAdmin">
+          <td colspan="6">
+            <button *ngIf="!isAddingKeg && isIncomplete()" class="btn btn-outline-info" (click)="isAddingKeg=true">New Beer </button>
+            <keg-move *ngIf="order.ReceivedDate && !isOrderMoved" [locations]="locations" [showClear]="false" (moveSubmitted)="moveToLocation($event)"></keg-move>
+            <span class="text-success" *ngIf="isOrderMoved">Move succesful!</span>
+            <keg-add *ngIf="isAddingKeg" (cancelled)="isAddingKeg=false" (kegSubmitted)="addKegToOrder($event)"></keg-add>
+
+            
+          <form (ngSubmit)="submitOrderStatus()" class="form-inline pull-right" *ngIf="!isAddingKeg">
+              <label class="mr-sm-2">Order Status</label>
+              <select class="form-control mr-sm-2" name="status" (change)="formOrderStatus = $event.target.value" [(ngModel)]="selectedStatus">
+                <option *ngFor="let status of orderStatuses" [ngValue]="status.value" [class.text-danger]="status.name === 'Cancelled'">{{status.name}}</option>
+              </select>
+              <button type="submit" name="submit" id="status-submit" class="btn btn-outline-success" [class.disabled]="selectedStatus === order.Status">
+                Submit
+              </button>
+            </form>
+
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+</ng-container>

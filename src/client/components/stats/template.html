@@ -2,38 +2,7 @@
   <div class="row">
     <div class="col-lg-9">
 
-
-      <div class="filters" *ngIf="!showFilters">
-        <label>Showing pour data from</label>
-        <button class="btn btn-link" (click)="showFilters=true">
-          {{dateToString(fromDate)}}  &ndash;  {{dateToString(toDate)}}
-        </button>
-      </div>
-      <form class="form-inline filters" *ngIf="showFilters">
-        <div class="form-group mr-sm-4">
-          <label class="mr-sm-2">From Date: </label>
-          <div class="input-group">
-            <input class="form-control" placeholder="yyyy-mm-dd"
-                   name="fromDate" [ngModel]="fromDate" (ngModelChange)="onFromDateChange($event)" ngbDatepicker #d1="ngbDatepicker">
-            <div class="input-group-addon" (click)="d1.toggle()" >
-              <i class="fa fa-calendar"></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group mr-sm-4">
-          <label class="mr-sm-2">To Date: </label>
-          <div class="input-group">
-            <input class="form-control" placeholder="yyyy-mm-dd"
-                   name="toDate" [ngModel]="toDate" (ngModelChange)="onToDateChange($event)" ngbDatepicker #d2="ngbDatepicker">
-        <span class="input-group-addon" (click)="d2.toggle()" >
-          <i class="fa fa-calendar"></i>
-        </span>
-          </div>
-        </div>
-
-        <button class="btn btn-outline-secondary" (click)="showFilters=false">Hide</button>
-      </form>
+      <date-range [fromDate]="fromDate" [toDate]="toDate" (change)="trySubmitDateRange($event)"></date-range>
 
       <ngb-tabset type="pills">
         <ngb-tab title="Keg Level">

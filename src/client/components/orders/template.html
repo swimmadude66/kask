@@ -1,0 +1,13 @@
+<section class="container" *ngIf="orders">
+  <div *ngIf="!orders.length" class="none-active">
+    There are currently no active orders.
+  </div>
+
+  <date-range [(fromDate)]="fromDate" [toDate]="toDate" (change)="trySubmitDateRange($event)"></date-range>
+
+  <order *ngFor="let orderInfo of orders" [orderInfo]="orderInfo" [isAdmin]="isAdmin" [isLoggedIn]="isLoggedIn" [locations]="locations"></order>
+
+  <button class="btn btn-outline-info" *ngIf="isAdmin && !isAddingOrder" (click)="isAddingOrder=true">New Order</button>
+  <add-order *ngIf="isAddingOrder" (submitted)="addOrder($event)" (cancelled)="isAddingOrder=false"></add-order>
+</section>
+<chalkboard-bottom></chalkboard-bottom>

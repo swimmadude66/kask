@@ -1,0 +1,24 @@
+<form (ngSubmit)="submit()">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Order Title</label>
+          <input type="text" name="title" class="form-control" [(ngModel)]="title" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea cols="50" rows="3" name="description" class="form-control" [(ngModel)]="description"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Votes Per User</label>
+          <input type="number" min="1" name="votesPerUser" class="form-control" [(ngModel)]="votesPerUser" />
+        </div>
+        <button type="submit" name="submit" id="order-submit" class="btn btn-outline-success" [ngClass]="(!title || !votesPerUser) ? 'disabled': ''">
+          Submit
+        </button>
+        <button type="button" name="cancel" id="order-cancel" class="btn btn-outline-danger pull-right" (click)="cancel()">
+          Cancel
+        </button>
+      </div>
+    </div>
+</form>

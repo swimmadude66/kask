@@ -6,6 +6,7 @@ import {Location} from './location.model';
 import {Beer} from './beer.model';
 import {Tap} from './tap.model';
 import {Keg, KegSize} from './keg.model';
+import {Order} from './order.model';
 
 export interface Database {
     // Auth methods
@@ -57,9 +58,19 @@ export interface Database {
     getKegTap(kegId: number): Observable<number>;
     findKeg(kegId: number): Observable<string>;
 
+    // Order Managemet
+    addOrder(title: string, description: string, votesPerUser: number): Observable<number>;
+    getOrders(isAdmin: boolean, fromDate: string, toDate: string): Observable<Order[]>;
+    getOrder(userId: number, orderId: number): Observable<Order>;
+    addBeerToOrder(beerId: number, orderId: number, size: KegSize): Observable<number>;
+    removeBeerFromOrder(orderId: number, orderBeerId: number): Observable<any>;
+    updateOrder(orderId: number, partialOrder: any): Observable<any>;
+    userCanVoteForOrder(userId: number, orderId: number): Observable<boolean>;
+
     // Voting
     voteForTap(tapId: number, userId: number, vote: string): Observable<any>;
     voteForSession(sessionId: number, userId: number, vote: string): Observable<any>;
+    voteForOrderBeer(orderBeerId: number, userId: number, vote: string): Observable<any>;
     getSessionVotes(sessionId: number): Observable<any[]>;
 
     // beer movement

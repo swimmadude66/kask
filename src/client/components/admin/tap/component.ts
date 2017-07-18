@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, Input} from '@angular/core';
+import {Component, OnDestroy, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import {Tap} from '../../../models/tap.model';
 import {AdminService} from '../../../services/admin.service';
 import {Beer} from '../../../models/beer.model';
@@ -20,6 +20,7 @@ export class TapEditComponent implements OnInit, OnDestroy {
     @Input() locations: Location[];
     @Input() info: Tap;
     @Input() tapNum: number;
+    @Output() moveSubmitted = new EventEmitter();
 
     constructor(
         private _adminService: AdminService,
@@ -48,5 +49,9 @@ export class TapEditComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.subscriptions.forEach(sub => sub.unsubscribe());
         this.subscriptions = [];
+    }
+
+    handleMove(result) {
+        this.moveSubmitted.emit(result);
     }
 }

@@ -1,10 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {TapService} from "../../services/tap.service";
-import {Tap} from "../../models/tap.model";
-import {StatsService} from "../../services/stats.service";
-import {NgbDatepickerConfig, NgbDateStruct} from "@ng-bootstrap/ng-bootstrap";
-import {TapSession} from "../../models/session.model";
+import {TapService} from '../../services/tap.service';
+import {Tap} from '../../models/tap.model';
+import {StatsService} from '../../services/stats.service';
+import {NgbDatepickerConfig, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+import {TapSession} from '../../models/session.model';
 import * as Moment from 'moment';
+import { NgbDateHelper } from "../../helpers/ngb_date";
 
 @Component({
     selector: 'stats',
@@ -14,35 +15,31 @@ import * as Moment from 'moment';
 export class StatsComponent implements OnInit, OnDestroy {
     private subscriptions = [];
 
-    private taps: Tap[];
-    private pourData: any[];
-    private sessionData: TapSession[];
-    private pourSessionData: TapSession[];
+    taps: Tap[];
+    pourData: any[];
+    sessionData: TapSession[];
+    pourSessionData: TapSession[];
 
-    private fromDate: NgbDateStruct;
-    private toDate: NgbDateStruct;
+    fromDate: NgbDateStruct;
+    toDate: NgbDateStruct;
 
-    private showFilters: boolean = false;
-    
+    showFilters: boolean = false;
+
     constructor(
         private _tapService: TapService,
-        private _statsService: StatsService,
-        private _datepickerConfig: NgbDatepickerConfig
+        private _statsService: StatsService
     ) {
-        _datepickerConfig.maxDate = this.momentToDate(Moment());
-        _datepickerConfig.minDate = this.momentToDate(Moment().subtract(1, 'year'));
-
-        this.toDate = Object.assign({}, _datepickerConfig.maxDate);
-        this.fromDate = this.momentToDate(Moment().subtract(2, 'w'));
+        this.toDate = Object.assign({}, NgbDateHelper.currentDate());
+        this.fromDate = NgbDateHelper.momentToDate(Moment().subtract(2, 'w'));
     }
 
     ngOnInit() {
         this._tapService.getTaps().subscribe(taps => this.taps = taps);
-        
+
         this.subscriptions.push(this._statsService.observePours().subscribe(pours => this.pourData = pours.filter(x => x.Volume < 1000)));
         this.subscriptions.push(this._statsService.observeSessions().subscribe(sessions => this.sessionData = sessions));
 
-        this._statsService.getSessions(this.dateToString(this._datepickerConfig.minDate), this.dateToString(this.toDate, true))
+        this._statsService.getSessions(NgbDateHelper.dateToString(NgbDateHelper.minDate()), NgbDateHelper.dateToString(this.toDate, true))
             .do(sessions => {
                 let earliestActiveSession:TapSession = sessions.filter(s => s.Active).reduce((prev, curr) => {
                     if(!prev || Moment(curr.TappedTime).isBefore(prev.TappedTime)) {
@@ -51,60 +48,34 @@ export class StatsComponent implements OnInit, OnDestroy {
                     return prev;
                 });
 
-                this.fromDate = this.momentToDate(Moment(earliestActiveSession.TappedTime));
+                this.fromDate = NgbDateHelper.momentToDate(Moment(earliestActiveSession.TappedTime));
 
-                this.trySubmitDateRange();
+                this.trySubmitDateRange({fromDate: this.fromDate, toDate: this.toDate});
             })
             .subscribe();
     }
 
     filterForKeg(session: TapSession) {
-        this.fromDate = this.momentToDate(Moment(session.TappedTime));
-        this.toDate = this.momentToDate(session.RemovalTime ? Moment(session.RemovalTime) : Moment());
+        this.fromDate = NgbDateHelper.momentToDate(Moment(session.TappedTime));
+        this.toDate = NgbDateHelper.momentToDate(session.RemovalTime ? Moment(session.RemovalTime) : Moment());
 
-        this.trySubmitDateRange();
+        this.trySubmitDateRange({fromDate: this.fromDate, toDate: this.toDate});
     }
 
-    onFromDateChange(newDate: NgbDateStruct) {
-        this.fromDate = newDate;
+    trySubmitDateRange(range) {
+        this.fromDate = range.fromDate;
+        this.toDate = range.toDate;
 
-        if (this.fromDate && this.toDate && new Date(this.dateToString(this.fromDate)) > new Date(this.dateToString(this.toDate))) {
-            this.onToDateChange(newDate);
-        }
-
-        this.trySubmitDateRange();
-    }
-
-    onToDateChange(newDate: NgbDateStruct) {
-        this.toDate = newDate;
-
-        if (this.toDate && this.fromDate && new Date(this.dateToString(this.toDate)) < new Date(this.dateToString(this.fromDate))) {
-            this.onFromDateChange(newDate);
-        }
-
-        this.trySubmitDateRange();
-    }
-
-    trySubmitDateRange() {
-        if(!(this.fromDate && this.toDate))
+        if (!(this.fromDate && this.toDate)) {
             return;
-
-        this._statsService.getPours(this.dateToString(this.fromDate), this.dateToString(this.toDate, true))
-            .subscribe(_ => {
-                this.pourSessionData = this.sessionData.filter(s => Moment(s.TappedTime) >= Moment(this.dateToString(this.fromDate)) && Moment(s.TappedTime) < Moment(this.dateToString(this.toDate)));
-            });
-    }
-
-    private momentToDate(moment: any): NgbDateStruct {
-        return {year: moment.year(), month: moment.month() + 1, day: moment.date()};
-    }
-
-    private dateToString(date: NgbDateStruct, nextDay: boolean = false) {
-        var m = Moment({day: date.day, month: date.month - 1, year: date.year});
-        if (nextDay) {
-            m.add(1, 'd');
         }
-        return m.format('YYYY-MM-DD');
+
+        this._statsService.getPours(NgbDateHelper.dateToString(this.fromDate), NgbDateHelper.dateToString(this.toDate, true))
+            .subscribe(_ => {
+                this.pourSessionData =
+                    this.sessionData.filter(s => Moment(s.TappedTime) >= Moment(NgbDateHelper.dateToString(this.fromDate))
+                        && Moment(s.TappedTime) < Moment(NgbDateHelper.dateToString(this.toDate)));
+            });
     }
 
     ngOnDestroy() {
