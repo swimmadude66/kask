@@ -21,11 +21,11 @@
   <table class="table table-striped table-hover">
       <thead class="thead">
       <tr>
-        <th>Beer Name</th>
-        <th class="hidden-xs-down">Brewery</th>
-        <th class="hidden-xs-down">Style</th>
-        <th>Size</th>
-        <th>Votes</th>
+        <th (click)="sortBeerOrder('name')" class="clickable">Beer Name</th>
+        <th (click)="sortBeerOrder('brewery')" class="hidden-xs-down clickable">Brewery</th>
+        <th (click)="sortBeerOrder('style')" class="hidden-xs-down clickable">Style</th>
+        <th (click)="sortBeerOrder('size')" class="clickable">Size</th>
+        <th (click)="sortBeerOrder('votes')" class="clickable">Votes</th>
         <th></th>
       </tr>
       </thead>
