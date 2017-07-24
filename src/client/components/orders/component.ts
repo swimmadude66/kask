@@ -7,7 +7,7 @@ import { Observable, Subscription } from 'rxjs/Rx';
 import {Location} from '../../models/location.model';
 import * as Moment from 'moment';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
-import { NgbDateHelper } from "../../helpers/ngb_date";
+import { NgbDateHelper } from '../../helpers/ngb_date';
 
 @Component({
     selector: 'orders',

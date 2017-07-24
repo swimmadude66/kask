@@ -6,6 +6,7 @@ import { AdminService } from '../../../services/admin.service';
 import { AuthService } from '../../../services/auth.service';
 import { OrderService } from '../../../services/orders.service';
 import {Location} from '../../../models/location.model';
+import { orderBy } from 'lodash';
 
 @Component({
     selector: 'order',
@@ -14,6 +15,21 @@ import {Location} from '../../../models/location.model';
 })
 export class OrderComponent implements OnInit, OnDestroy {
     private subscriptions = [];
+    private sorters = {
+        name: [(order: OrderBeer) => order.Beer.BeerName],
+        size: [(order: OrderBeer) => [order.Size, order.Beer.BeerName]],
+        brewery: [(order: OrderBeer) => [order.Beer.Brewery.BreweryName, order.Beer.BeerName]],
+        style: [(order: OrderBeer) => [order.Beer.Style.StyleName, order.Beer.BeerName]],
+        votes: [
+            // this one has two functions because they need to be sorted independently
+            [
+                ((order: OrderBeer) => order.NetVote),
+                ((order: OrderBeer) => order.Beer.BeerName)
+            ],
+            ['desc', 'asc']
+        ],
+        id: [(order: OrderBeer) => order.OrderBeerId],
+    };
 
     @Input() orderInfo: Order;
     @Input() isAdmin: boolean;
@@ -44,6 +60,7 @@ export class OrderComponent implements OnInit, OnDestroy {
         name: 'Cancelled',
         value: OrderStatus.Cancelled
     }];
+
 
     constructor(
         private orderService: OrderService,
@@ -143,6 +160,17 @@ export class OrderComponent implements OnInit, OnDestroy {
             this.order.OrderBeers.forEach(orderBeer => {
                 this.adminService.store(orderBeer.Beer.BeerId, orderBeer.Size.toString(), dest).subscribe(_ => this.isOrderMoved = true);
             });
+        }
+    }
+
+    sortBeerOrder(by: string): void {
+        if (by) {
+            let [sorter, orders] = this.sorters[by.toLocaleLowerCase()] || this.sorters.id;
+            this.order.OrderBeers = orderBy(
+                this.order.OrderBeers,
+                sorter,
+                orders
+            );
         }
     }
 }

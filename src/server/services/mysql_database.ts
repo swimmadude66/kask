@@ -889,7 +889,7 @@ export class MysqlDatabase implements Database {
             + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
             + ' WHERE p.`orderid` = ?'
-            + ' ORDER BY pb.OrderBeerId;';
+            + ' ORDER BY b.BeerName;';
 
         return this.query(q, [orderId])
             .map(result => result.reduce((order, voteRow) => {
