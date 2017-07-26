@@ -888,7 +888,7 @@ export class MysqlDatabase implements Database {
             + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
             + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
-            + ' WHERE p.`orderid` = ?'
+            + ' WHERE p.`orderid` = ? AND pb.`Removed` = 0'
             + ' ORDER BY b.BeerName;';
 
         return this.query(q, [orderId])
@@ -941,11 +941,9 @@ export class MysqlDatabase implements Database {
     }
 
     removeBeerFromOrder(orderId: number, orderBeerId: number): Observable<any> {
-        let q1 = 'DELETE FROM `order_votes` WHERE `orderbeerid` = ?;';
-        let q2 = 'DELETE FROM `order_beers` WHERE `orderid` = ? AND `orderbeerid` = ?;';
+        let q = 'UPDATE `order_beers` SET `Removed` = 1 WHERE `orderid` = ? AND `orderbeerid` = ?;';
 
-        return this.query(q1, [orderBeerId])
-            .flatMap(_ => this.query(q2, [orderId, orderBeerId]))
+        return this.query(q, [orderId, orderBeerId])
             .map(result => result,
                 err => this.logErrorAndThrow(err, 'an error occurred removing beer from order'));
     }

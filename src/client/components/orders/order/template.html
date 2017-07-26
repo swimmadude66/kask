@@ -44,12 +44,12 @@
             <button *ngIf="isLoggedIn && isPending()" type="button" class="btn btn-outline-secondary" [class.active]="votedForBeer(orderBeer.OrderBeerId)" (click)="vote(orderBeer)" [disabled]="!canVote() && !votedForBeer(orderBeer.OrderBeerId)">
               <i class="fa fa-fw fa-thumbs-up"></i>
             </button>
-            <button *ngIf="isIncomplete() && isAdmin" type="button" class="btn btn-outline-danger" (click)="removeKegFromOrder(orderBeer.OrderBeerId)">Remove</button>
+            <button *ngIf="isEditable() && isAdmin" type="button" class="btn btn-outline-danger" (click)="removeKegFromOrder(orderBeer.OrderBeerId)">Remove</button>
           </td>
         </tr>
         <tr *ngIf="isAdmin">
           <td colspan="6">
-            <button *ngIf="!isAddingKeg && isIncomplete()" class="btn btn-outline-info" (click)="isAddingKeg=true">New Beer </button>
+            <button *ngIf="!isAddingKeg && isEditable()" class="btn btn-outline-info" (click)="isAddingKeg=true">New Beer </button>
             <keg-move *ngIf="order.ReceivedDate && !isOrderMoved" [locations]="locations" [showClear]="false" (moveSubmitted)="moveToLocation($event)"></keg-move>
             <span class="text-success" *ngIf="isOrderMoved">Move succesful!</span>
             <keg-add *ngIf="isAddingKeg" (cancelled)="isAddingKeg=false" (kegSubmitted)="addKegToOrder($event)"></keg-add>
