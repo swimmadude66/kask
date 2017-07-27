@@ -1,6 +1,6 @@
 {
   "name": "kask",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "monitoring and management system for beer supplies",
   "main": "dist/server/app.js",
   "scripts": {
