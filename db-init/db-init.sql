@@ -160,6 +160,7 @@ CREATE TABLE IF NOT EXISTS `order_beers` (
   `OrderId` int(11) NOT NULL,
   `BeerId` int(11) NOT NULL,
   `Size` enum('1/2','1/3','1/4','1/5','1/6') NULL,
+  `Removed` tinyint(1) NOT NULL DEFAULT 0,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`OrderBeerId`),
   KEY `FK_order_idx` (`OrderId`),

@@ -116,8 +116,8 @@ export class OrderComponent implements OnInit, OnDestroy {
         return this.order.UserVotes.length < this.order.VotesPerUser;
     }
 
-    isIncomplete() {
-        return this.order.Status === OrderStatus.Incomplete;
+    isEditable() {
+        return this.order.Status === OrderStatus.Incomplete || this.order.Status === OrderStatus.Finalized;
     }
 
     isPending() {

@@ -11,6 +11,10 @@
     .navbar {
         background-color: transparent;
 
+        .navbar-brand img {
+            margin-right: 8px;
+            transform: rotate(-10deg);
+        }
         .nav-item {
             padding: 0 1.5rem;
         }
