@@ -888,7 +888,7 @@ export class MysqlDatabase implements Database {
             + ' LEFT JOIN styles s on b.StyleId = s.StyleId'
             + ' LEFT JOIN `order_votes` pv on pb.OrderBeerId = pv.OrderBeerId'
             + ' LEFT JOIN `votes` v on pv.`VoteId` = v.`VoteId`'
-            + ' WHERE p.`orderid` = ? AND pb.`Removed` = 0'
+            + ' WHERE p.`orderid` = ? AND (pb.`Removed` IS NULL OR pb.`Removed`= 0)'
             + ' ORDER BY b.BeerName;';
 
         return this.query(q, [orderId])
