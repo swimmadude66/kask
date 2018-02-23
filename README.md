@@ -1,4 +1,6 @@
 # Kask
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fswimmadude66%2Fkask.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fswimmadude66%2Fkask?ref=badge_shield)
+
 
 _Better than a whiteboard over the kegerator_
 
@@ -46,3 +48,7 @@ For example, you can recompile the server without building the entire project by
 3. Open a pull request against the `dev` branch. That is the home for latest code, whereas master will hold release versions.
 4. Your PR must pass our status checks and a review from at least one contributor
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fswimmadude66%2Fkask.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fswimmadude66%2Fkask?ref=badge_large)
